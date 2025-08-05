@@ -14,3 +14,58 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Budget {
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  name       String
+  month      DateTime
+  income     Float
+  categories Category[]
+  funds      Fund[]
+
+  @@unique([name, month])
+}
+
+model Category {
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  budgetId     Int
+  budget       Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([name, budgetId])
+}
+
+model Fund {
+  id             Int           @id @default(autoincrement())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  name           String
+  initialBalance Float
+  budgetId       Int
+  budget         Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  transactions   Transaction[]
+
+  @@unique([name, budgetId])
+}
+
+model Transaction {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  amount      Float
+  date        DateTime
+  vendor      String
+  description String?
+  categoryId  Int?
+  fundId      Int?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  fund        Fund?     @relation(fields: [fundId], references: [id], onDelete: SetNull)
+
+  // Note: A transaction should belong to either a category or a fund, but not both
+  // This constraint should be enforced at the application level
+}
