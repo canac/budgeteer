@@ -6,12 +6,19 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && tsc --noEmit",
-    "start": "vite start"
+    "start": "vite start",
+    "db:format": "prisma format",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@prisma/client": "^6.13.0",
     "@tanstack/react-router": "^1.130.12",
     "@tanstack/react-router-devtools": "^1.130.13",
     "@tanstack/react-start": "^1.130.15",
+    "prisma": "^6.13.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "zod": "^4.0.14"
