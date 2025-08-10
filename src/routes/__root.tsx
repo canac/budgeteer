@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import appCss from "~/styles/app.css?url";
 import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
 
 export const Route = createRootRoute({
   head: () => ({

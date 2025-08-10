@@ -34,6 +34,7 @@ model Category {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   name         String
+  amount       Float
   budgetId     Int
   budget       Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   transactions Transaction[]

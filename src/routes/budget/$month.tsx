@@ -1,5 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, Group, List, Paper, Stack, Title } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
+import {
+  AppShell,
+  Container,
+  Group,
+  Stack,
+  Title,
+  Text,
+  Card,
+  Flex,
+  ActionIcon,
+} from "@mantine/core";
 import { parse, format, startOfMonth } from "date-fns";
 import { getBudgetByMonth } from "../../lib/prisma";
 
@@ -19,40 +30,79 @@ export const Route = createFileRoute("/budget/$month")({
 
 export default function BudgetPage() {
   const { budget } = Route.useLoaderData();
-
-  // budget.month is ISO string
   const date = parse(budget.month, "MM-yyyy", startOfMonth(new Date()));
   const header = format(date, "MMMM yyyy");
 
   return (
-    <Container size="sm" py="xl">
-      <Stack gap="md">
-        <Title order={1}>{header}</Title>
-        <Group align="flex-start" grow>
-          <Paper shadow="xs" p="md" withBorder>
-            <Title order={2} size="h4" mb="sm">
-              Categories
+    <AppShell header={{ height: 60 }} padding="md">
+      <AppShell.Header
+        style={{
+          background: "linear-gradient(135deg, #51cf66ff 0%, #0d8523ff 100%)",
+          color: "white",
+        }}
+      >
+        <Container size="lg" h="100%">
+          <Flex justify="space-between" align="center" h="100%">
+            <Title order={1} c="white" size="h2">
+              {header}
             </Title>
-            <List spacing="xs">
-              {budget.categories.map((cat) => (
-                <List.Item key={cat.id}>{cat.name}</List.Item>
+            <ActionIcon variant="outline" c="white" size="xl">
+              <IconPlus size={24} />
+            </ActionIcon>
+          </Flex>
+        </Container>
+      </AppShell.Header>
+
+      <AppShell.Main>
+        <Container size="lg">
+          <Card shadow="sm" padding="lg" radius="md" withBorder mb="md">
+            <Group justify="space-between" mb="xs">
+              <Text size="lg" fw={600}>
+                Income
+              </Text>
+              <Text fw={600} size="xl">
+                ${budget.income}
+              </Text>
+            </Group>
+          </Card>
+
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Group justify="space-between" mb="xs">
+              <Text size="lg" fw={600}>
+                Categories
+              </Text>
+            </Group>
+            <Stack gap="xs">
+              {budget.categories.map((category) => (
+                <Group key={category.id} justify="space-between">
+                  <Text fw={500}>{category.name}</Text>
+                  <Text fw={600} size="lg">
+                    ${category.amount}
+                  </Text>
+                </Group>
               ))}
-            </List>
-          </Paper>
-          <Paper shadow="xs" p="md" withBorder>
-            <Title order={2} size="h4" mb="sm">
-              Funds
-            </Title>
-            <List spacing="xs">
+            </Stack>
+          </Card>
+
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Group justify="space-between" mb="xs">
+              <Text size="lg" fw={600}>
+                Funds
+              </Text>
+            </Group>
+            <Stack gap="xs">
               {budget.funds.map((fund) => (
-                <List.Item key={fund.id}>
-                  {fund.name}: {fund.initialBalance}
-                </List.Item>
+                <Group key={fund.id} justify="space-between">
+                  <Text fw={500}>{fund.name}</Text>
+                  <Text fw={600} size="lg">
+                    ${fund.initialBalance}
+                  </Text>
+                </Group>
               ))}
-            </List>
-          </Paper>
-        </Group>
-      </Stack>
-    </Container>
+            </Stack>
+          </Card>
+        </Container>
+      </AppShell.Main>
+    </AppShell>
   );
 }

@@ -14,9 +14,9 @@ const augustBudget = await prisma.budget.create({
     income: 5000,
     categories: {
       create: [
-        { name: "Groceries" },
-        { name: "Utilities" },
-        { name: "Entertainment" },
+        { name: "Groceries", amount: 600 },
+        { name: "Utilities", amount: 300 },
+        { name: "Entertainment", amount: 200 },
       ],
     },
     funds: {
