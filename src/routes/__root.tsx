@@ -33,11 +33,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <div>
-          <Link to="/">Index</Link>
-          <Link to="/about">About</Link>
-        </div>
-
         <MantineProvider>{children}</MantineProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />

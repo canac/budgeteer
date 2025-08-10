@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider        = "prisma-client-js"
+  provider        = "prisma-client"
   output          = "../generated/prisma"
+  moduleFormat    = "esm"
   previewFeatures = ["queryCompiler", "driverAdapters"]
 }
 
@@ -20,7 +21,7 @@ model Budget {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   name       String
-  month      DateTime
+  month      String
   income     Float
   categories Category[]
   funds      Fund[]
