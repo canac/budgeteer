@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getBudgetByMonth } from "../../lib/prisma";
 import { Container, Group, List, Paper, Stack, Title } from "@mantine/core";
 import { parse, format, startOfMonth } from "date-fns";
+import { getBudgetByMonth } from "../../lib/prisma";
 
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
@@ -34,7 +34,7 @@ export default function BudgetPage() {
               Categories
             </Title>
             <List spacing="xs">
-              {budget.categories.map((cat: any) => (
+              {budget.categories.map((cat) => (
                 <List.Item key={cat.id}>{cat.name}</List.Item>
               ))}
             </List>
@@ -44,7 +44,7 @@ export default function BudgetPage() {
               Funds
             </Title>
             <List spacing="xs">
-              {budget.funds.map((fund: any) => (
+              {budget.funds.map((fund) => (
                 <List.Item key={fund.id}>
                   {fund.name}: {fund.initialBalance}
                 </List.Item>

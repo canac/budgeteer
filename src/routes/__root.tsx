@@ -1,9 +1,8 @@
 /// <reference types="vite/client" />
-import * as React from "react";
+import type * as React from "react";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import {
   HeadContent,
-  Link,
   Outlet,
   Scripts,
   createRootRoute,
@@ -28,7 +27,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
