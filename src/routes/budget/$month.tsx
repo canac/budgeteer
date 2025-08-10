@@ -12,18 +12,12 @@ import {
   ActionIcon,
 } from "@mantine/core";
 import { parse, format, startOfMonth } from "date-fns";
-import { getBudgetByMonth } from "../../lib/prisma";
+import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
   loader: async ({ params: { month } }) => {
-    if (!/^\d{2}-\d{4}$/.test(month)) {
-      throw new Response("Invalid month format", { status: 400 });
-    }
-    const budget = await getBudgetByMonth(month);
-    if (!budget) {
-      throw new Response("Budget not found", { status: 404 });
-    }
+    const budget = await getBudgetByMonth({ data: month });
     return { budget };
   },
 });
