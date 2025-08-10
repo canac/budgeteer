@@ -9,6 +9,7 @@ import {
   createRootRoute,
 } from "@tanstack/react-router";
 import appCss from "~/styles/app.css?url";
+import { MantineProvider } from "@mantine/core";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -37,7 +38,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <Link to="/about">About</Link>
         </div>
 
-        {children}
+        <MantineProvider>{children}</MantineProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>
