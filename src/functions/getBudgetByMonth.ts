@@ -21,26 +21,28 @@ export const getBudgetByMonth = createServerFn()
       throw new Response("Budget not found", { status: 404 });
     }
 
+    const allTransactions = await prisma.transaction.findMany({
+      where: {
+        date: { lte: endOfMonth(month) },
+      },
+      include: { budgetFund: true },
+    });
+
     return {
       ...budget,
-      budgetFunds: await Promise.all(
-        budget.budgetFunds.map(async (budgetFund) => {
-          const fundTransactions = await prisma.transaction.findMany({
-            where: {
-              budgetFund: { fundId: budgetFund.fundId },
-              date: { lte: endOfMonth(month) },
-            },
-          });
-          const fundBalance = fundTransactions.reduce(
-            (sum, transaction) => sum + transaction.amount,
-            budgetFund.fund.initialBalance,
-          );
-          return {
-            ...budgetFund,
-            name: budgetFund.fund.name,
-            fundBalance,
-          };
-        }),
-      ),
+      budgetFunds: budget.budgetFunds.map((budgetFund) => {
+        const fundTransactions = allTransactions.filter(
+          (transaction) => transaction.budgetFund?.fundId === budgetFund.fundId,
+        );
+        const fundBalance = fundTransactions.reduce(
+          (sum, transaction) => sum + transaction.amount,
+          budgetFund.fund.initialBalance,
+        );
+        return {
+          ...budgetFund,
+          name: budgetFund.fund.name,
+          fundBalance,
+        };
+      }),
     };
   });
