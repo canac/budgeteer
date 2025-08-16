@@ -3,5 +3,5 @@
 /.nitro/
 /.output/
 /.tanstack/
-/generated/prisma/
+/generated/
 /src/routeTree.gen.ts
