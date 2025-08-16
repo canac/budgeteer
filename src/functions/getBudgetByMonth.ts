@@ -13,7 +13,7 @@ export const getBudgetByMonth = createServerFn()
       },
       include: {
         categories: true,
-        funds: true,
+        budgetFunds: { include: { fund: true } },
       },
     });
     if (!budget) {

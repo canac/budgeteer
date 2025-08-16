@@ -17,14 +17,14 @@ datasource db {
 }
 
 model Budget {
-  id         Int        @id @default(autoincrement())
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  name       String
-  month      String
-  income     Float
-  categories Category[]
-  funds      Fund[]
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  name        String
+  month       String
+  income      Float
+  categories  Category[]
+  budgetFunds BudgetFund[]
 
   @@unique([name, month])
 }
@@ -43,30 +43,37 @@ model Category {
 }
 
 model Fund {
-  id             Int           @id @default(autoincrement())
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
   name           String
   initialBalance Float
-  budgetId       Int
-  budget         Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  transactions   Transaction[]
+  budgetFunds    BudgetFund[]
+}
 
-  @@unique([name, budgetId])
+model BudgetFund {
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  fundId       Int
+  budgetId     Int
+  fund         Fund          @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  budget       Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 }
 
 model Transaction {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  amount      Float
-  date        DateTime
-  vendor      String
-  description String?
-  categoryId  Int?
-  fundId      Int?
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  fund        Fund?     @relation(fields: [fundId], references: [id], onDelete: SetNull)
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  amount       Float
+  date         DateTime
+  vendor       String
+  description  String?
+  categoryId   Int?
+  budgetFundId Int?
+  category     Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  budgetFund   BudgetFund? @relation(fields: [budgetFundId], references: [id], onDelete: SetNull)
 
   // Note: A transaction should belong to either a category or a fund, but not both
   // This constraint should be enforced at the application level
