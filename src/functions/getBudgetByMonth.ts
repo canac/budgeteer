@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { endOfMonth } from "date-fns";
 import { prisma } from "~/lib/prisma";
 
 export const getBudgetByMonth = createServerFn()
@@ -13,11 +14,33 @@ export const getBudgetByMonth = createServerFn()
       },
       include: {
         categories: true,
-        budgetFunds: { include: { fund: true } },
+        budgetFunds: { include: { fund: true, transactions: true } },
       },
     });
     if (!budget) {
       throw new Response("Budget not found", { status: 404 });
     }
-    return budget;
+
+    return {
+      ...budget,
+      budgetFunds: await Promise.all(
+        budget.budgetFunds.map(async (budgetFund) => {
+          const fundTransactions = await prisma.transaction.findMany({
+            where: {
+              budgetFund: { fundId: budgetFund.fundId },
+              date: { lte: endOfMonth(month) },
+            },
+          });
+          const fundBalance = fundTransactions.reduce(
+            (sum, transaction) => sum + transaction.amount,
+            budgetFund.fund.initialBalance,
+          );
+          return {
+            ...budgetFund,
+            name: budgetFund.fund.name,
+            fundBalance,
+          };
+        }),
+      ),
+    };
   });

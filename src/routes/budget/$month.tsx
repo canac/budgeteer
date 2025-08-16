@@ -87,9 +87,9 @@ export default function BudgetPage() {
             <Stack gap="xs">
               {budget.budgetFunds.map((budgetFund) => (
                 <Group key={budgetFund.id} justify="space-between">
-                  <Text fw={500}>{budgetFund.fund.name}</Text>
+                  <Text fw={500}>{budgetFund.name}</Text>
                   <Text fw={600} size="lg">
-                    ${budgetFund.fund.initialBalance}
+                    ${budgetFund.fundBalance}
                   </Text>
                 </Group>
               ))}
