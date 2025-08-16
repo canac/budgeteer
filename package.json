@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && tsc --noEmit",
+    "build": "vite build && pnpm lint:ts",
     "start": "vite start",
     "db:format": "prisma format",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "node --env-file=.env seed.ts"
+    "db:seed": "node --env-file=.env seed.ts",
+    "lint:ts": "tsc --noEmit"
   },
   "dependencies": {
     "@mantine/core": "^8.2.4",
