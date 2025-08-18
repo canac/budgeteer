@@ -35,7 +35,10 @@ const augustBudget = await prisma.budget.create({
       ],
     },
     budgetFunds: {
-      create: [{ fundId: emergencyFund.id }, { fundId: vacationFund.id }],
+      create: [
+        { fundId: emergencyFund.id, budgetedAmount: 1000 },
+        { fundId: vacationFund.id, budgetedAmount: 250 },
+      ],
     },
   },
   include: { categories: true, budgetFunds: true },

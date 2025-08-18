@@ -53,13 +53,14 @@ model Fund {
 }
 
 model BudgetFund {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  fundId    Int
-  budgetId  Int
-  fund      Fund     @relation(fields: [fundId], references: [id], onDelete: Cascade)
-  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  budgetedAmount Float
+  fundId         Int
+  budgetId       Int
+  fund           Fund     @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  budget         Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {
