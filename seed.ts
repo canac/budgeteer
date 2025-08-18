@@ -68,7 +68,7 @@ await prisma.transaction.create({
     date: "2025-08-15T00:00:00.000Z",
     vendor: "Car Repair",
     description: "Unexpected repair",
-    budgetFundId: augustBudget.budgetFunds[0].id,
+    fundId: emergencyFund.id,
   },
 });
 await prisma.transaction.create({
@@ -77,6 +77,6 @@ await prisma.transaction.create({
     date: "2025-08-20T00:00:00.000Z",
     vendor: "Travel Agency",
     description: "Vacation deposit",
-    budgetFundId: augustBudget.budgetFunds[1].id,
+    fundId: vacationFund.id,
   },
 });

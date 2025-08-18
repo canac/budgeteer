@@ -14,7 +14,7 @@ export const getBudgetByMonth = createServerFn()
       },
       include: {
         categories: true,
-        budgetFunds: { include: { fund: true, transactions: true } },
+        budgetFunds: { include: { fund: true } },
       },
     });
     if (!budget) {
@@ -25,14 +25,13 @@ export const getBudgetByMonth = createServerFn()
       where: {
         date: { lte: endOfMonth(month) },
       },
-      include: { budgetFund: true },
     });
 
     return {
       ...budget,
       budgetFunds: budget.budgetFunds.map((budgetFund) => {
         const fundTransactions = allTransactions.filter(
-          (transaction) => transaction.budgetFund?.fundId === budgetFund.fundId,
+          (transaction) => transaction.fundId === budgetFund.fundId,
         );
         const fundBalance = fundTransactions.reduce(
           (sum, transaction) => sum + transaction.amount,
