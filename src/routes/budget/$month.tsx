@@ -49,52 +49,54 @@ export default function BudgetPage() {
 
       <AppShell.Main>
         <Container size="lg">
-          <Card shadow="sm" padding="lg" radius="md" withBorder mb="md">
-            <Group justify="space-between" mb="xs">
-              <Text size="lg" fw={600}>
-                Income
-              </Text>
-              <Text fw={600} size="xl">
-                ${budget.income}
-              </Text>
-            </Group>
-          </Card>
+          <Stack>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Group justify="space-between" mb="xs">
+                <Text size="lg" fw={600}>
+                  Income
+                </Text>
+                <Text fw={600} size="xl">
+                  ${budget.income}
+                </Text>
+              </Group>
+            </Card>
 
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Group justify="space-between" mb="xs">
-              <Text size="lg" fw={600}>
-                Categories
-              </Text>
-            </Group>
-            <Stack gap="xs">
-              {budget.categories.map((category) => (
-                <Group key={category.id} justify="space-between">
-                  <Text fw={500}>{category.name}</Text>
-                  <Text fw={600} size="lg">
-                    ${category.amount}
-                  </Text>
-                </Group>
-              ))}
-            </Stack>
-          </Card>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Group justify="space-between" mb="xs">
+                <Text size="lg" fw={600}>
+                  Categories
+                </Text>
+              </Group>
+              <Stack gap="xs">
+                {budget.categories.map((category) => (
+                  <Group key={category.id} justify="space-between">
+                    <Text fw={500}>{category.name}</Text>
+                    <Text fw={600} size="lg">
+                      ${category.amount}
+                    </Text>
+                  </Group>
+                ))}
+              </Stack>
+            </Card>
 
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Group justify="space-between" mb="xs">
-              <Text size="lg" fw={600}>
-                Funds
-              </Text>
-            </Group>
-            <Stack gap="xs">
-              {budget.budgetFunds.map((budgetFund) => (
-                <Group key={budgetFund.id} justify="space-between">
-                  <Text fw={500}>{budgetFund.name}</Text>
-                  <Text fw={600} size="lg">
-                    ${budgetFund.fundBalance}
-                  </Text>
-                </Group>
-              ))}
-            </Stack>
-          </Card>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Group justify="space-between" mb="xs">
+                <Text size="lg" fw={600}>
+                  Funds
+                </Text>
+              </Group>
+              <Stack gap="xs">
+                {budget.budgetFunds.map((budgetFund) => (
+                  <Group key={budgetFund.id} justify="space-between">
+                    <Text fw={500}>{budgetFund.name}</Text>
+                    <Text fw={600} size="lg">
+                      ${budgetFund.fundBalance}
+                    </Text>
+                  </Group>
+                ))}
+              </Stack>
+            </Card>
+          </Stack>
         </Container>
       </AppShell.Main>
     </AppShell>
