@@ -17,7 +17,7 @@ import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
   loader: async ({ params: { month } }) => {
-    const budget = await getBudgetByMonth({ data: month });
+    const budget = await getBudgetByMonth({ data: { month } });
     return { budget };
   },
 });

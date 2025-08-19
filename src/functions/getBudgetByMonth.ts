@@ -1,12 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, parse } from "date-fns";
 import { prisma } from "~/lib/prisma";
+import { object, string } from "zod";
+
+const inputSchema = object({
+  month: string(),
+});
 
 export const getBudgetByMonth = createServerFn()
-  .validator((data: string) => data)
-  .handler(async ({ data: month }) => {
+  .validator((data) => inputSchema.parse(data))
+  .handler(async ({ data: { month } }) => {
     if (!/^\d{2}-\d{4}$/.test(month)) {
-      throw new Response("Invalid month format", { status: 400 });
+      throw new Error("Invalid month format");
     }
     const budget = await prisma.budget.findFirst({
       where: {
@@ -18,7 +23,7 @@ export const getBudgetByMonth = createServerFn()
       },
     });
     if (!budget) {
-      throw new Response("Budget not found", { status: 404 });
+      throw new Response("Budget not found");
     }
 
     const monthDate = parse(month, "MM-yyyy", new Date());
