@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { endOfMonth } from "date-fns";
+import { endOfMonth, parse } from "date-fns";
 import { prisma } from "~/lib/prisma";
 
 export const getBudgetByMonth = createServerFn()
@@ -21,9 +21,10 @@ export const getBudgetByMonth = createServerFn()
       throw new Response("Budget not found", { status: 404 });
     }
 
+    const monthDate = parse(month, "MM-yyyy", new Date());
     const historicalTransactions = await prisma.transaction.findMany({
       where: {
-        date: { lte: endOfMonth(month) },
+        date: { lte: endOfMonth(monthDate) },
       },
     });
     const historicalBudgetFunds = await prisma.budgetFund.findMany({
