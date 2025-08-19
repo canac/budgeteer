@@ -15,7 +15,10 @@ import { parse, format, startOfMonth } from "date-fns";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { setCategoryAmount } from "~/functions/setCategoryAmount";
+import { setCategoryName } from "~/functions/setCategoryName";
+import { setFundName } from "~/functions/setFundName";
 import { EditableAmount } from "~/components/EditableAmount";
+import { EditableName } from "~/components/EditableName";
 
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
@@ -38,12 +41,29 @@ export default function BudgetPage() {
     await router.invalidate();
   };
 
+  const handleSaveCategoryName = async (
+    categoryId: number,
+    newName: string,
+  ) => {
+    await setCategoryName({
+      data: { categoryId, name: newName },
+    });
+    await router.invalidate();
+  };
+
   const handleSaveCategoryAmount = async (
     categoryId: number,
     newAmount: number,
   ) => {
     await setCategoryAmount({
       data: { categoryId, amount: newAmount },
+    });
+    await router.invalidate();
+  };
+
+  const handleSaveFundName = async (fundId: number, newName: string) => {
+    await setFundName({
+      data: { fundId, name: newName },
     });
     await router.invalidate();
   };
@@ -92,7 +112,12 @@ export default function BudgetPage() {
               <Stack gap="xs">
                 {budget.categories.map((category) => (
                   <Group key={category.id} justify="space-between">
-                    <Text fw={500}>{category.name}</Text>
+                    <EditableName
+                      name={category.name}
+                      saveName={(newName) =>
+                        handleSaveCategoryName(category.id, newName)
+                      }
+                    />
                     <EditableAmount
                       amount={category.amount}
                       saveAmount={(newAmount) =>
@@ -113,7 +138,12 @@ export default function BudgetPage() {
               <Stack gap="xs">
                 {budget.budgetFunds.map((budgetFund) => (
                   <Group key={budgetFund.id} justify="space-between">
-                    <Text fw={500}>{budgetFund.name}</Text>
+                    <EditableName
+                      name={budgetFund.name}
+                      saveName={(newName) =>
+                        handleSaveFundName(budgetFund.fundId, newName)
+                      }
+                    />
                     <Text fw={600} size="lg">
                       ${budgetFund.fundBalance}
                     </Text>
