@@ -14,6 +14,7 @@ import {
 import { parse, format, startOfMonth } from "date-fns";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
+import { setCategoryAmount } from "~/functions/setCategoryAmount";
 import { EditableAmount } from "~/components/EditableAmount";
 
 export const Route = createFileRoute("/budget/$month")({
@@ -33,6 +34,16 @@ export default function BudgetPage() {
   const handleSaveIncome = async (newIncome: number) => {
     await setBudgetIncome({
       data: { month: budget.month, income: newIncome },
+    });
+    await router.invalidate();
+  };
+
+  const handleSaveCategoryAmount = async (
+    categoryId: number,
+    newAmount: number,
+  ) => {
+    await setCategoryAmount({
+      data: { categoryId, amount: newAmount },
     });
     await router.invalidate();
   };
@@ -82,9 +93,12 @@ export default function BudgetPage() {
                 {budget.categories.map((category) => (
                   <Group key={category.id} justify="space-between">
                     <Text fw={500}>{category.name}</Text>
-                    <Text fw={600} size="lg">
-                      ${category.amount}
-                    </Text>
+                    <EditableAmount
+                      amount={category.amount}
+                      saveAmount={(newAmount) =>
+                        handleSaveCategoryAmount(category.id, newAmount)
+                      }
+                    />
                   </Group>
                 ))}
               </Stack>

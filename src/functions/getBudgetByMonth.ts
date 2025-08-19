@@ -18,8 +18,8 @@ export const getBudgetByMonth = createServerFn()
         month,
       },
       include: {
-        categories: true,
-        budgetFunds: { include: { fund: true } },
+        categories: { orderBy: { id: "asc" } },
+        budgetFunds: { orderBy: { id: "asc" }, include: { fund: true } },
       },
     });
     if (!budget) {
