@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { endOfMonth, parse } from "date-fns";
+import { endOfMonth, parse, startOfMonth } from "date-fns";
 import { prisma } from "~/lib/prisma";
 import { calculateFundBalance } from "~/lib/calculateFundBalance";
 import { object, number, string } from "zod";
@@ -32,6 +32,9 @@ export const setFundBalance = createServerFn()
         fundId,
         budget: { month: { lte: month } },
       },
+      include: {
+        budget: true,
+      },
     });
 
     const currentBalance = calculateFundBalance({
@@ -40,11 +43,27 @@ export const setFundBalance = createServerFn()
       budgetFunds: historicalBudgetFunds,
     });
     const adjustmentAmount = targetBalance - currentBalance;
-    if (Math.abs(adjustmentAmount) > 0.01) {
+    if (Math.abs(adjustmentAmount) < 0.001) {
+      return;
+    }
+
+    const firstBudgetFund = historicalBudgetFunds.every(
+      (budgetFund) => budgetFund.budget.month === month,
+    );
+    if (firstBudgetFund) {
+      // If this is the first budget fund, we can just update the initial balance
+      await prisma.fund.update({
+        where: { id: fundId },
+        data: {
+          initialBalance: { increment: adjustmentAmount },
+        },
+      });
+    } else {
+      // Otherwise, we need to create a new balance adjustment transaction
       await prisma.transaction.create({
         data: {
           amount: adjustmentAmount,
-          date: endOfMonth(monthDate),
+          date: startOfMonth(monthDate),
           vendor: "Balance Adjustment",
           fundId,
         },
