@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { IconPlus } from "@tabler/icons-react";
+import { useState } from "react";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { IconPencil, IconPlus } from "@tabler/icons-react";
 import {
   AppShell,
   Container,
@@ -10,9 +11,11 @@ import {
   Card,
   Flex,
   ActionIcon,
+  TextInput,
 } from "@mantine/core";
 import { parse, format, startOfMonth } from "date-fns";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
+import { setBudgetIncome } from "~/functions/setBudgetIncome";
 
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
@@ -23,9 +26,26 @@ export const Route = createFileRoute("/budget/$month")({
 });
 
 export default function BudgetPage() {
+  const router = useRouter();
   const { budget } = Route.useLoaderData();
   const date = parse(budget.month, "MM-yyyy", startOfMonth(new Date()));
   const header = format(date, "MMMM yyyy");
+
+  const [editMode, setEditMode] = useState(false);
+  const [incomeValue, setIncomeValue] = useState(budget.income.toString());
+
+  const handleEditClick = () => {
+    setEditMode((editing) => !editing);
+    setIncomeValue(budget.income.toString());
+  };
+
+  const handleSave = async () => {
+    await setBudgetIncome({
+      data: { month: budget.month, income: Number(incomeValue) },
+    });
+    await router.invalidate();
+    setEditMode(false);
+  };
 
   return (
     <AppShell header={{ height: 60 }} padding="md">
@@ -37,10 +57,19 @@ export default function BudgetPage() {
       >
         <Container size="lg" h="100%">
           <Flex justify="space-between" align="center" h="100%">
-            <Title order={1} c="white" size="h2">
+            <Title flex={1} c="white" size="h2">
               {header}
             </Title>
-            <ActionIcon variant="outline" c="white" size="xl">
+            <ActionIcon
+              variant="subtle"
+              c="white"
+              size="xl"
+              onClick={handleEditClick}
+              aria-label="Edit income"
+            >
+              <IconPencil size={24} />
+            </ActionIcon>
+            <ActionIcon variant="subtle" c="white" size="xl">
               <IconPlus size={24} />
             </ActionIcon>
           </Flex>
@@ -55,9 +84,28 @@ export default function BudgetPage() {
                 <Text size="lg" fw={600}>
                   Income
                 </Text>
-                <Text fw={600} size="xl">
-                  ${budget.income}
-                </Text>
+                {editMode ? (
+                  <TextInput
+                    type="number"
+                    aria-label="Edit income"
+                    value={incomeValue}
+                    onChange={(event) => setIncomeValue(event.target.value)}
+                    onBlur={handleSave}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.currentTarget.blur();
+                      }
+                    }}
+                    min={0}
+                    w="6rem"
+                    data-autofocus
+                    leftSection="$"
+                  />
+                ) : (
+                  <Text fw={600} size="xl">
+                    ${budget.income}
+                  </Text>
+                )}
               </Group>
             </Card>
 
