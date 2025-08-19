@@ -21,7 +21,27 @@ const vacationFund = await prisma.fund.create({
   },
 });
 
-// Create a budget for August 2025
+const julyBudget = await prisma.budget.create({
+  data: {
+    month: "07-2025",
+    income: 5000,
+    categories: {
+      create: [
+        { name: "Groceries", amount: 600 },
+        { name: "Utilities", amount: 300 },
+        { name: "Entertainment", amount: 200 },
+      ],
+    },
+    budgetFunds: {
+      create: [
+        { fundId: emergencyFund.id, budgetedAmount: 800 },
+        { fundId: vacationFund.id, budgetedAmount: 500 },
+      ],
+    },
+  },
+  include: { categories: true, budgetFunds: true },
+});
+
 const augustBudget = await prisma.budget.create({
   data: {
     month: "08-2025",
@@ -47,6 +67,15 @@ const augustBudget = await prisma.budget.create({
 await prisma.transaction.create({
   data: {
     amount: -150,
+    date: "2025-07-05T00:00:00.000Z",
+    vendor: "Supermarket",
+    description: "Weekly groceries",
+    categoryId: julyBudget.categories[0].id,
+  },
+});
+await prisma.transaction.create({
+  data: {
+    amount: -150,
     date: "2025-08-05T00:00:00.000Z",
     vendor: "Supermarket",
     description: "Weekly groceries",
@@ -67,7 +96,7 @@ await prisma.transaction.create({
 await prisma.transaction.create({
   data: {
     amount: -200,
-    date: "2025-08-15T00:00:00.000Z",
+    date: "2025-07-15T00:00:00.000Z",
     vendor: "Car Repair",
     description: "Unexpected repair",
     fundId: emergencyFund.id,
