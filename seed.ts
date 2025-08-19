@@ -24,7 +24,6 @@ const vacationFund = await prisma.fund.create({
 // Create a budget for August 2025
 const augustBudget = await prisma.budget.create({
   data: {
-    name: "Household",
     month: "08-2025",
     income: 5000,
     categories: {
