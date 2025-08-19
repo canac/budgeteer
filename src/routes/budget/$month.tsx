@@ -16,6 +16,7 @@ import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { setCategoryAmount } from "~/functions/setCategoryAmount";
 import { setCategoryName } from "~/functions/setCategoryName";
+import { setFundBalance } from "~/functions/setFundBalance";
 import { setFundName } from "~/functions/setFundName";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
@@ -57,6 +58,13 @@ export default function BudgetPage() {
   ) => {
     await setCategoryAmount({
       data: { categoryId, amount: newAmount },
+    });
+    await router.invalidate();
+  };
+
+  const handleSaveFundBalance = async (fundId: number, newBalance: number) => {
+    await setFundBalance({
+      data: { fundId, targetBalance: newBalance, month: budget.month },
     });
     await router.invalidate();
   };
@@ -144,9 +152,12 @@ export default function BudgetPage() {
                         handleSaveFundName(budgetFund.fundId, newName)
                       }
                     />
-                    <Text fw={600} size="lg">
-                      ${budgetFund.fundBalance}
-                    </Text>
+                    <EditableAmount
+                      amount={budgetFund.fundBalance}
+                      saveAmount={(newBalance) =>
+                        handleSaveFundBalance(budgetFund.fundId, newBalance)
+                      }
+                    />
                   </Group>
                 ))}
               </Stack>

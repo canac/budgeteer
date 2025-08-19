@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, parse } from "date-fns";
 import { prisma } from "~/lib/prisma";
+import { calculateFundBalance } from "~/lib/calculateFundBalance";
 import { object, string } from "zod";
 
 const inputSchema = object({
@@ -45,17 +46,17 @@ export const getBudgetByMonth = createServerFn()
         const fundTransactions = historicalTransactions.filter(
           (transaction) => transaction.fundId === budgetFund.fundId,
         );
-        const totalBudgetedAmount = historicalBudgetFunds
-          .filter(({ fundId }) => fundId === budgetFund.fundId)
-          .reduce((sum, { budgetedAmount }) => sum + budgetedAmount, 0);
-        const fundBalance = fundTransactions.reduce(
-          (sum, transaction) => sum + transaction.amount,
-          budgetFund.fund.initialBalance + totalBudgetedAmount,
+        const fundBudgetFunds = historicalBudgetFunds.filter(
+          ({ fundId }) => fundId === budgetFund.fundId,
         );
         return {
           ...budgetFund,
           name: budgetFund.fund.name,
-          fundBalance,
+          fundBalance: calculateFundBalance({
+            fund: budgetFund.fund,
+            transactions: fundTransactions,
+            budgetFunds: fundBudgetFunds,
+          }),
         };
       }),
     };
