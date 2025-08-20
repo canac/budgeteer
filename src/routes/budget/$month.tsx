@@ -10,6 +10,7 @@ import {
   Card,
   Flex,
   ActionIcon,
+  Button,
 } from "@mantine/core";
 import { parse, format, startOfMonth } from "date-fns";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
@@ -18,8 +19,10 @@ import { setCategoryAmount } from "~/functions/setCategoryAmount";
 import { setCategoryName } from "~/functions/setCategoryName";
 import { setFundBalance } from "~/functions/setFundBalance";
 import { setFundName } from "~/functions/setFundName";
+import { createCategory } from "~/functions/createCategory";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
+import classes from "./$month.module.css";
 
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
@@ -76,6 +79,13 @@ export default function BudgetPage() {
     await router.invalidate();
   };
 
+  const handleCreateCategory = async () => {
+    await createCategory({
+      data: { budgetId: budget.id, name: "New Category" },
+    });
+    await router.invalidate();
+  };
+
   return (
     <AppShell header={{ height: 60 }} padding="md">
       <AppShell.Header
@@ -98,8 +108,14 @@ export default function BudgetPage() {
 
       <AppShell.Main>
         <Container size="lg">
-          <Stack>
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Stack align="center">
+            <Card
+              className={classes.card}
+              shadow="sm"
+              padding="lg"
+              radius="md"
+              withBorder
+            >
               <Group justify="space-between" mb="xs">
                 <Text size="lg" fw={600}>
                   Income
@@ -111,7 +127,13 @@ export default function BudgetPage() {
               </Group>
             </Card>
 
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Card
+              className={classes.card}
+              shadow="sm"
+              padding="lg"
+              radius="md"
+              withBorder
+            >
               <Group justify="space-between" mb="xs">
                 <Text size="lg" fw={600}>
                   Categories
@@ -134,10 +156,23 @@ export default function BudgetPage() {
                     />
                   </Group>
                 ))}
+                <Button
+                  variant="light"
+                  leftSection={<IconPlus size={16} />}
+                  onClick={handleCreateCategory}
+                >
+                  Add Category
+                </Button>
               </Stack>
             </Card>
 
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Card
+              className={classes.card}
+              shadow="sm"
+              padding="lg"
+              radius="md"
+              withBorder
+            >
               <Group justify="space-between" mb="xs">
                 <Text size="lg" fw={600}>
                   Funds
