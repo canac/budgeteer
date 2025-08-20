@@ -20,6 +20,7 @@ import { setCategoryName } from "~/functions/setCategoryName";
 import { setFundBalance } from "~/functions/setFundBalance";
 import { setFundName } from "~/functions/setFundName";
 import { createCategory } from "~/functions/createCategory";
+import { createFund } from "~/functions/createFund";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
 import classes from "./$month.module.css";
@@ -82,6 +83,13 @@ export default function BudgetPage() {
   const handleCreateCategory = async () => {
     await createCategory({
       data: { budgetId: budget.id, name: "New Category" },
+    });
+    await router.invalidate();
+  };
+
+  const handleCreateFund = async () => {
+    await createFund({
+      data: { budgetId: budget.id, name: "New Fund" },
     });
     await router.invalidate();
   };
@@ -195,6 +203,13 @@ export default function BudgetPage() {
                     />
                   </Group>
                 ))}
+                <Button
+                  variant="light"
+                  leftSection={<IconPlus size={16} />}
+                  onClick={handleCreateFund}
+                >
+                  Add Fund
+                </Button>
               </Stack>
             </Card>
           </Stack>
