@@ -35,8 +35,6 @@ model Category {
   budgetId     Int
   budget       Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   transactions Transaction[]
-
-  @@unique([name, budgetId])
 }
 
 model Fund {
