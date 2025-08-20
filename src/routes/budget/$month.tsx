@@ -36,6 +36,7 @@ export const Route = createFileRoute("/budget/$month")({
 export default function BudgetPage() {
   const router = useRouter();
   const { budget } = Route.useLoaderData();
+  const leftToBudget = budget.income - budget.totalBudgetedAmount;
   const date = parse(budget.month, "MM-yyyy", startOfMonth(new Date()));
   const header = format(date, "MMMM yyyy");
 
@@ -133,6 +134,14 @@ export default function BudgetPage() {
                   saveAmount={handleSaveIncome}
                 />
               </Group>
+              <Stack gap="xs">
+                <Group justify="space-between" mb="xs">
+                  <Text>Left to budget</Text>
+                  <Text c={leftToBudget >= 0 ? "green" : "red"}>
+                    ${leftToBudget}
+                  </Text>
+                </Group>
+              </Stack>
             </Card>
 
             <Card

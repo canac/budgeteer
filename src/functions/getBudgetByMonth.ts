@@ -40,8 +40,18 @@ export const getBudgetByMonth = createServerFn()
       },
     });
 
+    const totalCategoryAmount = budget.categories.reduce(
+      (sum, category) => sum + category.amount,
+      0,
+    );
+    const totalBudgetFundAmount = budget.budgetFunds.reduce(
+      (sum, budgetFund) => sum + budgetFund.budgetedAmount,
+      0,
+    );
+
     return {
       ...budget,
+      totalBudgetedAmount: totalCategoryAmount + totalBudgetFundAmount,
       budgetFunds: budget.budgetFunds.map((budgetFund) => {
         const fundTransactions = historicalTransactions.filter(
           (transaction) => transaction.fundId === budgetFund.fundId,
