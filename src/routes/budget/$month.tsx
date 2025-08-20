@@ -126,17 +126,17 @@ export default function BudgetPage() {
               radius="md"
               withBorder
             >
-              <Group justify="space-between" mb="xs">
-                <Text size="lg" fw={600}>
-                  Income
-                </Text>
-                <EditableAmount
-                  amount={budget.income}
-                  saveAmount={handleSaveIncome}
-                />
-              </Group>
               <Stack gap="xs">
-                <Group justify="space-between" mb="xs">
+                <Group justify="space-between">
+                  <Text size="lg" fw={600}>
+                    Income
+                  </Text>
+                  <EditableAmount
+                    amount={budget.income}
+                    saveAmount={handleSaveIncome}
+                  />
+                </Group>
+                <Group justify="space-between">
                   <Text>Left to budget</Text>
                   <Text c={leftToBudget >= 0 ? "green" : "red"}>
                     {formatCurrency(leftToBudget)}
@@ -152,12 +152,12 @@ export default function BudgetPage() {
               radius="md"
               withBorder
             >
-              <Group justify="space-between" mb="xs">
-                <Text size="lg" fw={600}>
-                  Categories
-                </Text>
-              </Group>
               <Stack gap="xs">
+                <Group justify="space-between">
+                  <Text size="lg" fw={600}>
+                    Categories
+                  </Text>
+                </Group>
                 {budget.categories.map((category) => (
                   <Group key={category.id} justify="space-between">
                     <EditableName
@@ -191,12 +191,12 @@ export default function BudgetPage() {
               radius="md"
               withBorder
             >
-              <Group justify="space-between" mb="xs">
-                <Text size="lg" fw={600}>
-                  Funds
-                </Text>
-              </Group>
               <Stack gap="xs">
+                <Group justify="space-between">
+                  <Text size="lg" fw={600}>
+                    Funds
+                  </Text>
+                </Group>
                 {budget.budgetFunds.map((budgetFund) => (
                   <Group key={budgetFund.id} justify="space-between">
                     <EditableName
