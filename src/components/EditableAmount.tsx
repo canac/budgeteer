@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { TextInput, Text } from "@mantine/core";
+import { formatCurrency } from "~/lib/formatCurrency";
 import classes from "./EditableAmount.module.css";
 
 interface EditableAmountProps {
@@ -44,7 +45,7 @@ export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
 
   return (
     <Text className={classes.text} onClick={handleEditClick}>
-      ${amount}
+      {formatCurrency(amount)}
     </Text>
   );
 }

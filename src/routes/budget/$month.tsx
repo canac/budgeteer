@@ -23,6 +23,7 @@ import { createCategory } from "~/functions/createCategory";
 import { createFund } from "~/functions/createFund";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
+import { formatCurrency } from "~/lib/formatCurrency";
 import classes from "./$month.module.css";
 
 export const Route = createFileRoute("/budget/$month")({
@@ -138,7 +139,7 @@ export default function BudgetPage() {
                 <Group justify="space-between" mb="xs">
                   <Text>Left to budget</Text>
                   <Text c={leftToBudget >= 0 ? "green" : "red"}>
-                    ${leftToBudget}
+                    {formatCurrency(leftToBudget)}
                   </Text>
                 </Group>
               </Stack>
