@@ -128,9 +128,7 @@ export default function BudgetPage() {
             >
               <Stack gap="xs">
                 <Group justify="space-between">
-                  <Text size="lg" fw={600}>
-                    Income
-                  </Text>
+                  <Text className={classes.cardHeader}>Income</Text>
                   <EditableAmount
                     amount={budget.income}
                     saveAmount={handleSaveIncome}
@@ -154,9 +152,7 @@ export default function BudgetPage() {
             >
               <Stack gap="xs">
                 <Group justify="space-between">
-                  <Text size="lg" fw={600}>
-                    Categories
-                  </Text>
+                  <Text className={classes.cardHeader}>Categories</Text>
                 </Group>
                 {budget.categories.map((category) => (
                   <Group key={category.id} justify="space-between">
@@ -193,9 +189,7 @@ export default function BudgetPage() {
             >
               <Stack gap="xs">
                 <Group justify="space-between">
-                  <Text size="lg" fw={600}>
-                    Funds
-                  </Text>
+                  <Text className={classes.cardHeader}>Funds</Text>
                 </Group>
                 {budget.budgetFunds.map((budgetFund) => (
                   <Group key={budgetFund.id} justify="space-between">

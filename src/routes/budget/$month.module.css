@@ -1,3 +1,8 @@
 .card {
   width: 24rem;
 }
+
+.cardHeader {
+  font-size: var(--mantine-font-size-lg);
+  font-weight: bold;
+}
