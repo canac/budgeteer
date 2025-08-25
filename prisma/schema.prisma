@@ -17,60 +17,45 @@ datasource db {
 }
 
 model Budget {
-  id          Int          @id @default(autoincrement())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  month       String
-  income      Float
-  categories  Category[]
-  budgetFunds BudgetFund[]
+  id               Int              @id @default(autoincrement())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  month            String
+  income           Float
+  budgetCategories BudgetCategory[]
 }
 
 model Category {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  name         String
-  amount       Float
-  budgetId     Int
-  budget       Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
+  id               Int              @id @default(autoincrement())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  name             String
+  fund             Boolean          @default(false)
+  transactions     Transaction[]
+  budgetCategories BudgetCategory[]
 }
 
-model Fund {
-  id             Int           @id @default(autoincrement())
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  name           String
-  initialBalance Float
-  budgetFunds    BudgetFund[]
-  transactions   Transaction[]
-}
-
-model BudgetFund {
+model BudgetCategory {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  budgetedAmount Float
-  fundId         Int
+  budgetedAmount Float    @default(0)
+  categoryId     Int
   budgetId       Int
-  fund           Fund     @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  category       Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   budget         Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, budgetId])
 }
 
 model Transaction {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   amount      Float
   date        DateTime
   vendor      String
   description String?
-  categoryId  Int?
-  fundId      Int?
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  fund        Fund?     @relation(fields: [fundId], references: [id], onDelete: SetNull)
-
-  // Note: A transaction should belong to either a category or a fund, but not both
-  // This constraint should be enforced at the application level
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }

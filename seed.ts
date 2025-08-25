@@ -2,65 +2,71 @@ import { prisma } from "./src/lib/prisma.ts";
 
 // Delete all existing data
 await prisma.transaction.deleteMany();
-await prisma.budgetFund.deleteMany();
 await prisma.category.deleteMany();
-await prisma.fund.deleteMany();
 await prisma.budget.deleteMany();
 
-const emergencyFund = await prisma.fund.create({
+const emergencyFund = await prisma.category.create({
   data: {
     name: "Emergency Fund",
-    initialBalance: 2000,
+    fund: true,
   },
 });
 
-const vacationFund = await prisma.fund.create({
+const vacationFund = await prisma.category.create({
   data: {
     name: "Vacation Fund",
-    initialBalance: 1000,
+    fund: true,
   },
 });
 
-const julyBudget = await prisma.budget.create({
+const groceriesCategory = await prisma.category.create({
+  data: {
+    name: "Groceries",
+  },
+});
+
+const utilitiesCategory = await prisma.category.create({
+  data: {
+    name: "Utilities",
+  },
+});
+
+const entertainmentCategory = await prisma.category.create({
+  data: {
+    name: "Entertainment",
+  },
+});
+
+await prisma.budget.create({
   data: {
     month: "07-2025",
     income: 5000,
-    categories: {
+    budgetCategories: {
       create: [
-        { name: "Groceries", amount: 600 },
-        { name: "Utilities", amount: 300 },
-        { name: "Entertainment", amount: 200 },
-      ],
-    },
-    budgetFunds: {
-      create: [
-        { fundId: emergencyFund.id, budgetedAmount: 800 },
-        { fundId: vacationFund.id, budgetedAmount: 500 },
+        { categoryId: emergencyFund.id, budgetedAmount: 800 },
+        { categoryId: vacationFund.id, budgetedAmount: 500 },
+        { categoryId: groceriesCategory.id, budgetedAmount: 600 },
+        { categoryId: utilitiesCategory.id, budgetedAmount: 300 },
+        { categoryId: entertainmentCategory.id, budgetedAmount: 200 },
       ],
     },
   },
-  include: { categories: true, budgetFunds: true },
 });
 
-const augustBudget = await prisma.budget.create({
+await prisma.budget.create({
   data: {
     month: "08-2025",
     income: 5000,
-    categories: {
+    budgetCategories: {
       create: [
-        { name: "Groceries", amount: 600 },
-        { name: "Utilities", amount: 300 },
-        { name: "Entertainment", amount: 200 },
-      ],
-    },
-    budgetFunds: {
-      create: [
-        { fundId: emergencyFund.id, budgetedAmount: 1000 },
-        { fundId: vacationFund.id, budgetedAmount: 250 },
+        { categoryId: emergencyFund.id, budgetedAmount: 1000 },
+        { categoryId: vacationFund.id, budgetedAmount: 250 },
+        { categoryId: groceriesCategory.id, budgetedAmount: 600 },
+        { categoryId: utilitiesCategory.id, budgetedAmount: 300 },
+        { categoryId: entertainmentCategory.id, budgetedAmount: 200 },
       ],
     },
   },
-  include: { categories: true, budgetFunds: true },
 });
 
 // Add transactions to categories
@@ -70,7 +76,7 @@ await prisma.transaction.create({
     date: "2025-07-05T00:00:00.000Z",
     vendor: "Supermarket",
     description: "Weekly groceries",
-    categoryId: julyBudget.categories[0].id,
+    categoryId: groceriesCategory.id,
   },
 });
 await prisma.transaction.create({
@@ -79,7 +85,7 @@ await prisma.transaction.create({
     date: "2025-08-05T00:00:00.000Z",
     vendor: "Supermarket",
     description: "Weekly groceries",
-    categoryId: augustBudget.categories[0].id,
+    categoryId: groceriesCategory.id,
   },
 });
 await prisma.transaction.create({
@@ -88,18 +94,18 @@ await prisma.transaction.create({
     date: "2025-08-10T00:00:00.000Z",
     vendor: "Electric Company",
     description: "Monthly bill",
-    categoryId: augustBudget.categories[1].id,
+    categoryId: utilitiesCategory.id,
   },
 });
 
-// Add transactions to funds
+// Add transactions to categories
 await prisma.transaction.create({
   data: {
     amount: -200,
     date: "2025-07-15T00:00:00.000Z",
     vendor: "Car Repair",
     description: "Unexpected repair",
-    fundId: emergencyFund.id,
+    categoryId: emergencyFund.id,
   },
 });
 await prisma.transaction.create({
@@ -108,6 +114,6 @@ await prisma.transaction.create({
     date: "2025-08-20T00:00:00.000Z",
     vendor: "Travel Agency",
     description: "Vacation deposit",
-    fundId: vacationFund.id,
+    categoryId: vacationFund.id,
   },
 });

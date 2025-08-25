@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { number, object, string } from "zod";
 import { prisma } from "~/lib/prisma";
-import { object, string, number } from "zod";
 
 const inputSchema = object({
   month: string(),

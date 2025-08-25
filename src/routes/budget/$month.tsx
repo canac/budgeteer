@@ -1,28 +1,26 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { IconPlus } from "@tabler/icons-react";
 import {
+  ActionIcon,
   AppShell,
+  Button,
+  Card,
   Container,
+  Flex,
   Group,
   Stack,
-  Title,
   Text,
-  Card,
-  Flex,
-  ActionIcon,
-  Button,
+  Title,
 } from "@mantine/core";
-import { parse, format, startOfMonth } from "date-fns";
-import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
-import { setBudgetIncome } from "~/functions/setBudgetIncome";
-import { setCategoryAmount } from "~/functions/setCategoryAmount";
-import { setCategoryName } from "~/functions/setCategoryName";
-import { setFundBalance } from "~/functions/setFundBalance";
-import { setFundName } from "~/functions/setFundName";
-import { createCategory } from "~/functions/createCategory";
-import { createFund } from "~/functions/createFund";
+import { IconPlus } from "@tabler/icons-react";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { format, parse, startOfMonth } from "date-fns";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
+import { createCategory } from "~/functions/createCategory";
+import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
+import { setBudgetIncome } from "~/functions/setBudgetIncome";
+import { setCategoryBalance } from "~/functions/setCategoryBalance";
+import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
+import { setCategoryName } from "~/functions/setCategoryName";
 import { formatCurrency } from "~/lib/formatCurrency";
 import classes from "./$month.module.css";
 
@@ -58,26 +56,22 @@ export default function BudgetPage() {
     await router.invalidate();
   };
 
-  const handleSaveCategoryAmount = async (
+  const handleSaveCategoryBalance = async (
     categoryId: number,
+    newBalance: number,
+  ) => {
+    await setCategoryBalance({
+      data: { categoryId, targetBalance: newBalance, month: budget.month },
+    });
+    await router.invalidate();
+  };
+
+  const handleSaveCategoryBudgetedAmount = async (
+    budgetCategoryId: number,
     newAmount: number,
   ) => {
-    await setCategoryAmount({
-      data: { categoryId, amount: newAmount },
-    });
-    await router.invalidate();
-  };
-
-  const handleSaveFundBalance = async (fundId: number, newBalance: number) => {
-    await setFundBalance({
-      data: { fundId, targetBalance: newBalance, month: budget.month },
-    });
-    await router.invalidate();
-  };
-
-  const handleSaveFundName = async (fundId: number, newName: string) => {
-    await setFundName({
-      data: { fundId, name: newName },
+    await setCategoryBudgetedAmount({
+      data: { budgetCategoryId, budgetedAmount: newAmount },
     });
     await router.invalidate();
   };
@@ -85,13 +79,6 @@ export default function BudgetPage() {
   const handleCreateCategory = async () => {
     await createCategory({
       data: { budgetId: budget.id, name: "New Category" },
-    });
-    await router.invalidate();
-  };
-
-  const handleCreateFund = async () => {
-    await createFund({
-      data: { budgetId: budget.id, name: "New Fund" },
     });
     await router.invalidate();
   };
@@ -154,18 +141,24 @@ export default function BudgetPage() {
                 <Group justify="space-between">
                   <Text className={classes.cardHeader}>Categories</Text>
                 </Group>
-                {budget.categories.map((category) => (
-                  <Group key={category.id} justify="space-between">
+                {budget.budgetCategories.map((budgetCategory) => (
+                  <Group key={budgetCategory.id} justify="space-between">
                     <EditableName
-                      name={category.name}
+                      name={budgetCategory.name}
                       saveName={(newName) =>
-                        handleSaveCategoryName(category.id, newName)
+                        handleSaveCategoryName(
+                          budgetCategory.categoryId,
+                          newName,
+                        )
                       }
                     />
                     <EditableAmount
-                      amount={category.amount}
+                      amount={budgetCategory.budgetedAmount}
                       saveAmount={(newAmount) =>
-                        handleSaveCategoryAmount(category.id, newAmount)
+                        handleSaveCategoryBudgetedAmount(
+                          budgetCategory.id,
+                          newAmount,
+                        )
                       }
                     />
                   </Group>
@@ -176,43 +169,6 @@ export default function BudgetPage() {
                   onClick={handleCreateCategory}
                 >
                   Add Category
-                </Button>
-              </Stack>
-            </Card>
-
-            <Card
-              className={classes.card}
-              shadow="sm"
-              padding="lg"
-              radius="md"
-              withBorder
-            >
-              <Stack gap="xs">
-                <Group justify="space-between">
-                  <Text className={classes.cardHeader}>Funds</Text>
-                </Group>
-                {budget.budgetFunds.map((budgetFund) => (
-                  <Group key={budgetFund.id} justify="space-between">
-                    <EditableName
-                      name={budgetFund.name}
-                      saveName={(newName) =>
-                        handleSaveFundName(budgetFund.fundId, newName)
-                      }
-                    />
-                    <EditableAmount
-                      amount={budgetFund.fundBalance}
-                      saveAmount={(newBalance) =>
-                        handleSaveFundBalance(budgetFund.fundId, newBalance)
-                      }
-                    />
-                  </Group>
-                ))}
-                <Button
-                  variant="light"
-                  leftSection={<IconPlus size={16} />}
-                  onClick={handleCreateFund}
-                >
-                  Add Fund
                 </Button>
               </Stack>
             </Card>

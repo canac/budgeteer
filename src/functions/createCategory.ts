@@ -1,21 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
+import { number, object, string } from "zod";
 import { prisma } from "~/lib/prisma";
-import { object, string, number } from "zod";
 
 const inputSchema = object({
   budgetId: number(),
   name: string().min(1),
-  amount: number().min(0).default(0),
+  budgetedAmount: number().min(0).default(0),
 });
 
 export const createCategory = createServerFn()
   .validator((data) => inputSchema.parse(data))
-  .handler(async ({ data: { budgetId, name, amount } }) => {
+  .handler(async ({ data: { budgetId, name, budgetedAmount } }) => {
     const category = await prisma.category.create({
       data: {
         name,
-        amount,
+      },
+    });
+    await prisma.budgetCategory.create({
+      data: {
         budgetId,
+        categoryId: category.id,
+        budgetedAmount,
       },
     });
     return category;
