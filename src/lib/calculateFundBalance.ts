@@ -10,13 +10,15 @@ export async function calculateCategoryBalance({
   category: Pick<CategoryModel, "id" | "fund">;
 }): Promise<number> {
   const monthDate = parse(month, "MM-yyyy", new Date());
-  const aggregateTransactions = await prisma.transaction.aggregate({
+  const aggregateTransactions = await prisma.transactionCategory.aggregate({
     _sum: { amount: true },
     where: {
       categoryId: category.id,
-      date: {
-        gte: category.fund ? undefined : startOfMonth(monthDate),
-        lte: endOfMonth(monthDate),
+      transaction: {
+        date: {
+          gte: category.fund ? undefined : startOfMonth(monthDate),
+          lte: endOfMonth(monthDate),
+        },
       },
     },
   });

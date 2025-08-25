@@ -1,6 +1,7 @@
 import { prisma } from "./src/lib/prisma.ts";
 
 // Delete all existing data
+await prisma.transactionCategory.deleteMany();
 await prisma.transaction.deleteMany();
 await prisma.category.deleteMany();
 await prisma.budget.deleteMany();
@@ -76,7 +77,12 @@ await prisma.transaction.create({
     date: "2025-07-05T00:00:00.000Z",
     vendor: "Supermarket",
     description: "Weekly groceries",
-    categoryId: groceriesCategory.id,
+    transactionCategories: {
+      create: {
+        amount: -150,
+        categoryId: groceriesCategory.id,
+      },
+    },
   },
 });
 await prisma.transaction.create({
@@ -85,7 +91,12 @@ await prisma.transaction.create({
     date: "2025-08-05T00:00:00.000Z",
     vendor: "Supermarket",
     description: "Weekly groceries",
-    categoryId: groceriesCategory.id,
+    transactionCategories: {
+      create: {
+        amount: -150,
+        categoryId: groceriesCategory.id,
+      },
+    },
   },
 });
 await prisma.transaction.create({
@@ -94,7 +105,12 @@ await prisma.transaction.create({
     date: "2025-08-10T00:00:00.000Z",
     vendor: "Electric Company",
     description: "Monthly bill",
-    categoryId: utilitiesCategory.id,
+    transactionCategories: {
+      create: {
+        amount: -80,
+        categoryId: utilitiesCategory.id,
+      },
+    },
   },
 });
 
@@ -105,7 +121,12 @@ await prisma.transaction.create({
     date: "2025-07-15T00:00:00.000Z",
     vendor: "Car Repair",
     description: "Unexpected repair",
-    categoryId: emergencyFund.id,
+    transactionCategories: {
+      create: {
+        amount: -200,
+        categoryId: emergencyFund.id,
+      },
+    },
   },
 });
 await prisma.transaction.create({
@@ -114,6 +135,35 @@ await prisma.transaction.create({
     date: "2025-08-20T00:00:00.000Z",
     vendor: "Travel Agency",
     description: "Vacation deposit",
-    categoryId: vacationFund.id,
+    transactionCategories: {
+      create: {
+        amount: -500,
+        categoryId: vacationFund.id,
+      },
+    },
+  },
+});
+await prisma.transaction.create({
+  data: {
+    amount: -250,
+    date: "2025-08-22T00:00:00.000Z",
+    vendor: "Costco",
+    description: "Bulk shopping trip",
+    transactionCategories: {
+      create: [
+        {
+          amount: -120,
+          categoryId: groceriesCategory.id,
+        },
+        {
+          amount: -80,
+          categoryId: entertainmentCategory.id,
+        },
+        {
+          amount: -50,
+          categoryId: utilitiesCategory.id,
+        },
+      ],
+    },
   },
 });

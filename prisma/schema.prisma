@@ -26,13 +26,13 @@ model Budget {
 }
 
 model Category {
-  id               Int              @id @default(autoincrement())
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  name             String
-  fund             Boolean          @default(false)
-  transactions     Transaction[]
-  budgetCategories BudgetCategory[]
+  id                    Int                   @id @default(autoincrement())
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  name                  String
+  fund                  Boolean               @default(false)
+  transactionCategories TransactionCategory[]
+  budgetCategories      BudgetCategory[]
 }
 
 model BudgetCategory {
@@ -49,13 +49,25 @@ model BudgetCategory {
 }
 
 model Transaction {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    Int                   @id @default(autoincrement())
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
   amount      Float
-  date        DateTime
-  vendor      String
-  description String?
-  categoryId  Int
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  date                  DateTime
+  vendor                String
+  description           String?
+  transactionCategories TransactionCategory[]
+}
+
+model TransactionCategory {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  amount        Float
+  transactionId Int
+  categoryId    Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  category      Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([transactionId, categoryId])
 }

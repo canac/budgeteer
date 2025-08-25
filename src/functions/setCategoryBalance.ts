@@ -36,7 +36,12 @@ export const setCategoryBalance = createServerFn()
         amount: adjustmentAmount,
         date: startOfMonth(monthDate),
         vendor: "Balance Adjustment",
-        categoryId,
+        transactionCategories: {
+          create: {
+            amount: adjustmentAmount,
+            categoryId,
+          },
+        },
       },
     });
   });

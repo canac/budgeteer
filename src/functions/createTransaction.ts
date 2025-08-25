@@ -20,7 +20,12 @@ export const createTransaction = createServerFn()
           vendor,
           description,
           date: new Date(date),
-          categoryId,
+          transactionCategories: {
+            create: {
+              amount,
+              categoryId,
+            },
+          },
         },
       });
       return transaction;
