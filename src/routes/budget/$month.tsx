@@ -2,6 +2,7 @@ import {
   ActionIcon,
   AppShell,
   Button,
+  ButtonGroup,
   Card,
   Container,
   Flex,
@@ -13,6 +14,7 @@ import {
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { format, parse, startOfMonth } from "date-fns";
+import { useState } from "react";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
 import { createCategory } from "~/functions/createCategory";
@@ -35,6 +37,7 @@ export const Route = createFileRoute("/budget/$month")({
 export default function BudgetPage() {
   const router = useRouter();
   const { budget } = Route.useLoaderData();
+  const [viewMode, setViewMode] = useState<"budgeted" | "balance">("budgeted");
   const leftToBudget = budget.income - budget.totalBudgetedAmount;
   const date = parse(budget.month, "MM-yyyy", startOfMonth(new Date()));
   const header = format(date, "MMMM yyyy");
@@ -140,6 +143,22 @@ export default function BudgetPage() {
               <Stack gap="xs">
                 <Group justify="space-between">
                   <Text className={classes.cardHeader}>Categories</Text>
+                  <ButtonGroup>
+                    <Button
+                      variant={viewMode === "budgeted" ? "filled" : "outline"}
+                      size="xs"
+                      onClick={() => setViewMode("budgeted")}
+                    >
+                      Budgeted
+                    </Button>
+                    <Button
+                      variant={viewMode === "balance" ? "filled" : "outline"}
+                      size="xs"
+                      onClick={() => setViewMode("balance")}
+                    >
+                      Balance
+                    </Button>
+                  </ButtonGroup>
                 </Group>
                 {budget.budgetCategories.map((budgetCategory) => (
                   <Group key={budgetCategory.id} justify="space-between">
@@ -153,12 +172,21 @@ export default function BudgetPage() {
                       }
                     />
                     <EditableAmount
-                      amount={budgetCategory.budgetedAmount}
+                      amount={
+                        viewMode === "budgeted"
+                          ? budgetCategory.budgetedAmount
+                          : budgetCategory.balance
+                      }
                       saveAmount={(newAmount) =>
-                        handleSaveCategoryBudgetedAmount(
-                          budgetCategory.id,
-                          newAmount,
-                        )
+                        viewMode === "budgeted"
+                          ? handleSaveCategoryBudgetedAmount(
+                              budgetCategory.id,
+                              newAmount,
+                            )
+                          : handleSaveCategoryBalance(
+                              budgetCategory.categoryId,
+                              newAmount,
+                            )
                       }
                     />
                   </Group>
