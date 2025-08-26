@@ -1,18 +1,17 @@
 /// <reference types="vite/client" />
-import { MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
+import { mantineHtmlProps, MantineProvider } from "@mantine/core";
+import mantineCss from "@mantine/core/styles.css?url";
 import {
+  createRootRoute,
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import appCss from "~/styles/app.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [{ rel: "stylesheet", href: mantineCss }],
   }),
   component: RootComponent,
 });
@@ -27,7 +26,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
       <head>
         <HeadContent />
       </head>
