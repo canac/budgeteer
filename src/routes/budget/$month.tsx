@@ -214,7 +214,7 @@ export default function BudgetPage() {
                   ))}
                   <Button
                     variant="light"
-                    leftSection={<IconPlus size={16} />}
+                    leftSection={<IconPlus />}
                     onClick={handleCreateCategory}
                   >
                     Add Category
