@@ -8,8 +8,8 @@ const inputSchema = object({
   budgetedAmount: number().min(0).default(0),
 });
 
-export const createCategory = createServerFn()
-  .validator((data) => inputSchema.parse(data))
+export const createCategory = createServerFn({ method: "POST" })
+  .validator(inputSchema)
   .handler(async ({ data: { budgetId, name, budgetedAmount } }) => {
     const category = await prisma.category.create({
       data: {

@@ -10,8 +10,8 @@ const inputSchema = object({
   targetBalance: number(),
 });
 
-export const setCategoryBalance = createServerFn()
-  .validator((data) => inputSchema.parse(data))
+export const setCategoryBalance = createServerFn({ method: "POST" })
+  .validator(inputSchema)
   .handler(async ({ data: { categoryId, month, targetBalance } }) => {
     const category = await prisma.category.findUnique({
       where: { id: categoryId },

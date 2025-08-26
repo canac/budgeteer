@@ -20,8 +20,8 @@ const inputSchema = object({
   { error: "Amount must equal the sum of category amounts." },
 );
 
-export const createTransaction = createServerFn()
-  .validator((data) => inputSchema.parse(data))
+export const createTransaction = createServerFn({ method: "POST" })
+  .validator(inputSchema)
   .handler(
     async ({ data: { amount, vendor, description, date, categories } }) => {
       const transaction = await prisma.transaction.create({

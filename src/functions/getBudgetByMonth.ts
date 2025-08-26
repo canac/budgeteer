@@ -8,7 +8,7 @@ const inputSchema = object({
 });
 
 export const getBudgetByMonth = createServerFn()
-  .validator((data) => inputSchema.parse(data))
+  .validator(inputSchema)
   .handler(async ({ data: { month } }) => {
     if (!/^\d{2}-\d{4}$/.test(month)) {
       throw new Error("Invalid month format");

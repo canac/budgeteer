@@ -7,8 +7,8 @@ const inputSchema = object({
   budgetedAmount: number().min(0),
 });
 
-export const setCategoryBudgetedAmount = createServerFn()
-  .validator((data) => inputSchema.parse(data))
+export const setCategoryBudgetedAmount = createServerFn({ method: "POST" })
+  .validator(inputSchema)
   .handler(async ({ data: { budgetCategoryId, budgetedAmount } }) => {
     await prisma.budgetCategory.updateMany({
       where: {
