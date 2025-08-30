@@ -170,7 +170,7 @@ export function NewTransactionModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title="New Transaction"
+      title={<Text fw="bold">New Transaction</Text>}
       size="md"
       centered
     >

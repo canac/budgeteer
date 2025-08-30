@@ -13,18 +13,15 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { format, parse, startOfMonth } from "date-fns";
 import { useState } from "react";
 import { EditableAmount } from "~/components/EditableAmount";
-import { EditableName } from "~/components/EditableName";
+import { MantineLink } from "~/components/MantineLink";
 import { NewTransactionModal } from "~/components/NewTransactionModal";
 import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
-import { setCategoryBalance } from "~/functions/setCategoryBalance";
-import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
-import { setCategoryName } from "~/functions/setCategoryName";
 import { formatCurrency } from "~/lib/formatCurrency";
 import classes from "./$month.module.css";
 
@@ -48,36 +45,6 @@ export default function BudgetPage() {
   const handleSaveIncome = async (newIncome: number) => {
     await setBudgetIncome({
       data: { month: budget.month, income: newIncome },
-    });
-    await router.invalidate();
-  };
-
-  const handleSaveCategoryName = async (
-    categoryId: number,
-    newName: string,
-  ) => {
-    await setCategoryName({
-      data: { categoryId, name: newName },
-    });
-    await router.invalidate();
-  };
-
-  const handleSaveCategoryBalance = async (
-    categoryId: number,
-    newBalance: number,
-  ) => {
-    await setCategoryBalance({
-      data: { categoryId, targetBalance: newBalance, month: budget.month },
-    });
-    await router.invalidate();
-  };
-
-  const handleSaveCategoryBudgetedAmount = async (
-    budgetCategoryId: number,
-    newAmount: number,
-  ) => {
-    await setCategoryBudgetedAmount({
-      data: { budgetCategoryId, budgetedAmount: newAmount },
     });
     await router.invalidate();
   };
@@ -128,7 +95,7 @@ export default function BudgetPage() {
 
         <AppShell.Main>
           <Container size="lg">
-            {}
+            <Outlet />
             <Stack align="center">
               <Card
                 className={classes.card}
@@ -182,35 +149,27 @@ export default function BudgetPage() {
                     </ButtonGroup>
                   </Group>
                   {budget.budgetCategories.map((budgetCategory) => (
-                    <Group key={budgetCategory.id} justify="space-between">
-                      <EditableName
-                        name={budgetCategory.name}
-                        saveName={(newName) =>
-                          handleSaveCategoryName(
-                            budgetCategory.categoryId,
-                            newName,
-                          )
-                        }
-                      />
-                      <EditableAmount
-                        amount={
-                          viewMode === "budgeted"
-                            ? budgetCategory.budgetedAmount
-                            : budgetCategory.balance
-                        }
-                        saveAmount={(newAmount) =>
-                          viewMode === "budgeted"
-                            ? handleSaveCategoryBudgetedAmount(
-                                budgetCategory.id,
-                                newAmount,
-                              )
-                            : handleSaveCategoryBalance(
-                                budgetCategory.categoryId,
-                                newAmount,
-                              )
-                        }
-                      />
-                    </Group>
+                    <MantineLink
+                      key={budgetCategory.id}
+                      to="/budget/$month/category/$category"
+                      params={{
+                        month: budget.month,
+                        category: budgetCategory.categoryId.toString(),
+                      }}
+                      underline="never"
+                      c="inherit"
+                    >
+                      <Group justify="space-between">
+                        <Text>{budgetCategory.name}</Text>
+                        <Text>
+                          {formatCurrency(
+                            viewMode === "budgeted"
+                              ? budgetCategory.budgetedAmount
+                              : budgetCategory.balance,
+                          )}
+                        </Text>
+                      </Group>
+                    </MantineLink>
                   ))}
                   <Button
                     variant="light"
