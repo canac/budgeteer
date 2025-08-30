@@ -1,4 +1,4 @@
-import { Card, Drawer, Group, Stack, Table, Text } from "@mantine/core";
+import { Box, Divider, Drawer, Group, Stack, Table, Text } from "@mantine/core";
 import {
   createFileRoute,
   useNavigate,
@@ -34,7 +34,6 @@ export default function CategoryDetailsPage() {
   const router = useRouter();
 
   const date = parse(month, "MM-yyyy", startOfMonth(new Date()));
-  const monthFormatted = format(date, "MMMM yyyy");
 
   const handleGoBack = () => {
     navigate({ to: "/budget/$month", params: { month } });
@@ -57,120 +56,115 @@ export default function CategoryDetailsPage() {
     await router.invalidate();
   };
 
+  const budgetUsed = Math.abs(categoryDetails.amountSpentThisMonth);
+  const { budgetedAmount } = categoryDetails.budgetCategory;
+  const percentageRemaining = Math.max(
+    0,
+    Math.round(((budgetedAmount - budgetUsed) / budgetedAmount) * 100),
+  );
+
   return (
     <Drawer
       opened
       onClose={handleGoBack}
       title={
-        <Text fw="bold">
-          {categoryDetails.category.name} ({monthFormatted})
-        </Text>
+        <Group justify="space-between" align="center" w="100%">
+          <EditableName
+            name={categoryDetails.category.name}
+            saveName={handleSaveCategoryName}
+          />
+          <Text size="sm" fw={500} c="white" p="4px 8px" bg="black" bdrs="sm">
+            {percentageRemaining}% remaining
+          </Text>
+        </Group>
       }
       position="right"
       size="xl"
     >
-      <Stack>
-        <EditableName
-          name={categoryDetails.category.name}
-          saveName={handleSaveCategoryName}
-        />
+      <Stack gap="lg">
+        <div>
+          <Text size="md">Current Balance</Text>
+          <Text
+            size="xl"
+            fw={700}
+            c={categoryDetails.currentBalance >= 0 ? "green" : "red"}
+          >
+            {formatCurrency(categoryDetails.currentBalance)}
+          </Text>
+        </div>
 
-        <Group gap="md" align="stretch" w="100%" justify="center">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Stack gap="xs" align="center">
-              <Text size="sm" c="dimmed">
-                Current Balance
-              </Text>
-              <Text
-                size="xl"
-                fw={700}
-                c={categoryDetails.currentBalance >= 0 ? "green" : "red"}
-              >
-                {formatCurrency(categoryDetails.currentBalance)}
-              </Text>
-            </Stack>
-          </Card>
-
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Stack gap="xs" align="center">
-              <Text size="sm" c="dimmed">
-                Starting Balance
-              </Text>
-              <Text size="xl" fw={700}>
-                {formatCurrency(categoryDetails.startingBalance)}
-              </Text>
-            </Stack>
-          </Card>
-
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Stack gap="xs" align="center">
-              <Text size="sm" c="dimmed">
-                Amount Spent
-              </Text>
-              <Text size="xl" fw={700} c="red">
-                {formatCurrency(categoryDetails.amountSpentThisMonth)}
-              </Text>
-            </Stack>
-          </Card>
-
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Stack gap="xs" align="center">
-              <Text size="sm" c="dimmed">
-                Budgeted Amount
-              </Text>
+        <div>
+          <Text size="md">Budget Used</Text>
+          <Group justify="space-between" align="center">
+            <div
+              style={{
+                flex: 1,
+                height: "8px",
+                backgroundColor: "#e9ecef",
+                borderRadius: "4px",
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                w={`${Math.min(100, (budgetUsed / budgetedAmount) * 100)}%`}
+                bg={budgetUsed > budgetedAmount ? "red" : "green"}
+              />
+            </div>
+            <Text size="sm" c="dimmed" ml="md">
+              {formatCurrency(budgetUsed)} of{" "}
               <EditableAmount
                 amount={categoryDetails.budgetCategory.budgetedAmount}
                 saveAmount={handleSaveBudgetedAmount}
               />
-            </Stack>
-          </Card>
-        </Group>
-
-        <Card shadow="sm" padding="lg" radius="md" withBorder w="100%">
-          <Stack gap="md">
-            <Text fw={500} size="lg">
-              Transactions
             </Text>
-            <Table striped>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Date</Table.Th>
-                  <Table.Th>Vendor</Table.Th>
-                  <Table.Th>Description</Table.Th>
-                  <Table.Th ta="right">Amount</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {categoryDetails.transactions.map((transaction) => (
-                  <Table.Tr key={transaction.id}>
-                    <Table.Td>
-                      {format(new Date(transaction.date), "MMM dd")}
-                    </Table.Td>
-                    <Table.Td>{transaction.vendor}</Table.Td>
-                    <Table.Td>{transaction.description}</Table.Td>
-                    <Table.Td
-                      ta="right"
-                      c={transaction.amount < 0 ? undefined : "green"}
-                    >
-                      {formatCurrency(transaction.amount)}
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                <Table.Tr style={{ borderTop: "2px solid" }}>
-                  <Table.Td>{format(date, "MMM dd")}</Table.Td>
-                  <Table.Td>Starting Balance</Table.Td>
-                  <Table.Td></Table.Td>
+          </Group>
+        </div>
+
+        <Divider />
+
+        <Stack gap="md">
+          <Text fw={500} size="lg">
+            Transactions
+          </Text>
+          <Table striped>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Vendor</Table.Th>
+                <Table.Th>Description</Table.Th>
+                <Table.Th ta="right">Amount</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {categoryDetails.transactions.map((transaction) => (
+                <Table.Tr key={transaction.id}>
+                  <Table.Td>
+                    {format(new Date(transaction.date), "MMM dd")}
+                  </Table.Td>
+                  <Table.Td>{transaction.vendor}</Table.Td>
+                  <Table.Td>{transaction.description}</Table.Td>
                   <Table.Td
                     ta="right"
-                    c={categoryDetails.startingBalance < 0 ? "red" : "green"}
+                    c={transaction.amount < 0 ? undefined : "green"}
                   >
-                    {formatCurrency(categoryDetails.startingBalance)}
+                    {formatCurrency(transaction.amount)}
                   </Table.Td>
                 </Table.Tr>
-              </Table.Tbody>
-            </Table>
-          </Stack>
-        </Card>
+              ))}
+              <Table.Tr style={{ borderTop: "2px solid" }}>
+                <Table.Td>{format(date, "MMM dd")}</Table.Td>
+                <Table.Td>Starting Balance</Table.Td>
+                <Table.Td></Table.Td>
+                <Table.Td
+                  ta="right"
+                  c={categoryDetails.startingBalance < 0 ? "red" : "green"}
+                >
+                  {formatCurrency(categoryDetails.startingBalance)}
+                </Table.Td>
+              </Table.Tr>
+            </Table.Tbody>
+          </Table>
+        </Stack>
       </Stack>
     </Drawer>
   );
