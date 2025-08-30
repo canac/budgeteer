@@ -52,7 +52,7 @@ model Transaction {
   id                    Int                   @id @default(autoincrement())
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
-  amount      Float
+  amount                Float
   date                  DateTime
   vendor                String
   description           String?
