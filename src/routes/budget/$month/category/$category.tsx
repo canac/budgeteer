@@ -67,6 +67,10 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
+  const handleTransactionDeleted = async () => {
+    await router.invalidate();
+  };
+
   const { budgetedAmount } = budgetCategory.budgetCategory;
 
   return (
@@ -125,6 +129,7 @@ function CategoryDetailsPage() {
             transactions={budgetCategory.transactions}
             startingBalance={budgetCategory.startingBalance}
             startingBalanceDate={date}
+            onTransactionDeleted={handleTransactionDeleted}
           />
         </div>
       </Stack>
