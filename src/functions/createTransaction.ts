@@ -3,14 +3,14 @@ import { array, number, object, string } from "zod";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
-  amount: number().min(0),
+  amount: number(),
   vendor: string().min(1),
   description: string().optional(),
   date: string(), // ISO date string
   categories: array(
     object({
       categoryId: number(),
-      amount: number().min(0),
+      amount: number(),
     }),
   ).min(1),
 }).refine(

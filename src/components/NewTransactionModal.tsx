@@ -142,11 +142,14 @@ export function NewTransactionModal({
   const handleSubmit = form.onSubmit(async (values) => {
     await createTransaction({
       data: {
-        amount: values.amount,
+        amount: -values.amount,
         vendor: values.vendor,
         description: values.description || undefined,
         date: new Date(values.date).toISOString(),
-        categories: values.categoryAmounts,
+        categories: values.categoryAmounts.map((categoryAmount) => ({
+          ...categoryAmount,
+          amount: -categoryAmount.amount,
+        })),
       },
     });
 

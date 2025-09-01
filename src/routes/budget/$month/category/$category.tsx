@@ -7,7 +7,7 @@ import { DeleteCategoryModal } from "~/components/DeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
 import { TransactionTable } from "~/components/TransactionTable";
-import { getCategoryDetails } from "~/functions/getCategoryDetails";
+import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryName } from "~/functions/setCategoryName";
 import { formatCurrency } from "~/lib/formatCurrency";
@@ -20,15 +20,15 @@ export const Route = createFileRoute("/budget/$month/category/$category")({
       throw new Response("Invalid category ID", { status: 400 });
     }
 
-    const categoryDetails = await getCategoryDetails({
+    const budgetCategory = await getBudgetCategory({
       data: { month, categoryId },
     });
-    return { categoryDetails };
+    return { budgetCategory };
   },
 });
 
 function CategoryDetailsPage() {
-  const { categoryDetails } = Route.useLoaderData();
+  const { budgetCategory } = Route.useLoaderData();
   const { month } = Route.useParams();
   const navigate = useNavigate();
   const router = useRouter();
@@ -41,7 +41,7 @@ function CategoryDetailsPage() {
 
   const handleSaveCategoryName = async (newName: string) => {
     await setCategoryName({
-      data: { categoryId: categoryDetails.category.id, name: newName },
+      data: { categoryId: budgetCategory.category.id, name: newName },
     });
     await router.invalidate();
   };
@@ -49,18 +49,17 @@ function CategoryDetailsPage() {
   const handleSaveBudgetedAmount = async (newAmount: number) => {
     await setCategoryBudgetedAmount({
       data: {
-        budgetCategoryId: categoryDetails.budgetCategory.id,
+        budgetCategoryId: budgetCategory.budgetCategory.id,
         budgetedAmount: newAmount,
       },
     });
     await router.invalidate();
   };
 
-  const budgetUsed = Math.abs(categoryDetails.amountSpentThisMonth);
-  const { budgetedAmount } = categoryDetails.budgetCategory;
+  const { budgetedAmount } = budgetCategory.budgetCategory;
   const percentageRemaining = Math.max(
     0,
-    Math.round(((budgetedAmount - budgetUsed) / budgetedAmount) * 100),
+    Math.round(((budgetedAmount - budgetCategory.transactionTotal) / budgetedAmount) * 100),
   );
 
   return (
@@ -69,7 +68,7 @@ function CategoryDetailsPage() {
       onClose={handleGoBack}
       title={
         <Group justify="space-between" align="center" w="100%">
-          <EditableName name={categoryDetails.category.name} saveName={handleSaveCategoryName} />
+          <EditableName name={budgetCategory.category.name} saveName={handleSaveCategoryName} />
           <Text size="sm" fw={500} c="white" p="4px 8px" bg="black" bdrs="sm">
             {percentageRemaining}% remaining
           </Text>
@@ -89,8 +88,8 @@ function CategoryDetailsPage() {
       <Stack gap="lg">
         <div>
           <Text size="md">Current Balance</Text>
-          <Text size="xl" fw={700} c={categoryDetails.currentBalance >= 0 ? "green" : "red"}>
-            {formatCurrency(categoryDetails.currentBalance)}
+          <Text size="xl" fw={700} c={budgetCategory.currentBalance >= 0 ? "green" : "red"}>
+            {formatCurrency(budgetCategory.currentBalance)}
           </Text>
         </div>
 
@@ -106,12 +105,15 @@ function CategoryDetailsPage() {
                 overflow: "hidden",
               }}
             >
-              <Box w={`${Math.min(100, (budgetUsed / budgetedAmount) * 100)}%`} bg={"green"} />
+              <Box
+                w={`${Math.min(100, (budgetCategory.transactionTotal / budgetedAmount) * 100)}%`}
+                bg={"green"}
+              />
             </div>
             <Text size="sm" c="dimmed" ml="md">
-              {formatCurrency(budgetUsed)} of{" "}
+              {formatCurrency(budgetCategory.transactionTotal)} of{" "}
               <EditableAmount
-                amount={categoryDetails.budgetCategory.budgetedAmount}
+                amount={budgetCategory.budgetCategory.budgetedAmount}
                 saveAmount={handleSaveBudgetedAmount}
               />
             </Text>
@@ -119,15 +121,15 @@ function CategoryDetailsPage() {
         </div>
         <Divider />
         <TransactionTable
-          transactions={categoryDetails.transactions}
-          startingBalance={categoryDetails.startingBalance}
+          transactions={budgetCategory.transactions}
+          startingBalance={budgetCategory.startingBalance}
           startingBalanceDate={date}
         />
       </Stack>
       <DeleteCategoryModal
         open={deleteModalOpen}
         onClose={() => closeDeleteModal()}
-        category={categoryDetails.category}
+        category={budgetCategory.category}
         onDelete={() => handleGoBack()}
       />
     </Drawer>

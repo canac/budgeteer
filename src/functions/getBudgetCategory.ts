@@ -1,7 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, parse, startOfMonth } from "date-fns";
 import { number, object, string } from "zod";
-import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
+import {
+  calculateCategoryBalance,
+  calculateCategoryStartingBalance,
+} from "~/lib/calculateFundBalance";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
@@ -9,7 +12,7 @@ const inputSchema = object({
   categoryId: number(),
 });
 
-export const getCategoryDetails = createServerFn()
+export const getBudgetCategory = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month, categoryId } }) => {
     if (!/^\d{2}-\d{4}$/.test(month)) {
@@ -45,56 +48,16 @@ export const getCategoryDetails = createServerFn()
         },
       },
       include: { transaction: true },
-      orderBy: { transaction: { date: "desc" } },
+      orderBy: [{ transaction: { date: "desc" } }, { transaction: { createdAt: "desc" } }],
     });
 
-    // Calculate current balance
-    const currentBalance = await calculateCategoryBalance({
-      month,
-      category,
-    });
+    const currentBalance = await calculateCategoryBalance({ month, category });
+    const startingBalance = await calculateCategoryStartingBalance({ month, category });
 
-    // Calculate starting balance (beginning of month)
-    const previousMonthTransactions = await prisma.transactionCategory.aggregate({
-      _sum: { amount: true },
-      where: {
-        categoryId: category.id,
-        transaction: {
-          date: {
-            gte: category.fund ? undefined : undefined,
-            lt: startDate,
-          },
-        },
-      },
-    });
-
-    const previousMonthBudgetCategories = await prisma.budgetCategory.aggregate({
-      _sum: { budgetedAmount: true },
-      where: {
-        categoryId: category.id,
-        budget: {
-          month: category.fund ? { lt: month } : { lt: month },
-        },
-      },
-    });
-
-    const startingBalance =
-      (previousMonthBudgetCategories._sum.budgetedAmount ?? 0) +
-      (previousMonthTransactions._sum.amount ?? 0);
-
-    const monthlySpending = await prisma.transactionCategory.aggregate({
-      _sum: { amount: true },
-      where: {
-        categoryId,
-        transaction: {
-          date: {
-            gte: category.fund ? undefined : startDate,
-            lte: endDate,
-          },
-        },
-      },
-    });
-    const amountSpentThisMonth = Math.abs(monthlySpending._sum.amount ?? 0);
+    const transactionTotal = transactionCategories.reduce(
+      (total, transaction) => total + transaction.amount,
+      0,
+    );
 
     const budgetCategory = category.budgetCategories[0];
 
@@ -103,7 +66,7 @@ export const getCategoryDetails = createServerFn()
       budgetCategory,
       currentBalance: Math.round(currentBalance * 100) / 100,
       startingBalance: Math.round(startingBalance * 100) / 100,
-      amountSpentThisMonth: Math.round(amountSpentThisMonth * 100) / 100,
+      transactionTotal: Math.round(transactionTotal * 100) / 100,
       transactions: transactionCategories.map((transaction) => ({
         id: transaction.id,
         amount: transaction.amount,

@@ -2,6 +2,23 @@ import { endOfMonth, parse, startOfMonth } from "date-fns";
 import { prisma } from "~/lib/prisma";
 import type { CategoryModel } from "../../generated/prisma/models";
 
+async function getTotalBudgetedAmount({
+  month,
+  category,
+}: {
+  month: string;
+  category: Pick<CategoryModel, "id" | "fund">;
+}): Promise<number> {
+  const aggregateBudgetCategories = await prisma.budgetCategory.aggregate({
+    _sum: { budgetedAmount: true },
+    where: {
+      categoryId: category.id,
+      budget: { month: category.fund ? { lte: month } : month },
+    },
+  });
+  return aggregateBudgetCategories._sum.budgetedAmount ?? 0;
+}
+
 export async function calculateCategoryBalance({
   month,
   category,
@@ -10,6 +27,7 @@ export async function calculateCategoryBalance({
   category: Pick<CategoryModel, "id" | "fund">;
 }): Promise<number> {
   const monthDate = parse(month, "MM-yyyy", new Date());
+
   const aggregateTransactions = await prisma.transactionCategory.aggregate({
     _sum: { amount: true },
     where: {
@@ -22,16 +40,38 @@ export async function calculateCategoryBalance({
       },
     },
   });
+  const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
-  const aggregateBudgetCategories = await prisma.budgetCategory.aggregate({
-    _sum: { budgetedAmount: true },
+  const balance = (await getTotalBudgetedAmount({ month, category })) + totalTransactionAmount;
+  return Math.round(balance * 100) / 100;
+}
+
+export async function calculateCategoryStartingBalance({
+  month,
+  category,
+}: {
+  month: string;
+  category: Pick<CategoryModel, "id" | "fund">;
+}): Promise<number> {
+  const monthDate = parse(month, "MM-yyyy", new Date());
+  const totalBudgetedAmount = await getTotalBudgetedAmount({ month, category });
+
+  if (!category.fund) {
+    return totalBudgetedAmount;
+  }
+
+  const aggregateTransactions = await prisma.transactionCategory.aggregate({
+    _sum: { amount: true },
     where: {
       categoryId: category.id,
-      budget: { month: category.fund ? { lte: month } : month },
+      transaction: {
+        // Only include transactions before the start of this budget
+        date: { lte: startOfMonth(monthDate) },
+      },
     },
   });
+  const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
-  const balance =
-    (aggregateBudgetCategories._sum.budgetedAmount ?? 0) + (aggregateTransactions._sum.amount ?? 0);
+  const balance = totalBudgetedAmount + totalTransactionAmount;
   return Math.round(balance * 100) / 100;
 }
