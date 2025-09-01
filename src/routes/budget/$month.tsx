@@ -33,7 +33,7 @@ export const Route = createFileRoute("/budget/$month")({
   },
 });
 
-export default function BudgetPage() {
+function BudgetPage() {
   const router = useRouter();
   const { budget } = Route.useLoaderData();
   const [viewMode, setViewMode] = useState<"budgeted" | "balance">("budgeted");

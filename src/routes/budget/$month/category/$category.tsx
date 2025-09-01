@@ -1,15 +1,14 @@
 import {
   ActionIcon,
   Box,
-  Button,
   Divider,
   Drawer,
   Group,
-  Modal,
   Stack,
   Table,
   Text,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 import {
   createFileRoute,
@@ -17,10 +16,9 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { format, parse, startOfMonth } from "date-fns";
-import { useState } from "react";
+import { DeleteCategoryModal } from "~/components/DeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
-import { deleteCategory } from "~/functions/deleteCategory";
 import { getCategoryDetails } from "~/functions/getCategoryDetails";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryName } from "~/functions/setCategoryName";
@@ -41,12 +39,13 @@ export const Route = createFileRoute("/budget/$month/category/$category")({
   },
 });
 
-export default function CategoryDetailsPage() {
+function CategoryDetailsPage() {
   const { categoryDetails } = Route.useLoaderData();
   const { month } = Route.useParams();
   const navigate = useNavigate();
   const router = useRouter();
-  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
+  const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
+    useDisclosure(false);
 
   const date = parse(month, "MM-yyyy", startOfMonth(new Date()));
 
@@ -68,26 +67,6 @@ export default function CategoryDetailsPage() {
       },
     });
     await router.invalidate();
-  };
-
-  const handleDeleteCategory = async () => {
-    await deleteCategory({
-      data: { categoryId: categoryDetails.category.id },
-    });
-    await handleGoBack();
-  };
-
-  const handleDeleteClick = () => {
-    setDeleteModalOpened(true);
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteModalOpened(false);
-  };
-
-  const handleDeleteConfirm = async () => {
-    setDeleteModalOpened(false);
-    await handleDeleteCategory();
   };
 
   const budgetUsed = Math.abs(categoryDetails.amountSpentThisMonth);
@@ -112,7 +91,7 @@ export default function CategoryDetailsPage() {
           </Text>
           <ActionIcon
             color="red"
-            onClick={handleDeleteClick}
+            onClick={() => openDeleteModal()}
             title="Delete category"
             size="md"
           >
@@ -208,29 +187,12 @@ export default function CategoryDetailsPage() {
           </Table>
         </Stack>
       </Stack>
-
-      <Modal
-        opened={deleteModalOpened}
-        onClose={handleDeleteCancel}
-        title={<Text fw="bold">Delete Category</Text>}
-        size="md"
-        centered
-      >
-        <Stack gap="md">
-          <Text>
-            Are you sure you want to delete the "{categoryDetails.category.name}
-            " category?
-          </Text>
-          <Group justify="flex-end" gap="sm">
-            <Button variant="default" onClick={handleDeleteCancel}>
-              Cancel
-            </Button>
-            <Button color="red" onClick={handleDeleteConfirm}>
-              Delete
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+      <DeleteCategoryModal
+        open={deleteModalOpen}
+        onClose={() => closeDeleteModal()}
+        category={categoryDetails.category}
+        onDelete={() => handleGoBack()}
+      />
     </Drawer>
   );
 }
