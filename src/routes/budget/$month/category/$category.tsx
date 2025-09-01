@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Divider, Drawer, Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Divider, Drawer, Group, Progress, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
@@ -96,20 +96,11 @@ function CategoryDetailsPage() {
         <div>
           <Text size="md">Budget Used</Text>
           <Group justify="space-between" align="center">
-            <div
-              style={{
-                flex: 1,
-                height: "8px",
-                backgroundColor: "#e9ecef",
-                borderRadius: "4px",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                w={`${Math.min(100, (budgetCategory.transactionTotal / budgetedAmount) * 100)}%`}
-                bg={"green"}
-              />
-            </div>
+            <Progress
+              value={(budgetCategory.transactionTotal / budgetedAmount) * 100}
+              color="green"
+              flex={1}
+            />
             <Text size="sm" c="dimmed" ml="md">
               {formatCurrency(budgetCategory.transactionTotal)} of{" "}
               <EditableAmount
