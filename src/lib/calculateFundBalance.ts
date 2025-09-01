@@ -1,5 +1,6 @@
 import { endOfMonth, parse, startOfMonth } from "date-fns";
 import { prisma } from "~/lib/prisma";
+import { roundCurrency } from "~/lib/roundCurrency";
 import type { CategoryModel } from "../../generated/prisma/models";
 
 async function getTotalBudgetedAmount({
@@ -43,7 +44,7 @@ export async function calculateCategoryBalance({
   const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
   const balance = (await getTotalBudgetedAmount({ month, category })) + totalTransactionAmount;
-  return Math.round(balance * 100) / 100;
+  return roundCurrency(balance);
 }
 
 export async function calculateCategoryStartingBalance({
@@ -73,5 +74,5 @@ export async function calculateCategoryStartingBalance({
   const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
   const balance = totalBudgetedAmount + totalTransactionAmount;
-  return Math.round(balance * 100) / 100;
+  return roundCurrency(balance);
 }

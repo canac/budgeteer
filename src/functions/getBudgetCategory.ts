@@ -6,6 +6,7 @@ import {
   calculateCategoryStartingBalance,
 } from "~/lib/calculateFundBalance";
 import { prisma } from "~/lib/prisma";
+import { roundCurrency } from "~/lib/roundCurrency";
 
 const inputSchema = object({
   month: string(),
@@ -64,9 +65,9 @@ export const getBudgetCategory = createServerFn()
     return {
       category,
       budgetCategory,
-      currentBalance: Math.round(currentBalance * 100) / 100,
-      startingBalance: Math.round(startingBalance * 100) / 100,
-      transactionTotal: Math.round(transactionTotal * 100) / 100,
+      currentBalance: roundCurrency(currentBalance),
+      startingBalance: roundCurrency(startingBalance),
+      transactionTotal: roundCurrency(transactionTotal),
       transactions: transactionCategories.map((transaction) => ({
         id: transaction.id,
         amount: transaction.amount,

@@ -18,6 +18,7 @@ import type z from "zod";
 import { array, number, object, string } from "zod";
 import { createTransaction } from "~/functions/createTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { roundCurrency } from "~/lib/roundCurrency";
 
 interface Category {
   id: number;
@@ -55,7 +56,7 @@ const formSchema = object({
       (sum, category) => sum + category.amount,
       0,
     );
-    return Math.abs(values.amount - totalCategoryAmount) < 0.01;
+    return roundCurrency(values.amount - totalCategoryAmount);
   },
   {
     message: "Category amounts must equal total amount",
