@@ -1,19 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, parse, startOfMonth } from "date-fns";
-import { object, string } from "zod";
+import { object } from "zod";
 import { prisma } from "~/lib/prisma";
+import { month } from "~/lib/zod";
 
 const inputSchema = object({
-  month: string(),
+  month: month(),
 });
 
 export const getBudgetTransactions = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month } }) => {
-    if (!/^\d{2}-\d{4}$/.test(month)) {
-      throw new Error("Invalid month format");
-    }
-
     const monthDate = parse(month, "MM-yyyy", new Date());
     const startDate = startOfMonth(monthDate);
     const endDate = endOfMonth(monthDate);

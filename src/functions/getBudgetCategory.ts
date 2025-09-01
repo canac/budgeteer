@@ -1,25 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, parse, startOfMonth } from "date-fns";
-import { number, object, string } from "zod";
+import { number, object } from "zod";
 import {
   calculateCategoryBalance,
   calculateCategoryStartingBalance,
 } from "~/lib/calculateFundBalance";
 import { prisma } from "~/lib/prisma";
 import { roundCurrency } from "~/lib/roundCurrency";
+import { month } from "~/lib/zod";
 
 const inputSchema = object({
-  month: string(),
+  month: month(),
   categoryId: number(),
 });
 
 export const getBudgetCategory = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month, categoryId } }) => {
-    if (!/^\d{2}-\d{4}$/.test(month)) {
-      throw new Error("Invalid month format");
-    }
-
     const category = await prisma.category.findUnique({
       where: { id: categoryId },
       include: {
