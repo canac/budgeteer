@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { endOfMonth, parse, startOfMonth } from "date-fns";
+import { endOfMonth, startOfMonth } from "date-fns";
 import { object } from "zod";
+import { monthToDate } from "~/lib/monthToDate";
 import { prisma } from "~/lib/prisma";
 import { month } from "~/lib/zod";
 
@@ -11,7 +12,7 @@ const inputSchema = object({
 export const getBudgetTransactions = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month } }) => {
-    const monthDate = parse(month, "MM-yyyy", new Date());
+    const monthDate = monthToDate(month);
     const startDate = startOfMonth(monthDate);
     const endDate = endOfMonth(monthDate);
 

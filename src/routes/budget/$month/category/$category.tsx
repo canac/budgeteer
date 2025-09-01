@@ -12,7 +12,6 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { parse, startOfMonth } from "date-fns";
 import { DeleteCategoryModal } from "~/components/DeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
@@ -21,6 +20,7 @@ import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryName } from "~/functions/setCategoryName";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { monthToDate } from "~/lib/monthToDate";
 import classes from "./$category.module.css";
 
 export const Route = createFileRoute("/budget/$month/category/$category")({
@@ -45,8 +45,6 @@ function CategoryDetailsPage() {
   const router = useRouter();
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
-
-  const date = parse(month, "MM-yyyy", startOfMonth(new Date()));
 
   const handleGoBack = () => navigate({ to: "/budget/$month", params: { month } });
 
@@ -128,7 +126,7 @@ function CategoryDetailsPage() {
           <TransactionTable
             transactions={budgetCategory.transactions}
             startingBalance={budgetCategory.startingBalance}
-            startingBalanceDate={date}
+            startingBalanceDate={monthToDate(month)}
             onTransactionDeleted={handleTransactionDeleted}
           />
         </div>

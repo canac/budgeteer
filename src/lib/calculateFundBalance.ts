@@ -1,4 +1,5 @@
-import { endOfMonth, parse, startOfMonth } from "date-fns";
+import { endOfMonth, startOfMonth } from "date-fns";
+import { monthToDate } from "~/lib/monthToDate";
 import { prisma } from "~/lib/prisma";
 import { roundCurrency } from "~/lib/roundCurrency";
 import type { CategoryModel } from "../../generated/prisma/models";
@@ -27,7 +28,7 @@ export async function calculateCategoryBalance({
   month: string;
   category: Pick<CategoryModel, "id" | "fund">;
 }): Promise<number> {
-  const monthDate = parse(month, "MM-yyyy", new Date());
+  const monthDate = monthToDate(month);
 
   const aggregateTransactions = await prisma.transactionCategory.aggregate({
     _sum: { amount: true },
@@ -54,7 +55,7 @@ export async function calculateCategoryStartingBalance({
   month: string;
   category: Pick<CategoryModel, "id" | "fund">;
 }): Promise<number> {
-  const monthDate = parse(month, "MM-yyyy", new Date());
+  const monthDate = monthToDate(month);
   const totalBudgetedAmount = await getTotalBudgetedAmount({ month, category });
 
   if (!category.fund) {

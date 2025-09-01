@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
-import { parse, startOfMonth } from "date-fns";
+import { startOfMonth } from "date-fns";
 import { number, object, string } from "zod";
 import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
+import { monthToDate } from "~/lib/monthToDate";
 import { prisma } from "~/lib/prisma";
 import { roundCurrency } from "~/lib/roundCurrency";
 
@@ -21,7 +22,6 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
       throw new Error("Category not found");
     }
 
-    const monthDate = parse(month, "MM-yyyy", new Date());
     const currentBalance = await calculateCategoryBalance({
       month,
       category,
@@ -35,7 +35,7 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
     await prisma.transaction.create({
       data: {
         amount: adjustmentAmount,
-        date: startOfMonth(monthDate),
+        date: startOfMonth(monthToDate(month)),
         vendor: "Balance Adjustment",
         transactionCategories: {
           create: {

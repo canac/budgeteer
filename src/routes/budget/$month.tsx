@@ -14,7 +14,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconList, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
-import { format, parse, startOfMonth } from "date-fns";
+import { format } from "date-fns";
 import { useState } from "react";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineLink } from "~/components/MantineLink";
@@ -23,6 +23,7 @@ import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { monthToDate } from "~/lib/monthToDate";
 import classes from "./$month.module.css";
 
 export const Route = createFileRoute("/budget/$month")({
@@ -39,8 +40,7 @@ function BudgetPage() {
   const [viewMode, setViewMode] = useState<"budgeted" | "balance">("budgeted");
   const [opened, { open, close }] = useDisclosure(false);
   const leftToBudget = budget.income - budget.totalBudgetedAmount;
-  const date = parse(budget.month, "MM-yyyy", startOfMonth(new Date()));
-  const header = format(date, "MMMM yyyy");
+  const header = format(monthToDate(budget.month), "MMMM yyyy");
 
   const handleSaveIncome = async (newIncome: number) => {
     await setBudgetIncome({

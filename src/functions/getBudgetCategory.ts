@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { endOfMonth, parse, startOfMonth } from "date-fns";
+import { endOfMonth, startOfMonth } from "date-fns";
 import { number, object } from "zod";
 import {
   calculateCategoryBalance,
   calculateCategoryStartingBalance,
 } from "~/lib/calculateFundBalance";
+import { monthToDate } from "~/lib/monthToDate";
 import { prisma } from "~/lib/prisma";
 import { roundCurrency } from "~/lib/roundCurrency";
 import { month } from "~/lib/zod";
@@ -34,7 +35,7 @@ export const getBudgetCategory = createServerFn()
       throw new Response("Category not found", { status: 404 });
     }
 
-    const monthDate = parse(month, "MM-yyyy", new Date());
+    const monthDate = monthToDate(month);
     const startDate = startOfMonth(monthDate);
     const endDate = endOfMonth(monthDate);
 
