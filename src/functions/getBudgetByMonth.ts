@@ -3,6 +3,7 @@ import { object } from "zod";
 import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
 import { prisma } from "~/lib/prisma";
 import { month } from "~/lib/zod";
+import { cloneBudget } from "./cloneBudget";
 
 const inputSchema = object({
   month: month(),
@@ -11,17 +12,18 @@ const inputSchema = object({
 export const getBudgetByMonth = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month } }) => {
-    const budget = await prisma.budget.findFirst({
-      where: {
-        month,
-      },
-      include: {
-        budgetCategories: {
-          orderBy: { id: "asc" },
-          include: { category: true },
+    const budget =
+      (await prisma.budget.findFirst({
+        where: {
+          month,
         },
-      },
-    });
+        include: {
+          budgetCategories: {
+            orderBy: { id: "asc" },
+            include: { category: true },
+          },
+        },
+      })) ?? (await cloneBudget({ data: { month } }));
     if (!budget) {
       throw new Response("Budget not found");
     }
