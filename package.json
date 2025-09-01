@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && pnpm lint:ts",
+    "build": "pnpm lint:ts && vite build",
+    "build:analyze": "ANALYZE=true pnpm build",
     "start": "vite start",
     "db:format": "prisma format",
     "db:generate": "prisma generate",
