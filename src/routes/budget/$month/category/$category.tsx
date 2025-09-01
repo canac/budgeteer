@@ -1,4 +1,14 @@
-import { ActionIcon, Divider, Drawer, Group, Progress, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Divider,
+  Drawer,
+  Group,
+  Progress,
+  Space,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
@@ -11,6 +21,7 @@ import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryName } from "~/functions/setCategoryName";
 import { formatCurrency } from "~/lib/formatCurrency";
+import classes from "./$category.module.css";
 
 export const Route = createFileRoute("/budget/$month/category/$category")({
   component: CategoryDetailsPage,
@@ -57,21 +68,15 @@ function CategoryDetailsPage() {
   };
 
   const { budgetedAmount } = budgetCategory.budgetCategory;
-  const percentageRemaining = Math.max(
-    0,
-    Math.round(((budgetedAmount - budgetCategory.transactionTotal) / budgetedAmount) * 100),
-  );
 
   return (
     <Drawer
+      className={classes.root}
       opened
       onClose={handleGoBack}
       title={
         <Group justify="space-between" align="center" w="100%">
           <EditableName name={budgetCategory.category.name} saveName={handleSaveCategoryName} />
-          <Text size="sm" fw={500} c="white" p="4px 8px" bg="black" bdrs="sm">
-            {percentageRemaining}% remaining
-          </Text>
           <ActionIcon
             color="red"
             onClick={() => openDeleteModal()}
@@ -87,20 +92,16 @@ function CategoryDetailsPage() {
     >
       <Stack gap="lg">
         <div>
-          <Text size="md">Current Balance</Text>
+          <Title order={3}>Current Balance</Title>
           <Text size="xl" fw={700} c={budgetCategory.currentBalance >= 0 ? "green" : "red"}>
             {formatCurrency(budgetCategory.currentBalance)}
           </Text>
         </div>
 
         <div>
-          <Text size="md">Budget Used</Text>
-          <Group justify="space-between" align="center">
-            <Progress
-              value={(budgetCategory.transactionTotal / budgetedAmount) * 100}
-              color="green"
-              flex={1}
-            />
+          <Group>
+            <Title order={3}>Spent</Title>
+            <Space flex={1} />
             <Text size="sm" c="dimmed" ml="md">
               {formatCurrency(budgetCategory.transactionTotal)} of{" "}
               <EditableAmount
@@ -109,13 +110,23 @@ function CategoryDetailsPage() {
               />
             </Text>
           </Group>
+          <Progress
+            value={(budgetCategory.transactionTotal / budgetedAmount) * 100}
+            color="green"
+            flex={1}
+          />
         </div>
+
         <Divider />
-        <TransactionTable
-          transactions={budgetCategory.transactions}
-          startingBalance={budgetCategory.startingBalance}
-          startingBalanceDate={date}
-        />
+
+        <div>
+          <Title order={3}>Transactions</Title>
+          <TransactionTable
+            transactions={budgetCategory.transactions}
+            startingBalance={budgetCategory.startingBalance}
+            startingBalanceDate={date}
+          />
+        </div>
       </Stack>
       <DeleteCategoryModal
         open={deleteModalOpen}
