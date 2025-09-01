@@ -1,12 +1,7 @@
 /// <reference types="vite/client" />
 import { mantineHtmlProps, MantineProvider } from "@mantine/core";
 import mantineCss from "@mantine/core/styles.css?url";
-import {
-  createRootRoute,
-  HeadContent,
-  Outlet,
-  Scripts,
-} from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 export const Route = createRootRoute({

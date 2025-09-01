@@ -55,31 +55,28 @@ export const getCategoryDetails = createServerFn()
     });
 
     // Calculate starting balance (beginning of month)
-    const previousMonthTransactions =
-      await prisma.transactionCategory.aggregate({
-        _sum: { amount: true },
-        where: {
-          categoryId: category.id,
-          transaction: {
-            date: {
-              gte: category.fund ? undefined : undefined,
-              lt: startDate,
-            },
-          },
-        },
-      });
-
-    const previousMonthBudgetCategories = await prisma.budgetCategory.aggregate(
-      {
-        _sum: { budgetedAmount: true },
-        where: {
-          categoryId: category.id,
-          budget: {
-            month: category.fund ? { lt: month } : { lt: month },
+    const previousMonthTransactions = await prisma.transactionCategory.aggregate({
+      _sum: { amount: true },
+      where: {
+        categoryId: category.id,
+        transaction: {
+          date: {
+            gte: category.fund ? undefined : undefined,
+            lt: startDate,
           },
         },
       },
-    );
+    });
+
+    const previousMonthBudgetCategories = await prisma.budgetCategory.aggregate({
+      _sum: { budgetedAmount: true },
+      where: {
+        categoryId: category.id,
+        budget: {
+          month: category.fund ? { lt: month } : { lt: month },
+        },
+      },
+    });
 
     const startingBalance =
       (previousMonthBudgetCategories._sum.budgetedAmount ?? 0) +

@@ -14,30 +14,26 @@ const inputSchema = object({
     }),
   ).min(1),
 }).refine(
-  (value) =>
-    value.amount ===
-    value.categories.reduce((sum, category) => sum + category.amount, 0),
+  (value) => value.amount === value.categories.reduce((sum, category) => sum + category.amount, 0),
   { error: "Amount must equal the sum of category amounts." },
 );
 
 export const createTransaction = createServerFn({ method: "POST" })
   .validator(inputSchema)
-  .handler(
-    async ({ data: { amount, vendor, description, date, categories } }) => {
-      const transaction = await prisma.transaction.create({
-        data: {
-          amount,
-          vendor,
-          description,
-          date: new Date(date),
-          transactionCategories: {
-            create: categories.map(({ categoryId, amount }) => ({
-              categoryId,
-              amount,
-            })),
-          },
+  .handler(async ({ data: { amount, vendor, description, date, categories } }) => {
+    const transaction = await prisma.transaction.create({
+      data: {
+        amount,
+        vendor,
+        description,
+        date: new Date(date),
+        transactionCategories: {
+          create: categories.map(({ categoryId, amount }) => ({
+            categoryId,
+            amount,
+          })),
         },
-      });
-      return transaction;
-    },
-  );
+      },
+    });
+    return transaction;
+  });

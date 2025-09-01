@@ -36,9 +36,7 @@ export function DeleteCategoryModal({
       centered
     >
       <Stack gap="md">
-        <Text>
-          Are you sure you want to delete the "{category.name}" category?
-        </Text>
+        <Text>Are you sure you want to delete the "{category.name}" category?</Text>
         <Group justify="flex-end" gap="sm">
           <Button variant="default" onClick={handleDeleteCancel}>
             Cancel

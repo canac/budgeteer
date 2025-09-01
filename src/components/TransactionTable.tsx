@@ -5,9 +5,7 @@ import { formatCurrency } from "~/lib/formatCurrency";
 import classes from "./TransactionTable.module.css";
 
 interface TransactionTableProps {
-  transactions: Array<
-    Pick<Transaction, "id" | "date" | "vendor" | "description" | "amount">
-  >;
+  transactions: Array<Pick<Transaction, "id" | "date" | "vendor" | "description" | "amount">>;
   startingBalance: number;
   startingBalanceDate: Date;
 }
@@ -37,10 +35,7 @@ export function TransactionTable({
               <Table.Td>{format(transaction.date, "MMM dd")}</Table.Td>
               <Table.Td>{transaction.vendor}</Table.Td>
               <Table.Td>{transaction.description}</Table.Td>
-              <Table.Td
-                ta="right"
-                c={transaction.amount < 0 ? undefined : "green"}
-              >
+              <Table.Td ta="right" c={transaction.amount < 0 ? undefined : "green"}>
                 {formatCurrency(transaction.amount)}
               </Table.Td>
             </Table.Tr>

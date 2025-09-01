@@ -42,10 +42,7 @@ const formSchema = object({
   vendor: string().min(1, "Vendor is required"),
   description: string(),
   date: string().min(1, "Date is required"),
-  selectedCategoryIds: array(string()).min(
-    1,
-    "At least one category is required",
-  ),
+  selectedCategoryIds: array(string()).min(1, "At least one category is required"),
   categoryAmounts: array(
     object({
       categoryId: number(),
@@ -96,9 +93,7 @@ export function NewTransactionModal({
 
   form.watch("selectedCategoryIds", ({ value, previousValue }) => {
     if (value.length === 1) {
-      form.setFieldValue("categoryAmounts", [
-        { categoryId: Number(value[0]), amount },
-      ]);
+      form.setFieldValue("categoryAmounts", [{ categoryId: Number(value[0]), amount }]);
     } else if (value.length === 2 && previousValue.length === 1) {
       form.setFieldValue("categoryAmounts", [
         { categoryId: Number(value[0]), amount: 0 },
@@ -107,9 +102,7 @@ export function NewTransactionModal({
     } else {
       const newCategoryAmounts = value.map(
         (categoryId) =>
-          categoryAmounts.find(
-            (category) => category.categoryId.toString() === categoryId,
-          ) ?? {
+          categoryAmounts.find((category) => category.categoryId.toString() === categoryId) ?? {
             categoryId: Number(categoryId),
             amount: 0,
           },
@@ -127,10 +120,7 @@ export function NewTransactionModal({
   });
 
   const assignRemainingAmount = (index: number) => {
-    const currentTotal = categoryAmounts.reduce(
-      (sum, category) => sum + category.amount,
-      0,
-    );
+    const currentTotal = categoryAmounts.reduce((sum, category) => sum + category.amount, 0);
     const remainingAmount = amount - currentTotal;
     form.setFieldValue(
       `categoryAmounts.${index}.amount`,
@@ -147,8 +137,7 @@ export function NewTransactionModal({
   };
 
   const remainingAmount =
-    amount -
-    categoryAmounts.reduce((sum, category) => sum + category.amount, 0);
+    amount - categoryAmounts.reduce((sum, category) => sum + category.amount, 0);
 
   const handleSubmit = form.onSubmit(async (values) => {
     await createTransaction({
@@ -230,11 +219,7 @@ export function NewTransactionModal({
                   (category) => category.id === categoryAmount.categoryId,
                 );
                 return (
-                  <Group
-                    key={categoryAmount.categoryId}
-                    gap="xs"
-                    align="flex-start"
-                  >
+                  <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
                     <NumberInput
                       placeholder={`${category?.name} amount`}
                       leftSection="$"
@@ -267,11 +252,7 @@ export function NewTransactionModal({
             </Stack>
           )}
           <Group justify="flex-end">
-            <Button
-              type="submit"
-              loading={form.submitting}
-              disabled={!form.isValid()}
-            >
+            <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               Save
             </Button>
           </Group>

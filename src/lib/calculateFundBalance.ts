@@ -32,7 +32,6 @@ export async function calculateCategoryBalance({
   });
 
   const balance =
-    (aggregateBudgetCategories._sum.budgetedAmount ?? 0) +
-    (aggregateTransactions._sum.amount ?? 0);
+    (aggregateBudgetCategories._sum.budgetedAmount ?? 0) + (aggregateTransactions._sum.amount ?? 0);
   return Math.round(balance * 100) / 100;
 }

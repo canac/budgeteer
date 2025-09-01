@@ -1,19 +1,7 @@
-import {
-  ActionIcon,
-  Box,
-  Divider,
-  Drawer,
-  Group,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Box, Divider, Drawer, Group, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { parse, startOfMonth } from "date-fns";
 import { DeleteCategoryModal } from "~/components/DeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
@@ -49,8 +37,7 @@ function CategoryDetailsPage() {
 
   const date = parse(month, "MM-yyyy", startOfMonth(new Date()));
 
-  const handleGoBack = () =>
-    navigate({ to: "/budget/$month", params: { month } });
+  const handleGoBack = () => navigate({ to: "/budget/$month", params: { month } });
 
   const handleSaveCategoryName = async (newName: string) => {
     await setCategoryName({
@@ -82,10 +69,7 @@ function CategoryDetailsPage() {
       onClose={handleGoBack}
       title={
         <Group justify="space-between" align="center" w="100%">
-          <EditableName
-            name={categoryDetails.category.name}
-            saveName={handleSaveCategoryName}
-          />
+          <EditableName name={categoryDetails.category.name} saveName={handleSaveCategoryName} />
           <Text size="sm" fw={500} c="white" p="4px 8px" bg="black" bdrs="sm">
             {percentageRemaining}% remaining
           </Text>
@@ -105,11 +89,7 @@ function CategoryDetailsPage() {
       <Stack gap="lg">
         <div>
           <Text size="md">Current Balance</Text>
-          <Text
-            size="xl"
-            fw={700}
-            c={categoryDetails.currentBalance >= 0 ? "green" : "red"}
-          >
+          <Text size="xl" fw={700} c={categoryDetails.currentBalance >= 0 ? "green" : "red"}>
             {formatCurrency(categoryDetails.currentBalance)}
           </Text>
         </div>
@@ -126,10 +106,7 @@ function CategoryDetailsPage() {
                 overflow: "hidden",
               }}
             >
-              <Box
-                w={`${Math.min(100, (budgetUsed / budgetedAmount) * 100)}%`}
-                bg={"green"}
-              />
+              <Box w={`${Math.min(100, (budgetUsed / budgetedAmount) * 100)}%`} bg={"green"} />
             </div>
             <Text size="sm" c="dimmed" ml="md">
               {formatCurrency(budgetUsed)} of{" "}

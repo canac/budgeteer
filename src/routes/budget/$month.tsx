@@ -97,20 +97,11 @@ function BudgetPage() {
           <Container size="lg">
             <Outlet />
             <Stack align="center">
-              <Card
-                className={classes.card}
-                shadow="sm"
-                padding="lg"
-                radius="md"
-                withBorder
-              >
+              <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="xs">
                   <Group justify="space-between">
                     <Text className={classes.cardHeader}>Income</Text>
-                    <EditableAmount
-                      amount={budget.income}
-                      saveAmount={handleSaveIncome}
-                    />
+                    <EditableAmount amount={budget.income} saveAmount={handleSaveIncome} />
                   </Group>
                   <Group justify="space-between">
                     <Text>Left to budget</Text>
@@ -121,13 +112,7 @@ function BudgetPage() {
                 </Stack>
               </Card>
 
-              <Card
-                className={classes.card}
-                shadow="sm"
-                padding="lg"
-                radius="md"
-                withBorder
-              >
+              <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="xs">
                   <Group justify="space-between">
                     <Text className={classes.cardHeader}>Categories</Text>
@@ -171,11 +156,7 @@ function BudgetPage() {
                       </Group>
                     </MantineLink>
                   ))}
-                  <Button
-                    variant="light"
-                    leftSection={<IconPlus />}
-                    onClick={handleCreateCategory}
-                  >
+                  <Button variant="light" leftSection={<IconPlus />} onClick={handleCreateCategory}>
                     Add Category
                   </Button>
                 </Stack>
