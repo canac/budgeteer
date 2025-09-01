@@ -12,7 +12,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconPlus } from "@tabler/icons-react";
+import { IconList, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { format, parse, startOfMonth } from "date-fns";
 import { useState } from "react";
@@ -60,6 +60,13 @@ function BudgetPage() {
     await router.invalidate();
   };
 
+  const handleViewTransactions = () => {
+    router.navigate({
+      to: "/budget/$month/transactions",
+      params: { month: budget.month },
+    });
+  };
+
   const categories = budget.budgetCategories.map((budgetCategory) => ({
     id: budgetCategory.categoryId,
     name: budgetCategory.name,
@@ -86,9 +93,14 @@ function BudgetPage() {
               <Title flex={1} c="white" size="h2">
                 {header}
               </Title>
-              <ActionIcon variant="subtle" c="white" size="xl" onClick={open}>
-                <IconPlus size={24} />
-              </ActionIcon>
+              <Group gap="xs">
+                <ActionIcon variant="subtle" c="white" size="xl" onClick={handleViewTransactions}>
+                  <IconList size={24} />
+                </ActionIcon>
+                <ActionIcon variant="subtle" c="white" size="xl" onClick={open}>
+                  <IconPlus size={24} />
+                </ActionIcon>
+              </Group>
             </Flex>
           </Container>
         </AppShell.Header>
