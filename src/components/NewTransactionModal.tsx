@@ -120,9 +120,10 @@ export function NewTransactionModal({
     }
   });
 
+  const remainingAmount =
+    amount - categoryAmounts.reduce((sum, category) => sum + category.amount, 0);
+
   const assignRemainingAmount = (index: number) => {
-    const currentTotal = categoryAmounts.reduce((sum, category) => sum + category.amount, 0);
-    const remainingAmount = amount - currentTotal;
     form.setFieldValue(
       `categoryAmounts.${index}.amount`,
       categoryAmounts[index].amount + remainingAmount,
@@ -136,9 +137,6 @@ export function NewTransactionModal({
       selectedCategoryIds.filter((id) => id !== categoryId),
     );
   };
-
-  const remainingAmount =
-    amount - categoryAmounts.reduce((sum, category) => sum + category.amount, 0);
 
   const handleSubmit = form.onSubmit(async (values) => {
     await createTransaction({
@@ -236,20 +234,22 @@ export function NewTransactionModal({
                     />
                     <ActionIcon
                       variant="transparent"
-                      color="green"
-                      onClick={() => assignRemainingAmount(index)}
-                      title="Assign remaining amount"
-                    >
-                      <IconCircleCheck />
-                    </ActionIcon>
-                    <ActionIcon
-                      variant="transparent"
                       color="red"
                       onClick={() => removeCategory(index)}
                       title="Remove category"
                     >
                       <IconTrash />
                     </ActionIcon>
+                    {remainingAmount !== 0 && (
+                      <ActionIcon
+                        variant="transparent"
+                        color="green"
+                        onClick={() => assignRemainingAmount(index)}
+                        title="Assign remaining amount"
+                      >
+                        <IconCircleCheck />
+                      </ActionIcon>
+                    )}
                   </Group>
                 );
               })}
