@@ -56,7 +56,7 @@ const formSchema = object({
       (sum, category) => sum + category.amount,
       0,
     );
-    return roundCurrency(values.amount - totalCategoryAmount);
+    return roundCurrency(values.amount - totalCategoryAmount) === 0;
   },
   {
     message: "Category amounts must equal total amount",
