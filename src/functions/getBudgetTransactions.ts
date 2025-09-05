@@ -30,8 +30,9 @@ export const getBudgetTransactions = createServerFn()
 
     return transactions.map((transaction) => ({
       ...transaction,
-      transactionCategories: transaction.transactionCategories.map(({ category }) => ({
+      transactionCategories: transaction.transactionCategories.map(({ amount, category }) => ({
         id: category.id,
+        amount,
         name: category.name,
       })),
     }));

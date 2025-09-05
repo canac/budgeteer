@@ -65,7 +65,7 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
-  const handleTransactionDeleted = async () => {
+  const updateUpdate = async () => {
     await router.invalidate();
   };
 
@@ -127,7 +127,7 @@ function CategoryDetailsPage() {
             transactions={budgetCategory.transactions}
             startingBalance={budgetCategory.startingBalance}
             startingBalanceDate={monthToDate(month)}
-            onTransactionDeleted={handleTransactionDeleted}
+            onUpdate={updateUpdate}
           />
         </div>
       </Stack>

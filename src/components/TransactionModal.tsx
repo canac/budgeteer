@@ -17,20 +17,28 @@ import { zod4Resolver } from "mantine-form-zod-resolver";
 import type z from "zod";
 import { array, number, object, string } from "zod";
 import { createTransaction } from "~/functions/createTransaction";
+import { editTransaction } from "~/functions/editTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
 import { roundCurrency } from "~/lib/roundCurrency";
+import { Route as BudgetRoute } from "~/routes/budget/$month";
 
-interface Category {
+interface EditTransaction {
   id: number;
-  name: string;
-  currentBalance: number;
+  amount: number;
+  vendor: string;
+  description: string | null;
+  date: Date;
+  transactionCategories: Array<{
+    id: number;
+    amount: number;
+  }>;
 }
 
-interface NewTransactionModalProps {
+export interface TransactionModalProps {
   opened: boolean;
   onClose: () => void;
-  categories: Category[];
-  onTransactionCreated: () => void;
+  onSave: () => void;
+  editingTransaction?: EditTransaction;
 }
 
 const amountSchema = number("Amount is required").refine(
@@ -66,28 +74,46 @@ const formSchema = object({
 
 type Schema = z.infer<typeof formSchema>;
 
-export function NewTransactionModal({
+export function TransactionModal({
   opened,
   onClose,
-  categories,
-  onTransactionCreated,
-}: NewTransactionModalProps) {
+  onSave,
+  editingTransaction,
+}: TransactionModalProps) {
+  const { budgetCategories } = BudgetRoute.useLoaderData().budget;
+
+  const isEditing = !!editingTransaction;
+
   const form = useForm<Schema>({
     validateInputOnBlur: true,
-    initialValues: {
-      amount: 0,
-      vendor: "",
-      description: "",
-      date: format(new Date(), "yyyy-MM-dd"),
-      selectedCategoryIds: [],
-      categoryAmounts: [],
-    },
+    initialValues: isEditing
+      ? {
+          amount: Math.abs(editingTransaction.amount),
+          vendor: editingTransaction.vendor,
+          description: editingTransaction.description || "",
+          date: format(editingTransaction.date, "yyyy-MM-dd"),
+          selectedCategoryIds: editingTransaction.transactionCategories.map((category) =>
+            category.id.toString(),
+          ),
+          categoryAmounts: editingTransaction.transactionCategories.map((category) => ({
+            categoryId: category.id,
+            amount: Math.abs(category.amount),
+          })),
+        }
+      : {
+          amount: 0,
+          vendor: "",
+          description: "",
+          date: format(new Date(), "yyyy-MM-dd"),
+          selectedCategoryIds: [],
+          categoryAmounts: [],
+        },
     validate: zod4Resolver(formSchema),
   });
 
-  const categoryOptions = categories.map((category) => ({
-    value: category.id.toString(),
-    label: `${category.name} (${formatCurrency(category.currentBalance)})`,
+  const categoryOptions = budgetCategories.map((category) => ({
+    value: category.categoryId.toString(),
+    label: `${category.name} (${formatCurrency(category.balance)})`,
   }));
 
   const { selectedCategoryIds, categoryAmounts, amount } = form.getValues();
@@ -139,29 +165,39 @@ export function NewTransactionModal({
   };
 
   const handleSubmit = form.onSubmit(async (values) => {
-    await createTransaction({
-      data: {
-        amount: -values.amount,
-        vendor: values.vendor,
-        description: values.description || undefined,
-        date: new Date(values.date).toISOString(),
-        categories: values.categoryAmounts.map((categoryAmount) => ({
-          ...categoryAmount,
-          amount: -categoryAmount.amount,
-        })),
-      },
-    });
+    const transaction = {
+      amount: -values.amount,
+      vendor: values.vendor,
+      description: values.description || undefined,
+      date: new Date(values.date).toISOString(),
+      categories: values.categoryAmounts.map((categoryAmount) => ({
+        ...categoryAmount,
+        amount: -categoryAmount.amount,
+      })),
+    };
+    if (isEditing) {
+      await editTransaction({
+        data: {
+          id: editingTransaction.id,
+          ...transaction,
+        },
+      });
+    } else {
+      await createTransaction({
+        data: transaction,
+      });
+    }
 
     form.reset();
     onClose();
-    onTransactionCreated();
+    onSave();
   });
 
   return (
     <Modal
       opened={opened}
       onClose={onClose}
-      title={<Text fw="bold">New Transaction</Text>}
+      title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
       size="md"
       centered
     >
@@ -217,13 +253,13 @@ export function NewTransactionModal({
                 </Alert>
               )}
               {categoryAmounts.map((categoryAmount, index) => {
-                const category = categories.find(
-                  (category) => category.id === categoryAmount.categoryId,
+                const budgetCategory = budgetCategories.find(
+                  (budgetCategory) => budgetCategory.categoryId === categoryAmount.categoryId,
                 );
                 return (
                   <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
                     <NumberInput
-                      placeholder={`${category?.name} amount`}
+                      placeholder={`${budgetCategory?.name} amount`}
                       leftSection="$"
                       key={form.key(`categoryAmounts.${index}.amount`)}
                       {...form.getInputProps(`categoryAmounts.${index}.amount`)}
@@ -257,7 +293,7 @@ export function NewTransactionModal({
           )}
           <Group justify="flex-end">
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
-              Save
+              {isEditing ? "Update" : "Save"}
             </Button>
           </Group>
         </Stack>

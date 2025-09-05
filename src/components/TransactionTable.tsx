@@ -1,5 +1,5 @@
-import { ActionIcon, Table } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
+import { ActionIcon, Group, Table } from "@mantine/core";
+import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
 import type { Transaction } from "generated/prisma/client";
 import { useState } from "react";
@@ -8,44 +8,48 @@ import {
   type DeleteTransactionModalProps,
 } from "~/components/DeleteTransactionModal";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { TransactionModal } from "./TransactionModal";
 import classes from "./TransactionTable.module.css";
 
 interface TransactionTableProps {
   transactions: Array<Pick<Transaction, "id" | "date" | "vendor" | "description" | "amount">>;
   startingBalance: number;
   startingBalanceDate: Date;
-  onTransactionDeleted?: () => Promise<void>;
+  onUpdate: () => Promise<void>;
 }
 
 export function TransactionTable({
   transactions,
   startingBalance,
   startingBalanceDate,
-  onTransactionDeleted,
+  onUpdate,
 }: TransactionTableProps) {
-  const [selectedTransaction, setSelectedTransaction] = useState<
+  const [deletingTransaction, setDeletingTransaction] = useState<
+    DeleteTransactionModalProps["transaction"] | null
+  >(null);
+  const [editingTransaction, setEditingTransaction] = useState<
     DeleteTransactionModalProps["transaction"] | null
   >(null);
 
   const handleDeleteTransaction = (transaction: DeleteTransactionModalProps["transaction"]) => {
-    setSelectedTransaction(transaction);
+    setDeletingTransaction(transaction);
   };
-
-  const handleTransactionDeleted = async () => {
-    if (onTransactionDeleted) {
-      await onTransactionDeleted();
-    }
+  const handleEditTransaction = (transaction: DeleteTransactionModalProps["transaction"]) => {
+    setEditingTransaction(transaction);
   };
 
   return (
     <>
-      {selectedTransaction && (
+      {deletingTransaction && (
         <DeleteTransactionModal
-          open
-          onClose={() => setSelectedTransaction(null)}
-          transaction={selectedTransaction}
-          onDelete={handleTransactionDeleted}
+          opened
+          onClose={() => setDeletingTransaction(null)}
+          transaction={deletingTransaction}
+          onDelete={onUpdate}
         />
+      )}
+      {editingTransaction && (
+        <TransactionModal opened onClose={() => setEditingTransaction(null)} onSave={onUpdate} />
       )}
       <Table striped>
         <Table.Thead>
@@ -54,7 +58,7 @@ export function TransactionTable({
             <Table.Th>Vendor</Table.Th>
             <Table.Th>Description</Table.Th>
             <Table.Th ta="right">Amount</Table.Th>
-            {onTransactionDeleted && <Table.Th ta="center">Actions</Table.Th>}
+            <Table.Th ta="center">Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -66,8 +70,15 @@ export function TransactionTable({
               <Table.Td ta="right" c={transaction.amount < 0 ? undefined : "green"}>
                 {formatCurrency(transaction.amount)}
               </Table.Td>
-              {onTransactionDeleted && (
-                <Table.Td ta="center">
+              <Table.Td ta="center">
+                <Group gap="xs" justify="center">
+                  <ActionIcon
+                    variant="subtle"
+                    color="blue"
+                    onClick={() => handleEditTransaction(transaction)}
+                  >
+                    <IconEdit size={16} />
+                  </ActionIcon>
                   <ActionIcon
                     variant="subtle"
                     color="red"
@@ -75,8 +86,8 @@ export function TransactionTable({
                   >
                     <IconTrash size={16} />
                   </ActionIcon>
-                </Table.Td>
-              )}
+                </Group>
+              </Table.Td>
             </Table.Tr>
           ))}
           <Table.Tr className={classes.startingBalanceRow}>
@@ -86,7 +97,7 @@ export function TransactionTable({
             <Table.Td ta="right" c={startingBalance < 0 ? "red" : "green"}>
               {formatCurrency(startingBalance)}
             </Table.Td>
-            {onTransactionDeleted && <Table.Td></Table.Td>}
+            <Table.Td />
           </Table.Tr>
         </Table.Tbody>
       </Table>

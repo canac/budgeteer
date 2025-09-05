@@ -1,5 +1,5 @@
-import { ActionIcon, Drawer, Stack, Table, Text } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
+import { ActionIcon, Drawer, Group, Stack, Table, Text } from "@mantine/core";
+import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { Fragment, useState } from "react";
@@ -8,15 +8,17 @@ import {
   type DeleteTransactionModalProps,
 } from "~/components/DeleteTransactionModal";
 import { MantineLink } from "~/components/MantineLink";
+import { TransactionModal, type TransactionModalProps } from "~/components/TransactionModal";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
 import { formatCurrency } from "~/lib/formatCurrency";
+
+type DeleteTransaction = DeleteTransactionModalProps["transaction"];
+type EditTransaction = TransactionModalProps["editingTransaction"];
 
 export const Route = createFileRoute("/budget/$month/transactions")({
   component: TransactionsPage,
   loader: async ({ params: { month } }) => {
-    const transactions = await getBudgetTransactions({
-      data: { month },
-    });
+    const transactions = await getBudgetTransactions({ data: { month } });
     return { transactions };
   },
 });
@@ -25,16 +27,24 @@ function TransactionsPage() {
   const router = useRouter();
   const { transactions } = Route.useLoaderData();
   const { month } = Route.useParams();
-  const [deletingTransaction, setDeletingTransaction] = useState<
-    DeleteTransactionModalProps["transaction"] | null
-  >(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<DeleteTransaction | null>(null);
+  const [editingTransaction, setEditingTransaction] = useState<EditTransaction | null>(null);
 
   const handleClose = () => {
     router.navigate({ to: "/budget/$month", params: { month } });
   };
 
-  const handleDeleteTransaction = (transaction: DeleteTransactionModalProps["transaction"]) => {
+  const handleDeleteTransaction = (transaction: DeleteTransaction) => {
     setDeletingTransaction(transaction);
+  };
+
+  const handleEditTransaction = (transaction: EditTransaction) => {
+    setEditingTransaction(transaction);
+  };
+
+  const handleTransactionUpdated = async () => {
+    setEditingTransaction(null);
+    await router.invalidate();
   };
 
   const handleTransactionDeleted = async () => {
@@ -43,9 +53,17 @@ function TransactionsPage() {
 
   return (
     <>
+      {editingTransaction && (
+        <TransactionModal
+          opened
+          onClose={() => setEditingTransaction(null)}
+          onSave={handleTransactionUpdated}
+          editingTransaction={editingTransaction}
+        />
+      )}
       {deletingTransaction && (
         <DeleteTransactionModal
-          open
+          opened
           onClose={() => setDeletingTransaction(null)}
           transaction={deletingTransaction}
           onDelete={handleTransactionDeleted}
@@ -97,13 +115,22 @@ function TransactionsPage() {
                     {formatCurrency(transaction.amount)}
                   </Table.Td>
                   <Table.Td ta="center">
-                    <ActionIcon
-                      variant="subtle"
-                      color="red"
-                      onClick={() => handleDeleteTransaction(transaction)}
-                    >
-                      <IconTrash size={16} />
-                    </ActionIcon>
+                    <Group gap="xs" justify="center">
+                      <ActionIcon
+                        variant="subtle"
+                        color="blue"
+                        onClick={() => handleEditTransaction(transaction)}
+                      >
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="subtle"
+                        color="red"
+                        onClick={() => handleDeleteTransaction(transaction)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
                   </Table.Td>
                 </Table.Tr>
               ))}

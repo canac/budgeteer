@@ -18,7 +18,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineLink } from "~/components/MantineLink";
-import { NewTransactionModal } from "~/components/NewTransactionModal";
+import { TransactionModal } from "~/components/TransactionModal";
 import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
@@ -67,20 +67,9 @@ function BudgetPage() {
     });
   };
 
-  const categories = budget.budgetCategories.map((budgetCategory) => ({
-    id: budgetCategory.categoryId,
-    name: budgetCategory.name,
-    currentBalance: budgetCategory.balance,
-  }));
-
   return (
     <>
-      <NewTransactionModal
-        opened={opened}
-        onClose={close}
-        categories={categories}
-        onTransactionCreated={handleTransactionCreated}
-      />
+      <TransactionModal opened={opened} onClose={close} onSave={handleTransactionCreated} />
       <AppShell header={{ height: 60 }} padding="md">
         <AppShell.Header
           style={{
