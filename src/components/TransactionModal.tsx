@@ -14,8 +14,8 @@ import { useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
-import type z from "zod";
-import { array, number, object, string } from "zod";
+import type z from "zod/mini";
+import { array, minLength, number, object, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
@@ -41,35 +41,36 @@ export interface TransactionModalProps {
   editingTransaction?: EditTransaction;
 }
 
-const amountSchema = number("Amount is required").refine(
-  (value) => value > 0,
-  "Amount must not be zero",
+const amountSchema = number("Amount is required").check(
+  refine((value) => value > 0, "Amount must not be zero"),
 );
 
 const formSchema = object({
   amount: amountSchema,
-  vendor: string().min(1, "Vendor is required"),
+  vendor: string().check(minLength(1, "Vendor is required")),
   description: string(),
-  date: string().min(1, "Date is required"),
-  selectedCategoryIds: array(string()).min(1, "At least one category is required"),
+  date: string("Date is required"),
+  selectedCategoryIds: array(string()).check(minLength(1, "At least one category is required")),
   categoryAmounts: array(
     object({
       categoryId: number(),
       amount: amountSchema,
     }),
   ),
-}).refine(
-  (values) => {
-    const totalCategoryAmount = values.categoryAmounts.reduce(
-      (sum, category) => sum + category.amount,
-      0,
-    );
-    return roundCurrency(values.amount - totalCategoryAmount) === 0;
-  },
-  {
-    message: "Category amounts must equal total amount",
-    path: ["categoryAmounts"],
-  },
+}).check(
+  refine(
+    (values) => {
+      const totalCategoryAmount = values.categoryAmounts.reduce(
+        (sum, category) => sum + category.amount,
+        0,
+      );
+      return roundCurrency(values.amount - totalCategoryAmount) === 0;
+    },
+    {
+      message: "Category amounts must equal total amount",
+      path: ["categoryAmounts"],
+    },
+  ),
 );
 
 type Schema = z.infer<typeof formSchema>;
