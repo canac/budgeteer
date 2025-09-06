@@ -2,7 +2,7 @@ import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 import type { Category } from "generated/prisma/client";
 import { deleteCategory } from "~/functions/deleteCategory";
 
-interface DeleteCategoryModalProps {
+export interface DeleteCategoryModalProps {
   onClose: () => void;
   category: Pick<Category, "id" | "name">;
   onDelete: () => Promise<void>;

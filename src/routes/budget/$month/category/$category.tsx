@@ -12,7 +12,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { DeleteCategoryModal } from "~/components/DeleteCategoryModal";
+import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
 import { TransactionTable } from "~/components/TransactionTable";
@@ -132,7 +132,7 @@ function CategoryDetailsPage() {
         </div>
       </Stack>
       {deleteModalOpen && (
-        <DeleteCategoryModal
+        <DynamicDeleteCategoryModal
           onClose={() => closeDeleteModal()}
           category={budgetCategory.category}
           onDelete={() => handleGoBack()}

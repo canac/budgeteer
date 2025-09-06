@@ -3,12 +3,11 @@ import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { Fragment, useState } from "react";
-import {
-  DeleteTransactionModal,
-  type DeleteTransactionModalProps,
-} from "~/components/DeleteTransactionModal";
+import type { DeleteTransactionModalProps } from "~/components/DeleteTransactionModal";
+import { DynamicDeleteTransactionModal } from "~/components/DynamicDeleteTransactionModal";
+import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { MantineLink } from "~/components/MantineLink";
-import { TransactionModal, type TransactionModalProps } from "~/components/TransactionModal";
+import type { TransactionModalProps } from "~/components/TransactionModal";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
 import { formatCurrency } from "~/lib/formatCurrency";
 
@@ -54,14 +53,14 @@ function TransactionsPage() {
   return (
     <>
       {editingTransaction && (
-        <TransactionModal
+        <DynamicTransactionModal
           onClose={() => setEditingTransaction(null)}
           onSave={handleTransactionUpdated}
           editingTransaction={editingTransaction}
         />
       )}
       {deletingTransaction && (
-        <DeleteTransactionModal
+        <DynamicDeleteTransactionModal
           onClose={() => setDeletingTransaction(null)}
           transaction={deletingTransaction}
           onDelete={handleTransactionDeleted}

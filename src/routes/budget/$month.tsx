@@ -16,9 +16,9 @@ import { IconList, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { useState } from "react";
+import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineLink } from "~/components/MantineLink";
-import { TransactionModal } from "~/components/TransactionModal";
 import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
@@ -69,7 +69,7 @@ function BudgetPage() {
 
   return (
     <>
-      {opened && <TransactionModal onClose={close} onSave={handleTransactionCreated} />}
+      {opened && <DynamicTransactionModal onClose={close} onSave={handleTransactionCreated} />}
       <AppShell header={{ height: 60 }} padding="md">
         <AppShell.Header
           style={{
