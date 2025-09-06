@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
+import { useLoaderData } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import type z from "zod/mini";
@@ -20,7 +21,6 @@ import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
 import { roundCurrency } from "~/lib/roundCurrency";
-import { Route as BudgetRoute } from "~/routes/budget/$month";
 
 interface EditTransaction {
   id: number;
@@ -75,7 +75,7 @@ const formSchema = object({
 type Schema = z.infer<typeof formSchema>;
 
 export function TransactionModal({ onClose, onSave, editingTransaction }: TransactionModalProps) {
-  const { budgetCategories } = BudgetRoute.useLoaderData().budget;
+  const { budgetCategories } = useLoaderData({ from: "/budget/$month" }).budget;
 
   const isEditing = !!editingTransaction;
 
