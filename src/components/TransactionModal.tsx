@@ -35,7 +35,6 @@ interface EditTransaction {
 }
 
 export interface TransactionModalProps {
-  opened: boolean;
   onClose: () => void;
   onSave: () => void;
   editingTransaction?: EditTransaction;
@@ -75,12 +74,7 @@ const formSchema = object({
 
 type Schema = z.infer<typeof formSchema>;
 
-export function TransactionModal({
-  opened,
-  onClose,
-  onSave,
-  editingTransaction,
-}: TransactionModalProps) {
+export function TransactionModal({ onClose, onSave, editingTransaction }: TransactionModalProps) {
   const { budgetCategories } = BudgetRoute.useLoaderData().budget;
 
   const isEditing = !!editingTransaction;
@@ -196,7 +190,7 @@ export function TransactionModal({
 
   return (
     <Modal
-      opened={opened}
+      opened
       onClose={onClose}
       title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
       size="md"

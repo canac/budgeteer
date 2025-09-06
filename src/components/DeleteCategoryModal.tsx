@@ -3,18 +3,12 @@ import type { Category } from "generated/prisma/client";
 import { deleteCategory } from "~/functions/deleteCategory";
 
 interface DeleteCategoryModalProps {
-  open: boolean;
   onClose: () => void;
   category: Pick<Category, "id" | "name">;
   onDelete: () => Promise<void>;
 }
 
-export function DeleteCategoryModal({
-  open,
-  onClose,
-  category,
-  onDelete,
-}: DeleteCategoryModalProps) {
+export function DeleteCategoryModal({ onClose, category, onDelete }: DeleteCategoryModalProps) {
   const handleDeleteCancel = () => {
     onClose();
   };
@@ -29,7 +23,7 @@ export function DeleteCategoryModal({
 
   return (
     <Modal
-      opened={open}
+      opened
       onClose={handleDeleteCancel}
       title={<Text fw="bold">Delete Category</Text>}
       size="md"

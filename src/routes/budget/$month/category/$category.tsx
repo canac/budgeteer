@@ -131,12 +131,13 @@ function CategoryDetailsPage() {
           />
         </div>
       </Stack>
-      <DeleteCategoryModal
-        open={deleteModalOpen}
-        onClose={() => closeDeleteModal()}
-        category={budgetCategory.category}
-        onDelete={() => handleGoBack()}
-      />
+      {deleteModalOpen && (
+        <DeleteCategoryModal
+          onClose={() => closeDeleteModal()}
+          category={budgetCategory.category}
+          onDelete={() => handleGoBack()}
+        />
+      )}
     </Drawer>
   );
 }

@@ -4,14 +4,12 @@ import type { Transaction } from "generated/prisma/client";
 import { deleteTransaction } from "~/functions/deleteTransaction";
 
 export interface DeleteTransactionModalProps {
-  opened: boolean;
   onClose: () => void;
   transaction: Pick<Transaction, "id" | "vendor" | "amount" | "date">;
   onDelete: () => Promise<void>;
 }
 
 export function DeleteTransactionModal({
-  opened,
   onClose,
   transaction,
   onDelete,
@@ -30,7 +28,7 @@ export function DeleteTransactionModal({
 
   return (
     <Modal
-      opened={opened}
+      opened
       onClose={handleDeleteCancel}
       title={<Text fw="bold">Delete Transaction</Text>}
       size="md"

@@ -69,7 +69,7 @@ function BudgetPage() {
 
   return (
     <>
-      <TransactionModal opened={opened} onClose={close} onSave={handleTransactionCreated} />
+      {opened && <TransactionModal onClose={close} onSave={handleTransactionCreated} />}
       <AppShell header={{ height: 60 }} padding="md">
         <AppShell.Header
           style={{

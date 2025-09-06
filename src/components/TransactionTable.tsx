@@ -42,14 +42,13 @@ export function TransactionTable({
     <>
       {deletingTransaction && (
         <DeleteTransactionModal
-          opened
           onClose={() => setDeletingTransaction(null)}
           transaction={deletingTransaction}
           onDelete={onUpdate}
         />
       )}
       {editingTransaction && (
-        <TransactionModal opened onClose={() => setEditingTransaction(null)} onSave={onUpdate} />
+        <TransactionModal onClose={() => setEditingTransaction(null)} onSave={onUpdate} />
       )}
       <Table striped>
         <Table.Thead>

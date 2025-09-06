@@ -55,7 +55,6 @@ function TransactionsPage() {
     <>
       {editingTransaction && (
         <TransactionModal
-          opened
           onClose={() => setEditingTransaction(null)}
           onSave={handleTransactionUpdated}
           editingTransaction={editingTransaction}
@@ -63,14 +62,13 @@ function TransactionsPage() {
       )}
       {deletingTransaction && (
         <DeleteTransactionModal
-          opened
           onClose={() => setDeletingTransaction(null)}
           transaction={deletingTransaction}
           onDelete={handleTransactionDeleted}
         />
       )}
       <Drawer
-        opened={true}
+        opened
         onClose={handleClose}
         position="right"
         size="xl"
