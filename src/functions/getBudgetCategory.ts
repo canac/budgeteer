@@ -67,7 +67,7 @@ export const getBudgetCategory = createServerFn()
       startingBalance: roundCurrency(startingBalance),
       transactionTotal: roundCurrency(transactionTotal),
       transactions: transactionCategories.map((transaction) => ({
-        id: transaction.id,
+        id: transaction.transaction.id,
         amount: transaction.amount,
         date: transaction.transaction.date,
         vendor: transaction.transaction.vendor,

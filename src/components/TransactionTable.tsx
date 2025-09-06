@@ -7,8 +7,9 @@ import {
   DeleteTransactionModal,
   type DeleteTransactionModalProps,
 } from "~/components/DeleteTransactionModal";
+import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
-import { TransactionModal } from "./TransactionModal";
+import { TransactionModal, type TransactionModalProps } from "./TransactionModal";
 import classes from "./TransactionTable.module.css";
 
 interface TransactionTableProps {
@@ -28,14 +29,20 @@ export function TransactionTable({
     DeleteTransactionModalProps["transaction"] | null
   >(null);
   const [editingTransaction, setEditingTransaction] = useState<
-    DeleteTransactionModalProps["transaction"] | null
+    TransactionModalProps["editingTransaction"] | null
   >(null);
 
   const handleDeleteTransaction = (transaction: DeleteTransactionModalProps["transaction"]) => {
     setDeletingTransaction(transaction);
   };
-  const handleEditTransaction = (transaction: DeleteTransactionModalProps["transaction"]) => {
-    setEditingTransaction(transaction);
+  const handleEditTransaction = async (
+    transaction: TransactionTableProps["transactions"][number],
+  ) => {
+    setEditingTransaction(
+      await getTransaction({
+        data: { id: transaction.id },
+      }),
+    );
   };
 
   return (
@@ -48,7 +55,11 @@ export function TransactionTable({
         />
       )}
       {editingTransaction && (
-        <TransactionModal onClose={() => setEditingTransaction(null)} onSave={onUpdate} />
+        <TransactionModal
+          onClose={() => setEditingTransaction(null)}
+          editingTransaction={editingTransaction}
+          onSave={onUpdate}
+        />
       )}
       <Table striped>
         <Table.Thead>
