@@ -195,6 +195,7 @@ export function TransactionModal({ onClose, onSave, editingTransaction }: Transa
       title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
       size="md"
       centered
+      closeOnClickOutside={false}
     >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">

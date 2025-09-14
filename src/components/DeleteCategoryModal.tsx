@@ -28,6 +28,7 @@ export function DeleteCategoryModal({ onClose, category, onDelete }: DeleteCateg
       title={<Text fw="bold">Delete Category</Text>}
       size="md"
       centered
+      closeOnClickOutside={false}
     >
       <Stack gap="md">
         <Text>Are you sure you want to delete the "{category.name}" category?</Text>

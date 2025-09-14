@@ -33,6 +33,7 @@ export function DeleteTransactionModal({
       title={<Text fw="bold">Delete Transaction</Text>}
       size="md"
       centered
+      closeOnClickOutside={false}
     >
       <Stack gap="md">
         <Text>
