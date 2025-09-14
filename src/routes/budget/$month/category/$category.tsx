@@ -105,7 +105,7 @@ function CategoryDetailsPage() {
             <Title order={3}>Spent</Title>
             <Space flex={1} />
             <Text size="sm" c="dimmed" ml="md">
-              {formatCurrency(budgetCategory.transactionTotal)} of{" "}
+              {formatCurrency(-budgetCategory.transactionTotal)} of{" "}
               <EditableAmount
                 amount={budgetCategory.budgetCategory.budgetedAmount}
                 saveAmount={handleSaveBudgetedAmount}
@@ -113,7 +113,7 @@ function CategoryDetailsPage() {
             </Text>
           </Group>
           <Progress
-            value={(budgetCategory.transactionTotal / budgetedAmount) * 100}
+            value={(-budgetCategory.transactionTotal / budgetedAmount) * 100}
             color="green"
             flex={1}
           />

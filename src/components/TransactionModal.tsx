@@ -7,6 +7,7 @@ import {
   MultiSelect,
   NumberInput,
   Stack,
+  Switch,
   Text,
   TextInput,
 } from "@mantine/core";
@@ -16,7 +17,7 @@ import { useLoaderData } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import type z from "zod/mini";
-import { array, minLength, number, object, refine, string } from "zod/mini";
+import { array, boolean, minLength, number, object, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
@@ -49,6 +50,7 @@ const formSchema = object({
   vendor: string().check(minLength(1, "Vendor is required")),
   description: string(),
   date: string("Date is required"),
+  isIncome: boolean(),
   selectedCategoryIds: array(string()).check(minLength(1, "At least one category is required")),
   categoryAmounts: array(
     object({
@@ -87,6 +89,7 @@ export function TransactionModal({ onClose, onSave, editingTransaction }: Transa
           vendor: editingTransaction.vendor,
           description: editingTransaction.description || "",
           date: format(editingTransaction.date, "yyyy-MM-dd"),
+          isIncome: editingTransaction.amount > 0,
           selectedCategoryIds: editingTransaction.transactionCategories.map((category) =>
             category.id.toString(),
           ),
@@ -100,6 +103,7 @@ export function TransactionModal({ onClose, onSave, editingTransaction }: Transa
           vendor: "",
           description: "",
           date: format(new Date(), "yyyy-MM-dd"),
+          isIncome: false,
           selectedCategoryIds: [],
           categoryAmounts: [],
         },
@@ -160,14 +164,15 @@ export function TransactionModal({ onClose, onSave, editingTransaction }: Transa
   };
 
   const handleSubmit = form.onSubmit(async (values) => {
+    const sign = values.isIncome ? 1 : -1;
     const transaction = {
-      amount: -values.amount,
+      amount: sign * values.amount,
       vendor: values.vendor,
       description: values.description || undefined,
       date: new Date(values.date).toISOString(),
       categories: values.categoryAmounts.map((categoryAmount) => ({
         ...categoryAmount,
-        amount: -categoryAmount.amount,
+        amount: sign * categoryAmount.amount,
       })),
     };
     if (isEditing) {
@@ -199,6 +204,11 @@ export function TransactionModal({ onClose, onSave, editingTransaction }: Transa
     >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
+          <Switch
+            label="Income"
+            key={form.key("isIncome")}
+            {...form.getInputProps("isIncome", { type: "checkbox" })}
+          />
           <NumberInput
             label="Amount"
             leftSection="$"
