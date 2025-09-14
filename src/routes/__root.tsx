@@ -13,20 +13,14 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  );
-}
-
-function RootDocument({ children }: { children: React.ReactNode }) {
-  return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
         <HeadContent />
       </head>
       <body>
-        <MantineProvider>{children}</MantineProvider>
+        <MantineProvider>
+          <Outlet />
+        </MantineProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>
