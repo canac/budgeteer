@@ -118,7 +118,7 @@ export function TransactionModal({
 
   const categoryOptions = budgetCategories.map((category) => ({
     value: category.categoryId.toString(),
-    label: `${category.name} (${formatCurrency(category.balance)})`,
+    label: category.name,
   }));
 
   const { selectedCategoryIds, categoryAmounts, amount } = form.getValues();
@@ -251,6 +251,12 @@ export function TransactionModal({
             required
             multiple
             searchable
+            renderOption={({ option }) => {
+              const category = budgetCategories.find(
+                (category) => category.categoryId.toString() === option.value,
+              );
+              return category && `${option.label} (${formatCurrency(category.balance)})`;
+            }}
           />
           {selectedCategoryIds.length > 1 && (
             <Stack gap="xs">
@@ -281,7 +287,7 @@ export function TransactionModal({
                       style={{ flex: 1 }}
                     />
                     <ActionIcon
-                      variant="transparent"
+                      variant="subtle"
                       color="red"
                       onClick={() => removeCategory(index)}
                       title="Remove category"
@@ -290,7 +296,7 @@ export function TransactionModal({
                     </ActionIcon>
                     {remainingAmount !== 0 && (
                       <ActionIcon
-                        variant="transparent"
+                        variant="subtle"
                         color="green"
                         onClick={() => assignRemainingAmount(index)}
                         title="Assign remaining amount"
