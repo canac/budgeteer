@@ -36,7 +36,7 @@ export const Route = createFileRoute("/budget/$month")({
 function BudgetPage() {
   const router = useRouter();
   const { budget, month, totalBudgetedAmount, budgetCategories } = Route.useLoaderData();
-  const [viewMode, setViewMode] = useState<"budgeted" | "balance">("budgeted");
+  const [viewMode, setViewMode] = useState<"budgeted" | "spent" | "balance">("budgeted");
   const [opened, { open, close }] = useDisclosure(false);
   const leftToBudget = budget.income - totalBudgetedAmount;
   const header = format(month, "MMMM yyyy");
@@ -125,6 +125,13 @@ function BudgetPage() {
                         Budgeted
                       </Button>
                       <Button
+                        variant={viewMode === "spent" ? "filled" : "outline"}
+                        size="xs"
+                        onClick={() => setViewMode("spent")}
+                      >
+                        Spent
+                      </Button>
+                      <Button
                         variant={viewMode === "balance" ? "filled" : "outline"}
                         size="xs"
                         onClick={() => setViewMode("balance")}
@@ -150,15 +157,23 @@ function BudgetPage() {
                           {formatCurrency(
                             viewMode === "budgeted"
                               ? budgetCategory.budgetedAmount
-                              : budgetCategory.balance,
+                              : viewMode === "spent"
+                                ? -budgetCategory.spent
+                                : budgetCategory.balance,
                           )}
                         </Text>
                       </Group>
                     </MantineLink>
                   ))}
-                  <Button variant="light" leftSection={<IconPlus />} onClick={handleCreateCategory}>
-                    Add Category
-                  </Button>
+                  <Group justify="center">
+                    <Button
+                      variant="subtle"
+                      leftSection={<IconPlus />}
+                      onClick={handleCreateCategory}
+                    >
+                      Add Category
+                    </Button>
+                  </Group>
                 </Stack>
               </Card>
             </Stack>
