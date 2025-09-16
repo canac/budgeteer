@@ -1,8 +1,9 @@
-import { ActionIcon, Drawer, Group, Stack, Table, Text } from "@mantine/core";
+import { ActionIcon, Drawer, Group, Stack, Table } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { Fragment, useState } from "react";
+import { AddTransactionButton } from "~/components/AddTransactionButton";
 import type { DeleteTransactionModalProps } from "~/components/DeleteTransactionModal";
 import { DynamicDeleteTransactionModal } from "~/components/DynamicDeleteTransactionModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
@@ -26,27 +27,22 @@ function TransactionsPage() {
   const router = useRouter();
   const { transactions } = Route.useLoaderData();
   const { month } = Route.useParams();
-  const [deletingTransaction, setDeletingTransaction] = useState<DeleteTransaction | null>(null);
   const [editingTransaction, setEditingTransaction] = useState<EditTransaction | null>(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<DeleteTransaction | null>(null);
 
   const handleClose = () => {
     router.navigate({ to: "/budget/$month", params: { month } });
-  };
-
-  const handleDeleteTransaction = (transaction: DeleteTransaction) => {
-    setDeletingTransaction(transaction);
   };
 
   const handleEditTransaction = (transaction: EditTransaction) => {
     setEditingTransaction(transaction);
   };
 
-  const handleTransactionUpdated = async () => {
-    setEditingTransaction(null);
-    await router.invalidate();
+  const handleDeleteTransaction = (transaction: DeleteTransaction) => {
+    setDeletingTransaction(transaction);
   };
 
-  const handleTransactionDeleted = async () => {
+  const handleUpdate = async () => {
     await router.invalidate();
   };
 
@@ -55,7 +51,7 @@ function TransactionsPage() {
       {editingTransaction && (
         <DynamicTransactionModal
           onClose={() => setEditingTransaction(null)}
-          onSave={handleTransactionUpdated}
+          onSave={handleUpdate}
           editingTransaction={editingTransaction}
         />
       )}
@@ -63,7 +59,7 @@ function TransactionsPage() {
         <DynamicDeleteTransactionModal
           onClose={() => setDeletingTransaction(null)}
           transaction={deletingTransaction}
-          onDelete={handleTransactionDeleted}
+          onDelete={handleUpdate}
         />
       )}
       <Drawer
@@ -71,7 +67,12 @@ function TransactionsPage() {
         onClose={handleClose}
         position="right"
         size="xl"
-        title={<Text fw="bold">Transactions</Text>}
+        title={
+          <Group align="center" gap="xs" fw="bold">
+            Transactions
+            <AddTransactionButton />
+          </Group>
+        }
       >
         <Stack gap="md">
           <Table striped>
