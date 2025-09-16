@@ -1,21 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
 import { object } from "zod";
 import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
+import { monthToString } from "~/lib/monthToString";
 import { prisma } from "~/lib/prisma";
-import { month } from "~/lib/zod";
+import { monthDate } from "~/lib/zod";
 import { cloneBudget } from "./cloneBudget";
 
 const inputSchema = object({
-  month: month(),
+  month: monthDate(),
 });
 
 export const getBudgetByMonth = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month } }) => {
+    const monthString = monthToString(month);
     const budget =
       (await prisma.budget.findFirst({
         where: {
-          month,
+          month: monthString,
         },
         include: {
           budgetCategories: {
@@ -23,7 +25,7 @@ export const getBudgetByMonth = createServerFn()
             include: { category: true },
           },
         },
-      })) ?? (await cloneBudget({ data: { month } }));
+      })) ?? (await cloneBudget({ data: { month: monthString } }));
     if (!budget) {
       throw new Response("Budget not found");
     }
@@ -34,7 +36,8 @@ export const getBudgetByMonth = createServerFn()
     );
 
     return {
-      ...budget,
+      budget,
+      month,
       totalBudgetedAmount,
       budgetCategories: await Promise.all(
         budget.budgetCategories.map(async (budgetCategory) => ({

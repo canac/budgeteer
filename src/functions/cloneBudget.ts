@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { object } from "zod";
 import { prisma } from "~/lib/prisma";
-import { month } from "~/lib/zod";
+import { monthString } from "~/lib/zod";
 
 const inputSchema = object({
-  month: month(),
+  month: monthString(),
 });
 
 export const cloneBudget = createServerFn({ method: "POST" })

@@ -83,7 +83,7 @@ export function TransactionModal({
   editingTransaction,
   initialCategoryId,
 }: TransactionModalProps) {
-  const { budgetCategories } = useLoaderData({ from: "/budget/$month" }).budget;
+  const { budgetCategories } = useLoaderData({ from: "/budget/$month" });
 
   const isEditing = !!editingTransaction;
 

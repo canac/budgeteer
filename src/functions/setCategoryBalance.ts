@@ -1,14 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { startOfMonth } from "date-fns";
-import { number, object, string } from "zod";
+import { number, object } from "zod";
 import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
-import { monthToDate } from "~/lib/monthToDate";
 import { prisma } from "~/lib/prisma";
 import { roundCurrency } from "~/lib/roundCurrency";
+import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
   categoryId: number(),
-  month: string(),
+  month: monthDate(),
   targetBalance: number(),
 });
 
@@ -35,7 +35,7 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
     await prisma.transaction.create({
       data: {
         amount: adjustmentAmount,
-        date: startOfMonth(monthToDate(month)),
+        date: startOfMonth(month),
         vendor: "Balance Adjustment",
         transactionCategories: {
           create: {

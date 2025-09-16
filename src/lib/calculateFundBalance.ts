@@ -1,8 +1,8 @@
 import { endOfMonth, startOfMonth } from "date-fns";
-import { monthToDate } from "~/lib/monthToDate";
 import { prisma } from "~/lib/prisma";
 import { roundCurrency } from "~/lib/roundCurrency";
 import type { CategoryModel } from "../../generated/prisma/models";
+import { monthToString } from "./monthToString";
 
 async function getTotalBudgetedAmount({
   month,
@@ -25,26 +25,26 @@ export async function calculateCategoryBalance({
   month,
   category,
 }: {
-  month: string;
+  month: Date;
   category: Pick<CategoryModel, "id" | "fund">;
 }): Promise<number> {
-  const monthDate = monthToDate(month);
-
   const aggregateTransactions = await prisma.transactionCategory.aggregate({
     _sum: { amount: true },
     where: {
       categoryId: category.id,
       transaction: {
         date: {
-          gte: category.fund ? undefined : startOfMonth(monthDate),
-          lte: endOfMonth(monthDate),
+          gte: category.fund ? undefined : startOfMonth(month),
+          lte: endOfMonth(month),
         },
       },
     },
   });
   const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
-  const balance = (await getTotalBudgetedAmount({ month, category })) + totalTransactionAmount;
+  const balance =
+    (await getTotalBudgetedAmount({ month: monthToString(month), category })) +
+    totalTransactionAmount;
   return roundCurrency(balance);
 }
 
@@ -52,11 +52,13 @@ export async function calculateCategoryStartingBalance({
   month,
   category,
 }: {
-  month: string;
+  month: Date;
   category: Pick<CategoryModel, "id" | "fund">;
 }): Promise<number> {
-  const monthDate = monthToDate(month);
-  const totalBudgetedAmount = await getTotalBudgetedAmount({ month, category });
+  const totalBudgetedAmount = await getTotalBudgetedAmount({
+    month: monthToString(month),
+    category,
+  });
 
   if (!category.fund) {
     return totalBudgetedAmount;
@@ -68,7 +70,7 @@ export async function calculateCategoryStartingBalance({
       categoryId: category.id,
       transaction: {
         // Only include transactions before the start of this budget
-        date: { lte: startOfMonth(monthDate) },
+        date: { lte: startOfMonth(month) },
       },
     },
   });
