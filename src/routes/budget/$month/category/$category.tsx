@@ -10,9 +10,10 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconTrash } from "@tabler/icons-react";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
+import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
 import { TransactionTable } from "~/components/TransactionTable";
@@ -44,6 +45,8 @@ function CategoryDetailsPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
+    useDisclosure(false);
+  const [transactionModalOpen, { open: openTransactionModal, close: closeTransactionModal }] =
     useDisclosure(false);
 
   const handleGoBack = () => navigate({ to: "/budget/$month", params: { month } });
@@ -122,7 +125,14 @@ function CategoryDetailsPage() {
         <Divider />
 
         <div>
-          <Title order={3}>Transactions</Title>
+          <Title order={3}>
+            <Group align="center" gap="xs">
+              Transactions
+              <ActionIcon variant="subtle" onClick={openTransactionModal} title="Add Transaction">
+                <IconPlus />
+              </ActionIcon>
+            </Group>
+          </Title>
           <TransactionTable
             transactions={budgetCategory.transactions}
             startingBalance={budgetCategory.startingBalance}
@@ -136,6 +146,13 @@ function CategoryDetailsPage() {
           onClose={() => closeDeleteModal()}
           category={budgetCategory.category}
           onDelete={() => handleGoBack()}
+        />
+      )}
+      {transactionModalOpen && (
+        <DynamicTransactionModal
+          onClose={closeTransactionModal}
+          onSave={updateUpdate}
+          initialCategoryId={budgetCategory.category.id}
         />
       )}
     </Drawer>

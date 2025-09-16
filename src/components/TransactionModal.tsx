@@ -39,6 +39,7 @@ export interface TransactionModalProps {
   onClose: () => void;
   onSave: () => void;
   editingTransaction?: EditTransaction;
+  initialCategoryId?: number;
 }
 
 const amountSchema = number("Amount is required").check(
@@ -76,7 +77,12 @@ const formSchema = object({
 
 type Schema = z.infer<typeof formSchema>;
 
-export function TransactionModal({ onClose, onSave, editingTransaction }: TransactionModalProps) {
+export function TransactionModal({
+  onClose,
+  onSave,
+  editingTransaction,
+  initialCategoryId,
+}: TransactionModalProps) {
   const { budgetCategories } = useLoaderData({ from: "/budget/$month" }).budget;
 
   const isEditing = !!editingTransaction;
@@ -104,8 +110,8 @@ export function TransactionModal({ onClose, onSave, editingTransaction }: Transa
           description: "",
           date: format(new Date(), "yyyy-MM-dd"),
           isIncome: false,
-          selectedCategoryIds: [],
-          categoryAmounts: [],
+          selectedCategoryIds: initialCategoryId ? [initialCategoryId.toString()] : [],
+          categoryAmounts: initialCategoryId ? [{ categoryId: initialCategoryId, amount: 0 }] : [],
         },
     validate: zod4Resolver(formSchema),
   });
