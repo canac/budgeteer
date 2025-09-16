@@ -4,6 +4,29 @@ import { roundCurrency } from "~/lib/roundCurrency";
 import type { CategoryModel } from "../../generated/prisma/models";
 import { monthToString } from "./monthToString";
 
+export async function calculateCategorySpent({
+  month,
+  category,
+}: {
+  month: Date;
+  category: Pick<CategoryModel, "id" | "fund">;
+}): Promise<number> {
+  const aggregateTransactions = await prisma.transactionCategory.aggregate({
+    _sum: { amount: true },
+    where: {
+      categoryId: category.id,
+      transaction: {
+        date: {
+          gte: startOfMonth(month),
+          lte: endOfMonth(month),
+        },
+      },
+    },
+  });
+  const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
+  return roundCurrency(totalTransactionAmount);
+}
+
 async function getTotalBudgetedAmount({
   month,
   category,

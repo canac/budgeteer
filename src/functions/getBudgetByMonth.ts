@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { object } from "zod";
-import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
+import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateFundBalance";
 import { monthToString } from "~/lib/monthToString";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
@@ -43,6 +43,10 @@ export const getBudgetByMonth = createServerFn()
         budget.budgetCategories.map(async (budgetCategory) => ({
           ...budgetCategory,
           name: budgetCategory.category.name,
+          spent: await calculateCategorySpent({
+            month,
+            category: budgetCategory.category,
+          }),
           balance: await calculateCategoryBalance({
             month,
             category: budgetCategory.category,
