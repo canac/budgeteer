@@ -23,24 +23,23 @@ import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { formatCurrency } from "~/lib/formatCurrency";
-import { monthToDate } from "~/lib/monthToDate";
 import classes from "./$month.module.css";
 
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
   loader: async ({ params: { month } }) => {
     const budget = await getBudgetByMonth({ data: { month } });
-    return { budget };
+    return budget;
   },
 });
 
 function BudgetPage() {
   const router = useRouter();
-  const { budget } = Route.useLoaderData();
+  const { budget, month, totalBudgetedAmount, budgetCategories } = Route.useLoaderData();
   const [viewMode, setViewMode] = useState<"budgeted" | "balance">("budgeted");
   const [opened, { open, close }] = useDisclosure(false);
-  const leftToBudget = budget.income - budget.totalBudgetedAmount;
-  const header = format(monthToDate(budget.month), "MMMM yyyy");
+  const leftToBudget = budget.income - totalBudgetedAmount;
+  const header = format(month, "MMMM yyyy");
 
   const handleSaveIncome = async (newIncome: number) => {
     await setBudgetIncome({
@@ -134,7 +133,7 @@ function BudgetPage() {
                       </Button>
                     </ButtonGroup>
                   </Group>
-                  {budget.budgetCategories.map((budgetCategory) => (
+                  {budgetCategories.map((budgetCategory) => (
                     <MantineLink
                       key={budgetCategory.id}
                       to="/budget/$month/category/$category"

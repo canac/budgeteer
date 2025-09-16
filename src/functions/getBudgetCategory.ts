@@ -5,13 +5,13 @@ import {
   calculateCategoryBalance,
   calculateCategoryStartingBalance,
 } from "~/lib/calculateFundBalance";
-import { monthToDate } from "~/lib/monthToDate";
+import { monthToString } from "~/lib/monthToString";
 import { prisma } from "~/lib/prisma";
 import { roundCurrency } from "~/lib/roundCurrency";
-import { month } from "~/lib/zod";
+import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
-  month: month(),
+  month: monthDate(),
   categoryId: number(),
 });
 
@@ -23,7 +23,7 @@ export const getBudgetCategory = createServerFn()
       include: {
         budgetCategories: {
           where: {
-            budget: { month },
+            budget: { month: monthToString(month) },
           },
           include: {
             budget: true,
@@ -35,9 +35,8 @@ export const getBudgetCategory = createServerFn()
       throw new Response("Category not found", { status: 404 });
     }
 
-    const monthDate = monthToDate(month);
-    const startDate = startOfMonth(monthDate);
-    const endDate = endOfMonth(monthDate);
+    const startDate = startOfMonth(month);
+    const endDate = endOfMonth(month);
 
     const transactionCategories = await prisma.transactionCategory.findMany({
       where: {
