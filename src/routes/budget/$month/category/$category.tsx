@@ -68,7 +68,7 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
-  const updateUpdate = async () => {
+  const handleUpdate = async () => {
     await router.invalidate();
   };
 
@@ -137,7 +137,7 @@ function CategoryDetailsPage() {
             transactions={budgetCategory.transactions}
             startingBalance={budgetCategory.startingBalance}
             startingBalanceDate={monthToDate(month)}
-            onUpdate={updateUpdate}
+            onUpdate={handleUpdate}
           />
         </div>
       </Stack>
@@ -151,7 +151,7 @@ function CategoryDetailsPage() {
       {transactionModalOpen && (
         <DynamicTransactionModal
           onClose={closeTransactionModal}
-          onSave={updateUpdate}
+          onSave={handleUpdate}
           initialCategoryId={budgetCategory.category.id}
         />
       )}
