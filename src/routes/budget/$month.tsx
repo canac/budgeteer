@@ -9,18 +9,18 @@ import {
   Group,
   Stack,
   Text,
-  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconList, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
-import { format } from "date-fns";
 import { useState } from "react";
+import { BudgetMonthSelector } from "~/components/BudgetMonthSelector";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineLink } from "~/components/MantineLink";
 import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
+import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { formatCurrency } from "~/lib/formatCurrency";
 import classes from "./$month.module.css";
@@ -28,18 +28,21 @@ import classes from "./$month.module.css";
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
   loader: async ({ params: { month } }) => {
-    const budget = await getBudgetByMonth({ data: { month } });
-    return budget;
+    const [budget, budgetMonths] = await Promise.all([
+      getBudgetByMonth({ data: { month } }),
+      getBudgetMonths(),
+    ]);
+    return { ...budget, budgetMonths };
   },
 });
 
 function BudgetPage() {
   const router = useRouter();
-  const { budget, month, totalBudgetedAmount, budgetCategories } = Route.useLoaderData();
+  const { budget, month, totalBudgetedAmount, budgetCategories, budgetMonths } =
+    Route.useLoaderData();
   const [viewMode, setViewMode] = useState<"budgeted" | "spent" | "balance">("budgeted");
   const [opened, { open, close }] = useDisclosure(false);
   const leftToBudget = budget.income - totalBudgetedAmount;
-  const header = format(month, "MMMM yyyy");
 
   const handleSaveIncome = async (newIncome: number) => {
     await setBudgetIncome({
@@ -78,9 +81,7 @@ function BudgetPage() {
         >
           <Container size="lg" h="100%">
             <Flex justify="space-between" align="center" h="100%">
-              <Title flex={1} c="white" size="h2">
-                {header}
-              </Title>
+              <BudgetMonthSelector budgetMonths={budgetMonths} currentMonth={month} />
               <Group gap="xs">
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={handleViewTransactions}>
                   <IconList size={24} />
