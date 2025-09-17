@@ -28,13 +28,13 @@ function TransactionsPage() {
   const router = useRouter();
   const { transactions } = Route.useLoaderData();
   const { month } = Route.useParams();
-  const { opened, close } = useOpened();
+  const { modalProps } = useOpened({
+    onClose: () => {
+      router.navigate({ to: "/budget/$month", params: { month } });
+    },
+  });
   const [editingTransaction, setEditingTransaction] = useState<EditTransaction | null>(null);
   const [deletingTransaction, setDeletingTransaction] = useState<DeleteTransaction | null>(null);
-
-  const handleGoBack = () => {
-    router.navigate({ to: "/budget/$month", params: { month } });
-  };
 
   const handleEditTransaction = (transaction: EditTransaction) => {
     setEditingTransaction(transaction);
@@ -65,9 +65,7 @@ function TransactionsPage() {
         />
       )}
       <Drawer
-        opened={opened}
-        onClose={close}
-        onExitTransitionEnd={handleGoBack}
+        {...modalProps}
         position="right"
         size="xl"
         title={

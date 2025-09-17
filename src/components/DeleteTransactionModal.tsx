@@ -15,25 +15,19 @@ export function DeleteTransactionModal({
   transaction,
   onDelete,
 }: DeleteTransactionModalProps) {
-  const { opened, close } = useOpened();
-
-  const handleDeleteCancel = () => {
-    onClose();
-  };
+  const { close, modalProps } = useOpened({ onClose });
 
   const handleDeleteConfirm = async () => {
     await deleteTransaction({
       data: { transactionId: transaction.id },
     });
-    onClose();
+    close();
     await onDelete();
   };
 
   return (
     <Modal
-      opened={opened}
-      onClose={close}
-      onExitTransitionEnd={onClose}
+      {...modalProps}
       title={<Text fw="bold">Delete Transaction</Text>}
       size="md"
       centered
@@ -45,7 +39,7 @@ export function DeleteTransactionModal({
           {format(new Date(transaction.date), "MMM dd, yyyy")}?
         </Text>
         <Group justify="flex-end" gap="sm">
-          <Button variant="default" onClick={handleDeleteCancel}>
+          <Button variant="default" onClick={close}>
             Cancel
           </Button>
           <Button color="red" onClick={handleDeleteConfirm}>

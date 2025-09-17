@@ -44,11 +44,11 @@ function CategoryDetailsPage() {
   const { month } = Route.useParams();
   const { month: monthDate } = useLoaderData({ from: "/budget/$month" });
   const router = useRouter();
-  const { opened, close } = useOpened();
+  const { close, modalProps } = useOpened({
+    onClose: () => router.navigate({ to: "/budget/$month", params: { month } }),
+  });
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
-
-  const handleGoBack = () => router.navigate({ to: "/budget/$month", params: { month } });
 
   const handleSaveCategoryName = async (newName: string) => {
     await setCategoryName({
@@ -76,9 +76,7 @@ function CategoryDetailsPage() {
   return (
     <Drawer
       className={classes.root}
-      opened={opened}
-      onClose={close}
-      onExitTransitionEnd={handleGoBack}
+      {...modalProps}
       title={
         <Group>
           <EditableName name={budgetCategory.category.name} saveName={handleSaveCategoryName} />
@@ -143,7 +141,7 @@ function CategoryDetailsPage() {
         <DynamicDeleteCategoryModal
           onClose={() => closeDeleteModal()}
           category={budgetCategory.category}
-          onDelete={() => handleGoBack()}
+          onDelete={close}
         />
       )}
     </Drawer>

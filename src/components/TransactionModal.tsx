@@ -85,7 +85,7 @@ export function TransactionModal({
   initialCategoryId,
 }: TransactionModalProps) {
   const { budgetCategories } = useLoaderData({ from: "/budget/$month" });
-  const { opened, close } = useOpened();
+  const { close, modalProps } = useOpened({ onClose });
 
   const isEditing = !!editingTransaction;
 
@@ -203,9 +203,7 @@ export function TransactionModal({
 
   return (
     <Modal
-      opened={opened}
-      onClose={close}
-      onExitTransitionEnd={onClose}
+      {...modalProps}
       title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
       size="md"
       centered

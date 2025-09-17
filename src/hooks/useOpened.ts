@@ -1,11 +1,16 @@
+import type { ModalProps } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
-export interface UseOpenedResult {
-  opened: boolean;
-  close: () => void;
+export interface UseOpenedOptions {
+  onClose: () => void;
 }
 
-export function useOpened(): UseOpenedResult {
+export interface UseOpenedResult {
+  close: () => void;
+  modalProps: Pick<ModalProps, "opened" | "onClose" | "onExitTransitionEnd">;
+}
+
+export function useOpened({ onClose }: UseOpenedOptions): UseOpenedResult {
   const [opened, setOpened] = useState(false);
 
   const close = useCallback(() => setOpened(false), []);
@@ -19,5 +24,11 @@ export function useOpened(): UseOpenedResult {
     };
   }, []);
 
-  return { opened, close };
+  const modalProps = {
+    opened,
+    onClose: close,
+    onExitTransitionEnd: onClose,
+  };
+
+  return { close, modalProps };
 }

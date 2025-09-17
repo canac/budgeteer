@@ -6,29 +6,23 @@ import { useOpened } from "~/hooks/useOpened";
 export interface DeleteCategoryModalProps {
   onClose: () => void;
   category: Pick<Category, "id" | "name">;
-  onDelete: () => Promise<void>;
+  onDelete: () => void;
 }
 
 export function DeleteCategoryModal({ onClose, category, onDelete }: DeleteCategoryModalProps) {
-  const { opened, close } = useOpened();
-
-  const handleDeleteCancel = () => {
-    onClose();
-  };
+  const { close, modalProps } = useOpened({ onClose });
 
   const handleDeleteConfirm = async () => {
     await deleteCategory({
       data: { categoryId: category.id },
     });
-    onClose();
-    await onDelete();
+    close();
+    onDelete();
   };
 
   return (
     <Modal
-      opened={opened}
-      onClose={close}
-      onExitTransitionEnd={onClose}
+      {...modalProps}
       title={<Text fw="bold">Delete Category</Text>}
       size="md"
       centered
@@ -37,7 +31,7 @@ export function DeleteCategoryModal({ onClose, category, onDelete }: DeleteCateg
       <Stack gap="md">
         <Text>Are you sure you want to delete the "{category.name}" category?</Text>
         <Group justify="flex-end" gap="sm">
-          <Button variant="default" onClick={handleDeleteCancel}>
+          <Button variant="default" onClick={close}>
             Cancel
           </Button>
           <Button color="red" onClick={handleDeleteConfirm}>
