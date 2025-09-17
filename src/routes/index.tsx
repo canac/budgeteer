@@ -1,12 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-export const Route = createFileRoute("/")({
-  component: RouteComponent,
-});
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { monthToString } from "~/lib/monthToString";
 
-function RouteComponent() {
-  return (
-    <main>
-      <h1>Hello world!</h1>
-    </main>
-  );
-}
+export const Route = createFileRoute("/")({
+  beforeLoad: () =>
+    redirect({
+      to: "/budget/$month",
+      params: { month: monthToString(new Date()) },
+    }),
+});
