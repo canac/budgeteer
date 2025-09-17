@@ -10,6 +10,7 @@ import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { MantineLink } from "~/components/MantineLink";
 import type { TransactionModalProps } from "~/components/TransactionModal";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
+import { useOpened } from "~/hooks/useOpened";
 import { formatCurrency } from "~/lib/formatCurrency";
 
 type DeleteTransaction = DeleteTransactionModalProps["transaction"];
@@ -27,10 +28,11 @@ function TransactionsPage() {
   const router = useRouter();
   const { transactions } = Route.useLoaderData();
   const { month } = Route.useParams();
+  const { opened, close } = useOpened();
   const [editingTransaction, setEditingTransaction] = useState<EditTransaction | null>(null);
   const [deletingTransaction, setDeletingTransaction] = useState<DeleteTransaction | null>(null);
 
-  const handleClose = () => {
+  const handleGoBack = () => {
     router.navigate({ to: "/budget/$month", params: { month } });
   };
 
@@ -63,8 +65,9 @@ function TransactionsPage() {
         />
       )}
       <Drawer
-        opened
-        onClose={handleClose}
+        opened={opened}
+        onClose={close}
+        onExitTransitionEnd={handleGoBack}
         position="right"
         size="xl"
         title={

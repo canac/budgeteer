@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
-import { createFileRoute, useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
@@ -20,6 +20,7 @@ import { TransactionTable } from "~/components/TransactionTable";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryName } from "~/functions/setCategoryName";
+import { useOpened } from "~/hooks/useOpened";
 import { formatCurrency } from "~/lib/formatCurrency";
 import classes from "./$category.module.css";
 
@@ -42,12 +43,12 @@ function CategoryDetailsPage() {
   const { budgetCategory } = Route.useLoaderData();
   const { month } = Route.useParams();
   const { month: monthDate } = useLoaderData({ from: "/budget/$month" });
-  const navigate = useNavigate();
   const router = useRouter();
+  const { opened, close } = useOpened();
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
 
-  const handleGoBack = () => navigate({ to: "/budget/$month", params: { month } });
+  const handleGoBack = () => router.navigate({ to: "/budget/$month", params: { month } });
 
   const handleSaveCategoryName = async (newName: string) => {
     await setCategoryName({
@@ -75,10 +76,11 @@ function CategoryDetailsPage() {
   return (
     <Drawer
       className={classes.root}
-      opened
-      onClose={handleGoBack}
+      opened={opened}
+      onClose={close}
+      onExitTransitionEnd={handleGoBack}
       title={
-        <Group justify="space-between" align="center" w="100%">
+        <Group>
           <EditableName name={budgetCategory.category.name} saveName={handleSaveCategoryName} />
           <ActionIcon
             color="red"
