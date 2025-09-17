@@ -20,6 +20,7 @@ import type z from "zod/mini";
 import { array, boolean, minLength, number, object, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
+import { useOpened } from "~/hooks/useOpened";
 import { formatCurrency } from "~/lib/formatCurrency";
 import { roundCurrency } from "~/lib/roundCurrency";
 
@@ -84,6 +85,7 @@ export function TransactionModal({
   initialCategoryId,
 }: TransactionModalProps) {
   const { budgetCategories } = useLoaderData({ from: "/budget/$month" });
+  const { opened, close } = useOpened();
 
   const isEditing = !!editingTransaction;
 
@@ -195,14 +197,15 @@ export function TransactionModal({
     }
 
     form.reset();
-    onClose();
+    close();
     onSave();
   });
 
   return (
     <Modal
-      opened
-      onClose={onClose}
+      opened={opened}
+      onClose={close}
+      onExitTransitionEnd={onClose}
       title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
       size="md"
       centered

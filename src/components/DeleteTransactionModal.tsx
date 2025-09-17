@@ -2,6 +2,7 @@ import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 import { format } from "date-fns";
 import type { Transaction } from "generated/prisma/client";
 import { deleteTransaction } from "~/functions/deleteTransaction";
+import { useOpened } from "~/hooks/useOpened";
 
 export interface DeleteTransactionModalProps {
   onClose: () => void;
@@ -14,22 +15,25 @@ export function DeleteTransactionModal({
   transaction,
   onDelete,
 }: DeleteTransactionModalProps) {
+  const { opened, close } = useOpened();
+
   const handleDeleteCancel = () => {
     onClose();
   };
 
   const handleDeleteConfirm = async () => {
-    onClose();
     await deleteTransaction({
       data: { transactionId: transaction.id },
     });
+    onClose();
     await onDelete();
   };
 
   return (
     <Modal
-      opened
-      onClose={handleDeleteCancel}
+      opened={opened}
+      onClose={close}
+      onExitTransitionEnd={onClose}
       title={<Text fw="bold">Delete Transaction</Text>}
       size="md"
       centered

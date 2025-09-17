@@ -1,6 +1,7 @@
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 import type { Category } from "generated/prisma/client";
 import { deleteCategory } from "~/functions/deleteCategory";
+import { useOpened } from "~/hooks/useOpened";
 
 export interface DeleteCategoryModalProps {
   onClose: () => void;
@@ -9,22 +10,25 @@ export interface DeleteCategoryModalProps {
 }
 
 export function DeleteCategoryModal({ onClose, category, onDelete }: DeleteCategoryModalProps) {
+  const { opened, close } = useOpened();
+
   const handleDeleteCancel = () => {
     onClose();
   };
 
   const handleDeleteConfirm = async () => {
-    onClose();
     await deleteCategory({
       data: { categoryId: category.id },
     });
+    onClose();
     await onDelete();
   };
 
   return (
     <Modal
-      opened
-      onClose={handleDeleteCancel}
+      opened={opened}
+      onClose={close}
+      onExitTransitionEnd={onClose}
       title={<Text fw="bold">Delete Category</Text>}
       size="md"
       centered
