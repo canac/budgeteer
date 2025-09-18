@@ -10,7 +10,7 @@ import {
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
 import { TransactionModal, type TransactionModalProps } from "./TransactionModal";
-import classes from "./TransactionTable.module.css";
+import "./TransactionTable.css";
 
 interface TransactionTableProps {
   transactions: Array<Pick<Transaction, "id" | "date" | "vendor" | "description" | "amount">>;
@@ -61,7 +61,7 @@ export function TransactionTable({
           onSave={onUpdate}
         />
       )}
-      <Table striped>
+      <Table className="TransactionTable" striped>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Date</Table.Th>
@@ -100,7 +100,7 @@ export function TransactionTable({
               </Table.Td>
             </Table.Tr>
           ))}
-          <Table.Tr className={classes.startingBalanceRow}>
+          <Table.Tr className="startingBalanceRow">
             <Table.Td>{format(startingBalanceDate, "MMM dd")}</Table.Td>
             <Table.Td>Starting Balance</Table.Td>
             <Table.Td></Table.Td>

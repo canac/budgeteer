@@ -23,7 +23,7 @@ import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { formatCurrency } from "~/lib/formatCurrency";
-import classes from "./$month.module.css";
+import "./BudgetPage.css";
 
 export const Route = createFileRoute("/budget/$month")({
   component: BudgetPage,
@@ -72,7 +72,7 @@ function BudgetPage() {
   return (
     <>
       {opened && <DynamicTransactionModal onClose={close} onSave={handleTransactionCreated} />}
-      <AppShell header={{ height: 60 }} padding="md">
+      <AppShell className="BudgetPage" header={{ height: 60 }} padding="md">
         <AppShell.Header
           style={{
             background: "linear-gradient(135deg, #51cf66ff 0%, #0d8523ff 100%)",
@@ -98,10 +98,10 @@ function BudgetPage() {
           <Container size="lg">
             <Outlet />
             <Stack align="center">
-              <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
+              <Card className="card" shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="xs">
                   <Group justify="space-between">
-                    <Text className={classes.cardHeader}>Income</Text>
+                    <Text className="cardHeader">Income</Text>
                     <EditableAmount amount={budget.income} saveAmount={handleSaveIncome} />
                   </Group>
                   <Group justify="space-between">
@@ -113,10 +113,10 @@ function BudgetPage() {
                 </Stack>
               </Card>
 
-              <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
+              <Card className="card" shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="xs">
                   <Group justify="space-between">
-                    <Text className={classes.cardHeader}>Categories</Text>
+                    <Text className="cardHeader">Categories</Text>
                     <ButtonGroup>
                       <Button
                         variant={viewMode === "budgeted" ? "filled" : "outline"}

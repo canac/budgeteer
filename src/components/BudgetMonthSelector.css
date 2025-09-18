@@ -1,0 +1,11 @@
+.BudgetMonthSelector {
+  .section {
+    --combobox-chevron-color: white;
+  }
+
+  .input {
+    color: white;
+    font-weight: bold;
+    width: 14rem;
+  }
+}

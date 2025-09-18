@@ -1,0 +1,13 @@
+.EditableName {
+  .text {
+    display: flex;
+    align-items: center;
+    /* Matches --input-height-sm */
+    height: calc(2.25em * var(--mantine-scale));
+    cursor: pointer;
+  }
+
+  .input {
+    font-size: var(--mantine-font-size-md);
+  }
+}

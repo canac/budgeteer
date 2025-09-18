@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TextInput, Text } from "@mantine/core";
-import classes from "./EditableName.module.css";
+import "./EditableName.css";
 
 interface EditableNameProps {
   name: string;
@@ -24,7 +24,7 @@ export function EditableName({ name, saveName }: EditableNameProps) {
   if (editing) {
     return (
       <TextInput
-        classNames={{ input: classes.input }}
+        classNames={{ input: "EditableName input" }}
         ref={(input) => input?.focus()}
         type="text"
         aria-label="Edit name"
@@ -41,7 +41,7 @@ export function EditableName({ name, saveName }: EditableNameProps) {
   }
 
   return (
-    <Text className={classes.text} onClick={handleEditClick}>
+    <Text className="EditableName text" onClick={handleEditClick}>
       {name}
     </Text>
   );

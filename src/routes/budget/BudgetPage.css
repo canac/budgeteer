@@ -1,0 +1,10 @@
+.BudgetPage {
+  .card {
+    width: 28rem;
+  }
+
+  .cardHeader {
+    font-size: var(--mantine-font-size-lg);
+    font-weight: bold;
+  }
+}

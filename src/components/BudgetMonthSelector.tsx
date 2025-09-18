@@ -2,7 +2,7 @@ import { Select } from "@mantine/core";
 import { useRouter } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { monthToString } from "~/lib/monthToString";
-import classes from "./BudgetMonthSelector.module.css";
+import "./BudgetMonthSelector.css";
 
 interface BudgetMonthSelectorProps {
   budgetMonths: Date[];
@@ -25,6 +25,7 @@ export function BudgetMonthSelector({ budgetMonths, currentMonth }: BudgetMonthS
 
   return (
     <Select
+      className="BudgetMonthSelector"
       data={options}
       value={monthToString(currentMonth)}
       onChange={handleChange}
@@ -32,8 +33,8 @@ export function BudgetMonthSelector({ budgetMonths, currentMonth }: BudgetMonthS
       color="white"
       size="lg"
       classNames={{
-        section: classes.section,
-        input: classes.input,
+        section: "section",
+        input: "input",
       }}
     />
   );

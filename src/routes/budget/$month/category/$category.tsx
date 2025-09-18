@@ -22,7 +22,7 @@ import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount
 import { setCategoryName } from "~/functions/setCategoryName";
 import { useOpened } from "~/hooks/useOpened";
 import { formatCurrency } from "~/lib/formatCurrency";
-import classes from "./$category.module.css";
+import "./CategoryDetailsPage.css";
 
 export const Route = createFileRoute("/budget/$month/category/$category")({
   component: CategoryDetailsPage,
@@ -75,7 +75,7 @@ function CategoryDetailsPage() {
 
   return (
     <Drawer
-      className={classes.root}
+      className="CategoryDetailsPage"
       {...modalProps}
       title={
         <Group>

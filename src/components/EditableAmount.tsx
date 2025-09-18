@@ -1,7 +1,7 @@
 import { Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 import { formatCurrency } from "~/lib/formatCurrency";
-import classes from "./EditableAmount.module.css";
+import "./EditableAmount.css";
 
 interface EditableAmountProps {
   amount: number;
@@ -25,7 +25,8 @@ export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
   if (editing) {
     return (
       <TextInput
-        classNames={{ input: classes.input }}
+        className="EditableAmount"
+        classNames={{ input: "input" }}
         ref={(input) => input?.focus()}
         type="number"
         aria-label="Edit amount"
@@ -44,7 +45,7 @@ export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
   }
 
   return (
-    <Text component="span" className={classes.text} onClick={handleEditClick}>
+    <Text component="span" className="text" onClick={handleEditClick}>
       {formatCurrency(amount)}
     </Text>
   );
