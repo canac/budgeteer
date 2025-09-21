@@ -1,7 +1,6 @@
 import { array, coerce, number, object, string } from "zod";
-import { roundCurrency } from "./roundCurrency";
 
-const amountSchema = number().refine((value) => value !== 0, { message: "Must not be zero" });
+const amountSchema = number().int().refine((value) => value !== 0, { message: "Must not be zero" });
 
 export const transactionSchema = object({
   amount: amountSchema,
@@ -16,8 +15,6 @@ export const transactionSchema = object({
   ).min(1),
 }).refine(
   (value) =>
-    roundCurrency(
-      value.amount - value.categories.reduce((sum, category) => sum + category.amount, 0),
-    ) === 0,
+    value.amount === value.categories.reduce((sum, category) => sum + category.amount, 0),
   { error: "Amount must equal the sum of category amounts." },
 );

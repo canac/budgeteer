@@ -4,7 +4,7 @@ import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
   month: string(),
-  income: number().positive(),
+  income: number().int().positive(),
 });
 
 export const setBudgetIncome = createServerFn({ method: "POST" })

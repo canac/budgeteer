@@ -41,14 +41,14 @@ const entertainmentCategory = await prisma.category.create({
 await prisma.budget.create({
   data: {
     month: "07-2025",
-    income: 5000,
+    income: 500000,
     budgetCategories: {
       create: [
-        { categoryId: emergencyFund.id, budgetedAmount: 800 },
-        { categoryId: vacationFund.id, budgetedAmount: 500 },
-        { categoryId: groceriesCategory.id, budgetedAmount: 600 },
-        { categoryId: utilitiesCategory.id, budgetedAmount: 300 },
-        { categoryId: entertainmentCategory.id, budgetedAmount: 200 },
+        { categoryId: emergencyFund.id, budgetedAmount: 80000 },
+        { categoryId: vacationFund.id, budgetedAmount: 50000 },
+        { categoryId: groceriesCategory.id, budgetedAmount: 60000 },
+        { categoryId: utilitiesCategory.id, budgetedAmount: 30000 },
+        { categoryId: entertainmentCategory.id, budgetedAmount: 20000 },
       ],
     },
   },
@@ -57,14 +57,14 @@ await prisma.budget.create({
 await prisma.budget.create({
   data: {
     month: "08-2025",
-    income: 5000,
+    income: 500000,
     budgetCategories: {
       create: [
-        { categoryId: emergencyFund.id, budgetedAmount: 1000 },
-        { categoryId: vacationFund.id, budgetedAmount: 250 },
-        { categoryId: groceriesCategory.id, budgetedAmount: 600 },
-        { categoryId: utilitiesCategory.id, budgetedAmount: 300 },
-        { categoryId: entertainmentCategory.id, budgetedAmount: 200 },
+        { categoryId: emergencyFund.id, budgetedAmount: 100000 },
+        { categoryId: vacationFund.id, budgetedAmount: 25000 },
+        { categoryId: groceriesCategory.id, budgetedAmount: 60000 },
+        { categoryId: utilitiesCategory.id, budgetedAmount: 30000 },
+        { categoryId: entertainmentCategory.id, budgetedAmount: 20000 },
       ],
     },
   },
@@ -73,13 +73,13 @@ await prisma.budget.create({
 // Add transactions to categories
 await prisma.transaction.create({
   data: {
-    amount: -150,
+    amount: -15000,
     date: "2025-07-05T00:00:00.000Z",
     vendor: "Supermarket",
     description: "Weekly groceries",
     transactionCategories: {
       create: {
-        amount: -150,
+        amount: -15000,
         categoryId: groceriesCategory.id,
       },
     },
@@ -87,13 +87,13 @@ await prisma.transaction.create({
 });
 await prisma.transaction.create({
   data: {
-    amount: -150,
+    amount: -15000,
     date: "2025-08-05T00:00:00.000Z",
     vendor: "Supermarket",
     description: "Weekly groceries",
     transactionCategories: {
       create: {
-        amount: -150,
+        amount: -15000,
         categoryId: groceriesCategory.id,
       },
     },
@@ -101,13 +101,13 @@ await prisma.transaction.create({
 });
 await prisma.transaction.create({
   data: {
-    amount: -80,
+    amount: -8000,
     date: "2025-08-10T00:00:00.000Z",
     vendor: "Electric Company",
     description: "Monthly bill",
     transactionCategories: {
       create: {
-        amount: -80,
+        amount: -8000,
         categoryId: utilitiesCategory.id,
       },
     },
@@ -117,13 +117,13 @@ await prisma.transaction.create({
 // Add transactions to categories
 await prisma.transaction.create({
   data: {
-    amount: -200,
+    amount: -20000,
     date: "2025-07-15T00:00:00.000Z",
     vendor: "Car Repair",
     description: "Unexpected repair",
     transactionCategories: {
       create: {
-        amount: -200,
+        amount: -20000,
         categoryId: emergencyFund.id,
       },
     },
@@ -131,13 +131,13 @@ await prisma.transaction.create({
 });
 await prisma.transaction.create({
   data: {
-    amount: -500,
+    amount: -50000,
     date: "2025-08-20T00:00:00.000Z",
     vendor: "Travel Agency",
     description: "Vacation deposit",
     transactionCategories: {
       create: {
-        amount: -500,
+        amount: -50000,
         categoryId: vacationFund.id,
       },
     },
@@ -145,22 +145,22 @@ await prisma.transaction.create({
 });
 await prisma.transaction.create({
   data: {
-    amount: -250,
+    amount: -25000,
     date: "2025-08-22T00:00:00.000Z",
     vendor: "Costco",
     description: "Bulk shopping trip",
     transactionCategories: {
       create: [
         {
-          amount: -120,
+          amount: -12000,
           categoryId: groceriesCategory.id,
         },
         {
-          amount: -80,
+          amount: -8000,
           categoryId: entertainmentCategory.id,
         },
         {
-          amount: -50,
+          amount: -5000,
           categoryId: utilitiesCategory.id,
         },
       ],

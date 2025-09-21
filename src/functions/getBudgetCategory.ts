@@ -7,7 +7,6 @@ import {
 } from "~/lib/calculateFundBalance";
 import { monthToString } from "~/lib/monthToString";
 import { prisma } from "~/lib/prisma";
-import { roundCurrency } from "~/lib/roundCurrency";
 import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
@@ -62,9 +61,9 @@ export const getBudgetCategory = createServerFn()
     return {
       category,
       budgetCategory,
-      currentBalance: roundCurrency(currentBalance),
-      startingBalance: roundCurrency(startingBalance),
-      transactionTotal: roundCurrency(transactionTotal),
+      currentBalance: currentBalance,
+      startingBalance: startingBalance,
+      transactionTotal: transactionTotal,
       transactions: transactionCategories.map((transaction) => ({
         id: transaction.transaction.id,
         amount: transaction.amount,

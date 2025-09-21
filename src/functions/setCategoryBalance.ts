@@ -3,13 +3,12 @@ import { startOfMonth } from "date-fns";
 import { number, object } from "zod";
 import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
 import { prisma } from "~/lib/prisma";
-import { roundCurrency } from "~/lib/roundCurrency";
 import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
   categoryId: number(),
   month: monthDate(),
-  targetBalance: number(),
+  targetBalance: number().int(),
 });
 
 export const setCategoryBalance = createServerFn({ method: "POST" })
@@ -27,7 +26,7 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
       category,
     });
     const adjustmentAmount = targetBalance - currentBalance;
-    if (roundCurrency(adjustmentAmount) === 0) {
+    if (adjustmentAmount === 0) {
       return;
     }
 

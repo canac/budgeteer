@@ -4,7 +4,7 @@ import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
   budgetCategoryId: number(),
-  budgetedAmount: number().min(0),
+  budgetedAmount: number().int().min(0),
 });
 
 export const setCategoryBudgetedAmount = createServerFn({ method: "POST" })

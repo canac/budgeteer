@@ -1,6 +1,5 @@
 import { endOfMonth, startOfMonth } from "date-fns";
 import { prisma } from "~/lib/prisma";
-import { roundCurrency } from "~/lib/roundCurrency";
 import type { CategoryModel } from "../../generated/prisma/models";
 import { monthToString } from "./monthToString";
 
@@ -23,8 +22,7 @@ export async function calculateCategorySpent({
       },
     },
   });
-  const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
-  return roundCurrency(totalTransactionAmount);
+  return aggregateTransactions._sum.amount ?? 0;
 }
 
 async function getTotalBudgetedAmount({
@@ -65,10 +63,10 @@ export async function calculateCategoryBalance({
   });
   const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
-  const balance =
+  return (
     (await getTotalBudgetedAmount({ month: monthToString(month), category })) +
-    totalTransactionAmount;
-  return roundCurrency(balance);
+    totalTransactionAmount
+  );
 }
 
 export async function calculateCategoryStartingBalance({
@@ -99,6 +97,5 @@ export async function calculateCategoryStartingBalance({
   });
   const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
-  const balance = totalBudgetedAmount + totalTransactionAmount;
-  return roundCurrency(balance);
+  return totalBudgetedAmount + totalTransactionAmount;
 }

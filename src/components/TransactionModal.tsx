@@ -21,8 +21,8 @@ import { array, boolean, minLength, number, object, refine, string } from "zod/m
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { useOpened } from "~/hooks/useOpened";
+import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
-import { roundCurrency } from "~/lib/roundCurrency";
 
 interface EditTransaction {
   id: number;
@@ -64,10 +64,10 @@ const formSchema = object({
   refine(
     (values) => {
       const totalCategoryAmount = values.categoryAmounts.reduce(
-        (sum, category) => sum + category.amount,
+        (sum, category) => sum + dollarsToPennies(category.amount),
         0,
       );
-      return roundCurrency(values.amount - totalCategoryAmount) === 0;
+      return dollarsToPennies(values.amount) === totalCategoryAmount;
     },
     {
       message: "Category amounts must equal total amount",
@@ -93,7 +93,7 @@ export function TransactionModal({
     validateInputOnBlur: true,
     initialValues: isEditing
       ? {
-          amount: Math.abs(editingTransaction.amount),
+          amount: penniesToDollars(Math.abs(editingTransaction.amount)),
           vendor: editingTransaction.vendor,
           description: editingTransaction.description || "",
           date: format(editingTransaction.date, "yyyy-MM-dd"),
@@ -103,7 +103,7 @@ export function TransactionModal({
           ),
           categoryAmounts: editingTransaction.transactionCategories.map((category) => ({
             categoryId: category.id,
-            amount: Math.abs(category.amount),
+            amount: penniesToDollars(Math.abs(category.amount)),
           })),
         }
       : {
@@ -154,7 +154,8 @@ export function TransactionModal({
   });
 
   const remainingAmount =
-    amount - categoryAmounts.reduce((sum, category) => sum + category.amount, 0);
+    dollarsToPennies(amount) -
+    categoryAmounts.reduce((sum, category) => sum + dollarsToPennies(category.amount), 0);
 
   const assignRemainingAmount = (index: number) => {
     form.setFieldValue(
@@ -174,13 +175,13 @@ export function TransactionModal({
   const handleSubmit = form.onSubmit(async (values) => {
     const sign = values.isIncome ? 1 : -1;
     const transaction = {
-      amount: sign * values.amount,
+      amount: sign * dollarsToPennies(values.amount),
       vendor: values.vendor,
       description: values.description || undefined,
       date: new Date(values.date).toISOString(),
       categories: values.categoryAmounts.map((categoryAmount) => ({
         ...categoryAmount,
-        amount: sign * categoryAmount.amount,
+        amount: sign * dollarsToPennies(categoryAmount.amount),
       })),
     };
     if (isEditing) {

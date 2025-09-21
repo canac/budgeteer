@@ -1,5 +1,6 @@
 import { Text, TextInput } from "@mantine/core";
 import { useState } from "react";
+import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./EditableAmount.css";
 
@@ -10,15 +11,15 @@ interface EditableAmountProps {
 
 export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(amount.toString());
+  const [value, setValue] = useState(penniesToDollars(amount).toString());
 
   const handleEditClick = () => {
-    setValue(amount.toString());
+    setValue(penniesToDollars(amount).toString());
     setEditing(true);
   };
 
   const handleSave = async () => {
-    await saveAmount(Number(value));
+    await saveAmount(dollarsToPennies(Number(value)));
     setEditing(false);
   };
 
