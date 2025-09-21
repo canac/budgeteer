@@ -11,7 +11,7 @@ export const getBudgetMonths = createServerFn().handler(async () => {
   });
   const currentMonth = startOfMonth(new Date());
   const monthSpan = oldestBudget
-    ? differenceInMonths(parse(oldestBudget.month, "MM-yyyy", new Date()), currentMonth)
+    ? differenceInMonths(currentMonth, parse(oldestBudget.month, "MM-yyyy", new Date()))
     : 0;
   return Array.from({ length: monthSpan + 1 }, (_, index) => subMonths(currentMonth, index));
 });
