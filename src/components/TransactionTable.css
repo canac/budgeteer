@@ -1,5 +1,5 @@
 .TransactionTable {
-  .startingBalanceRow {
+  tr.starting-balance {
     border-top: 2px solid;
   }
 }

@@ -100,7 +100,7 @@ export function TransactionTable({
               </Table.Td>
             </Table.Tr>
           ))}
-          <Table.Tr className="startingBalanceRow">
+          <Table.Tr className="starting-balance">
             <Table.Td>{format(startingBalanceDate, "MMM dd")}</Table.Td>
             <Table.Td>Starting Balance</Table.Td>
             <Table.Td></Table.Td>

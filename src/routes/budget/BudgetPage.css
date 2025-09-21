@@ -1,10 +1,9 @@
 .BudgetPage {
-  .card {
+  .mantine-Card-root {
     width: 28rem;
-  }
 
-  .cardHeader {
-    font-size: var(--mantine-font-size-lg);
-    font-weight: bold;
+    h2 {
+      font-size: var(--mantine-font-size-lg);
+    }
   }
 }

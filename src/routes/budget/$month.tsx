@@ -9,6 +9,7 @@ import {
   Group,
   Stack,
   Text,
+  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconList, IconPlus } from "@tabler/icons-react";
@@ -98,10 +99,10 @@ function BudgetPage() {
           <Container size="lg">
             <Outlet />
             <Stack align="center">
-              <Card className="card" shadow="sm" padding="lg" radius="md" withBorder>
+              <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="xs">
                   <Group justify="space-between">
-                    <Text className="cardHeader">Income</Text>
+                    <Title order={2}>Income</Title>
                     <EditableAmount amount={budget.income} saveAmount={handleSaveIncome} />
                   </Group>
                   <Group justify="space-between">
@@ -113,10 +114,10 @@ function BudgetPage() {
                 </Stack>
               </Card>
 
-              <Card className="card" shadow="sm" padding="lg" radius="md" withBorder>
+              <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="xs">
                   <Group justify="space-between">
-                    <Text className="cardHeader">Categories</Text>
+                    <Title order={2}>Categories</Title>
                     <ButtonGroup>
                       <Button
                         variant={viewMode === "budgeted" ? "filled" : "outline"}
