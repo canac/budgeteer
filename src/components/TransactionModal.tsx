@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Alert,
   Button,
+  CheckIcon,
   Group,
   Modal,
   MultiSelect,
@@ -23,6 +24,7 @@ import { editTransaction } from "~/functions/editTransaction";
 import { useOpened } from "~/hooks/useOpened";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
+import "./TransactionModal.css";
 
 interface EditTransaction {
   id: number;
@@ -253,11 +255,19 @@ export function TransactionModal({
             required
             multiple
             searchable
-            renderOption={({ option }) => {
+            classNames={{ dropdown: "TransactionModal-dropdown" }}
+            renderOption={({ option, checked }) => {
               const category = budgetCategories.find(
                 (category) => category.categoryId.toString() === option.value,
               );
-              return category && `${option.label} (${formatCurrency(category.balance)})`;
+              return (
+                category && (
+                  <>
+                    {checked && <CheckIcon className="check-icon" />}
+                    {option.label} ({formatCurrency(category.balance)})
+                  </>
+                )
+              );
             }}
           />
           {selectedCategoryIds.length > 1 && (
