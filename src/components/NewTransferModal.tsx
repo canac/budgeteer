@@ -29,9 +29,10 @@ type Schema = {
 export interface NewTransferModalProps {
   onClose: () => void;
   onSave: () => void;
+  sourceCategoryId?: number;
 }
 
-export function NewTransferModal({ onClose, onSave }: NewTransferModalProps) {
+export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTransferModalProps) {
   const { budgetCategories, month } = useLoaderData({ from: "/budget/$month" });
   const { close, modalProps } = useOpened({ onClose });
 
@@ -39,7 +40,7 @@ export function NewTransferModal({ onClose, onSave }: NewTransferModalProps) {
     validateInputOnBlur: true,
     initialValues: {
       amount: 0,
-      sourceCategoryId: null,
+      sourceCategoryId: sourceCategoryId?.toString() ?? null,
       destinationCategoryId: null,
     },
     validate: zod4Resolver(formSchema),

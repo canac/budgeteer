@@ -13,6 +13,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
+import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
@@ -127,6 +128,7 @@ function CategoryDetailsPage() {
             <Group align="center" gap="xs">
               Transactions
               <AddTransactionButton initialCategoryId={budgetCategory.category.id} />
+              <AddTransferButton sourceCategoryId={budgetCategory.category.id} />
             </Group>
           </Title>
           <TransactionTable
