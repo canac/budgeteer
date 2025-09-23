@@ -44,7 +44,11 @@ export const getBudgetCategory = createServerFn()
           date: { gte: startDate, lte: endDate },
         },
       },
-      include: { transaction: true },
+      include: {
+        transaction: {
+          include: { transfer: true },
+        },
+      },
       orderBy: [{ transaction: { date: "desc" } }, { transaction: { createdAt: "desc" } }],
     });
 
@@ -64,12 +68,9 @@ export const getBudgetCategory = createServerFn()
       currentBalance: currentBalance,
       startingBalance: startingBalance,
       transactionTotal: transactionTotal,
-      transactions: transactionCategories.map((transaction) => ({
-        id: transaction.transaction.id,
-        amount: transaction.amount,
-        date: transaction.transaction.date,
-        vendor: transaction.transaction.vendor,
-        description: transaction.transaction.description,
+      transactions: transactionCategories.map(({ amount, transaction }) => ({
+        ...transaction,
+        amount,
       })),
       month,
     };

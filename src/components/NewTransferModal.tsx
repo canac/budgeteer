@@ -69,9 +69,9 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
     await createTransfer({
       data: {
         amount: dollarsToPennies(values.amount),
+        date: transferDate,
         sourceCategoryId: Number(values.sourceCategoryId),
         destinationCategoryId: Number(values.destinationCategoryId),
-        date: transferDate,
       },
     });
 

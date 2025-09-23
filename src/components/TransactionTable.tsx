@@ -1,19 +1,19 @@
 import { ActionIcon, Group, Table } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
-import type { Transaction } from "generated/prisma/client";
 import { useState } from "react";
 import {
   DeleteTransactionModal,
   type DeleteTransactionModalProps,
 } from "~/components/DeleteTransactionModal";
+import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
 import { TransactionModal, type TransactionModalProps } from "./TransactionModal";
 import "./TransactionTable.css";
 
 interface TransactionTableProps {
-  transactions: Array<Pick<Transaction, "id" | "date" | "vendor" | "description" | "amount">>;
+  transactions: Awaited<ReturnType<typeof getBudgetCategory>>["transactions"];
   startingBalance: number;
   startingBalanceDate: Date;
   onUpdate: () => Promise<void>;
@@ -86,6 +86,7 @@ export function TransactionTable({
                     variant="subtle"
                     color="blue"
                     onClick={() => handleEditTransaction(transaction)}
+                    disabled={transaction.transfer !== null}
                   >
                     <IconEdit size={16} />
                   </ActionIcon>

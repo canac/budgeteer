@@ -4,19 +4,19 @@ import { prisma } from "~/lib/prisma";
 
 const transferSchema = object({
   amount: number().int().positive(),
+  date: date(),
   sourceCategoryId: number(),
   destinationCategoryId: number(),
-  date: date(),
 });
 
 export const createTransfer = createServerFn({ method: "POST" })
   .validator(transferSchema)
-  .handler(async ({ data: { amount, sourceCategoryId, destinationCategoryId, date } }) => {
+  .handler(async ({ data: { amount, date, sourceCategoryId, destinationCategoryId } }) => {
     const transaction = await prisma.transaction.create({
       data: {
         amount: 0,
-        vendor: "Transfer",
         date,
+        vendor: "Transfer",
         transactionCategories: {
           create: [
             {
@@ -28,6 +28,13 @@ export const createTransfer = createServerFn({ method: "POST" })
               amount: amount,
             },
           ],
+        },
+        transfer: {
+          create: {
+            amount,
+            sourceCategoryId,
+            destinationCategoryId,
+          },
         },
       },
     });

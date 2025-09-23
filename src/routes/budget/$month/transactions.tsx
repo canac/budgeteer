@@ -2,6 +2,7 @@ import { ActionIcon, Drawer, Group, Stack, Table } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { format } from "date-fns";
+import type { Category } from "generated/prisma/client";
 import { Fragment, useState } from "react";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import type { DeleteTransactionModalProps } from "~/components/DeleteTransactionModal";
@@ -23,6 +24,26 @@ export const Route = createFileRoute("/budget/$month/transactions")({
     return { transactions };
   },
 });
+
+interface CategoryLinkProps {
+  month: string;
+  category: Pick<Category, "id" | "name">;
+}
+
+function CategoryLink({ month, category }: CategoryLinkProps) {
+  return (
+    <MantineLink
+      to="/budget/$month/category/$category"
+      params={{
+        month,
+        category: category.id.toString(),
+      }}
+      fz="inherit"
+    >
+      {category.name}
+    </MantineLink>
+  );
+}
 
 function TransactionsPage() {
   const router = useRouter();
@@ -94,24 +115,32 @@ function TransactionsPage() {
                   <Table.Td>{transaction.vendor}</Table.Td>
                   <Table.Td>{transaction.description}</Table.Td>
                   <Table.Td>
-                    {transaction.transactionCategories.map((category, index, array) => (
-                      <Fragment key={category.id}>
-                        <MantineLink
-                          to="/budget/$month/category/$category"
-                          params={{
-                            month,
-                            category: category.id.toString(),
-                          }}
-                          fz="inherit"
-                        >
-                          {category.name}
-                        </MantineLink>
-                        {index < array.length - 1 && " • "}
-                      </Fragment>
-                    ))}
+                    {transaction.transfer ? (
+                      <>
+                        <CategoryLink
+                          month={month}
+                          category={transaction.transfer.sourceCategory}
+                        />
+                        {" → "}
+                        <CategoryLink
+                          month={month}
+                          category={transaction.transfer.destinationCategory}
+                        />
+                      </>
+                    ) : (
+                      transaction.transactionCategories.map((category, index, array) => (
+                        <Fragment key={category.id}>
+                          <CategoryLink month={month} category={category} />
+                          {index < array.length - 1 && " • "}
+                        </Fragment>
+                      ))
+                    )}
                   </Table.Td>
-                  <Table.Td ta="right" c={transaction.amount < 0 ? undefined : "green"}>
-                    {formatCurrency(transaction.amount)}
+                  <Table.Td
+                    ta="right"
+                    c={transaction.transfer || transaction.amount < 0 ? undefined : "green"}
+                  >
+                    {formatCurrency(transaction.transfer?.amount ?? transaction.amount)}
                   </Table.Td>
                   <Table.Td ta="center">
                     <Group gap="xs" justify="center">
@@ -119,6 +148,7 @@ function TransactionsPage() {
                         variant="subtle"
                         color="blue"
                         onClick={() => handleEditTransaction(transaction)}
+                        disabled={transaction.transfer !== null}
                       >
                         <IconEdit size={16} />
                       </ActionIcon>

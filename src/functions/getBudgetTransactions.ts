@@ -22,6 +22,12 @@ export const getBudgetTransactions = createServerFn()
         transactionCategories: {
           include: { category: true },
         },
+        transfer: {
+          include: {
+            sourceCategory: true,
+            destinationCategory: true,
+          },
+        },
       },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     });

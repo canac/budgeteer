@@ -32,6 +32,8 @@ model Category {
   fund                  Boolean               @default(false)
   transactionCategories TransactionCategory[]
   budgetCategories      BudgetCategory[]
+  transfersFrom         Transfer[]            @relation("TransferSource")
+  transfersTo           Transfer[]            @relation("TransferDestination")
 }
 
 model BudgetCategory {
@@ -56,6 +58,7 @@ model Transaction {
   vendor                String
   description           String?
   transactionCategories TransactionCategory[]
+  transfer              Transfer?
 }
 
 model TransactionCategory {
@@ -69,4 +72,17 @@ model TransactionCategory {
   category      Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([transactionId, categoryId])
+}
+
+model Transfer {
+  id                    Int         @id @default(autoincrement())
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  amount                Int
+  sourceCategoryId      Int
+  destinationCategoryId Int
+  transactionId         Int         @unique
+  transaction           Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  sourceCategory        Category    @relation("TransferSource", fields: [sourceCategoryId], references: [id], onDelete: Cascade)
+  destinationCategory   Category    @relation("TransferDestination", fields: [destinationCategoryId], references: [id], onDelete: Cascade)
 }
