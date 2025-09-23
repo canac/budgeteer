@@ -1,5 +1,6 @@
-import { Button, Group, Modal, NumberInput, Select, Stack, Text } from "@mantine/core";
+import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { IconSwitch } from "@tabler/icons-react";
 import { useLoaderData } from "@tanstack/react-router";
 import { endOfMonth } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
@@ -59,6 +60,11 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
 
   const transferDate = endOfMonth(new Date(month));
 
+  const handleSwitch = () => {
+    form.setFieldValue("sourceCategoryId", form.values.destinationCategoryId);
+    form.setFieldValue("destinationCategoryId", form.values.sourceCategoryId);
+  };
+
   const handleSubmit = form.onSubmit(async (values) => {
     await createTransfer({
       data: {
@@ -102,6 +108,16 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
             required
             searchable
           />
+          <Group justify="center">
+            <ActionIcon
+              variant="subtle"
+              onClick={handleSwitch}
+              title="Switch source and destination"
+              disabled={!form.values.sourceCategoryId && !form.values.destinationCategoryId}
+            >
+              <IconSwitch />
+            </ActionIcon>
+          </Group>
           <Select
             label="Destination"
             data={categoryOptions.filter((option) => option.value !== form.values.sourceCategoryId)}
