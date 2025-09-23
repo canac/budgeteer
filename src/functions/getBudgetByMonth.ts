@@ -1,12 +1,96 @@
-import { redirect } from "@tanstack/react-router";
+import { invariant, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { isAfter, startOfMonth } from "date-fns";
+import { isAfter, isBefore, parse, startOfMonth } from "date-fns";
 import { object } from "zod";
 import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateFundBalance";
 import { monthToString } from "~/lib/monthToString";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
-import { cloneBudget } from "./cloneBudget";
+
+async function getBudget(requestedMonth: Date) {
+  const currentMonth = startOfMonth(new Date());
+  const currentMonthString = monthToString(currentMonth);
+  if (isAfter(requestedMonth, currentMonth)) {
+    // A future month was requested, so redirect to the current month
+    throw redirect({
+      to: "/budget/$month",
+      params: { month: currentMonthString },
+    });
+  }
+
+  const requestedMonthString = monthToString(requestedMonth);
+  const actualBudget = await prisma.budget.findFirst({
+    where: {
+      month: requestedMonthString,
+    },
+    include: {
+      budgetCategories: {
+        orderBy: { id: "asc" },
+        include: { category: true },
+      },
+    },
+  });
+  if (actualBudget) {
+    return actualBudget;
+  }
+
+  const initialBudget = await prisma.budget.findFirst({
+    select: {
+      month: true,
+    },
+    orderBy: { month: "asc" },
+  });
+  if (!initialBudget) {
+    // Regardless of the requested month, create the initial budget for the current month and redirect to it
+    await prisma.budget.create({
+      data: {
+        month: currentMonthString,
+        income: 0,
+      },
+    });
+    throw redirect({
+      to: "/budget/$month",
+      params: { month: currentMonthString },
+    });
+  }
+
+  const initialBudgetMonth = parse(initialBudget.month, "MM-yyyy", new Date());
+  if (isBefore(requestedMonth, initialBudgetMonth)) {
+    // A month before the initial budget was requested, so redirect to the initial budget
+    throw redirect({
+      to: "/budget/$month",
+      params: { month: initialBudget.month },
+    });
+  }
+
+  // Clone the first budget before the requested month
+  const sourceBudget = await prisma.budget.findFirst({
+    where: { month: { lt: requestedMonthString } },
+    include: {
+      budgetCategories: true,
+    },
+    orderBy: { month: "desc" },
+  });
+  invariant(sourceBudget, "No source budget found");
+  return prisma.budget.create({
+    data: {
+      month: requestedMonthString,
+      income: sourceBudget.income,
+      budgetCategories: {
+        create: sourceBudget.budgetCategories.map(({ categoryId, budgetedAmount }) => ({
+          categoryId,
+          budgetedAmount,
+        })),
+      },
+    },
+    include: {
+      budgetCategories: {
+        orderBy: { id: "asc" },
+        include: { category: true },
+      },
+    },
+  });
+}
 
 const inputSchema = object({
   month: monthDate(),
@@ -15,31 +99,7 @@ const inputSchema = object({
 export const getBudgetByMonth = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month } }) => {
-    const currentMonth = startOfMonth(new Date());
-    if (isAfter(startOfMonth(month), currentMonth)) {
-      throw redirect({
-        to: "/budget/$month",
-        params: { month: monthToString(currentMonth) },
-      });
-    }
-
-    const monthString = monthToString(month);
-    const budget =
-      (await prisma.budget.findFirst({
-        where: {
-          month: monthString,
-        },
-        include: {
-          budgetCategories: {
-            orderBy: { id: "asc" },
-            include: { category: true },
-          },
-        },
-      })) ?? (await cloneBudget({ data: { month: monthString } }));
-    if (!budget) {
-      throw new Response("Budget not found");
-    }
-
+    const budget = await getBudget(month);
     const totalBudgetedAmount = budget.budgetCategories.reduce(
       (sum, budgetCategory) => sum + budgetCategory.budgetedAmount,
       0,
