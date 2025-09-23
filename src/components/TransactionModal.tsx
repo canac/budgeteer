@@ -18,7 +18,7 @@ import { useLoaderData } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import type z from "zod/mini";
-import { array, boolean, minLength, number, object, refine, string } from "zod/mini";
+import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { useOpened } from "~/hooks/useOpened";
@@ -45,9 +45,7 @@ export interface TransactionModalProps {
   initialCategoryId?: number;
 }
 
-const amountSchema = number("Amount is required").check(
-  refine((value) => value > 0, "Amount must not be zero"),
-);
+const amountSchema = number("Amount is required").check(positive("Amount must not be zero"));
 
 const formSchema = object({
   amount: amountSchema,

@@ -12,10 +12,11 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconList, IconPlus } from "@tabler/icons-react";
+import { IconArrowsExchange, IconList, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { BudgetMonthSelector } from "~/components/BudgetMonthSelector";
+import { DynamicNewTransferModal } from "~/components/DynamicNewTransferModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineLink } from "~/components/MantineLink";
@@ -42,7 +43,9 @@ function BudgetPage() {
   const { budget, month, totalBudgetedAmount, budgetCategories, budgetMonths } =
     Route.useLoaderData();
   const [viewMode, setViewMode] = useState<"budgeted" | "spent" | "balance">("budgeted");
-  const [opened, { open, close }] = useDisclosure(false);
+  const [transactionOpened, { open: openTransaction, close: closeTransaction }] =
+    useDisclosure(false);
+  const [transferOpened, { open: openTransfer, close: closeTransfer }] = useDisclosure(false);
   const leftToBudget = budget.income - totalBudgetedAmount;
 
   const handleSaveIncome = async (newIncome: number) => {
@@ -59,7 +62,7 @@ function BudgetPage() {
     await router.invalidate();
   };
 
-  const handleTransactionCreated = async () => {
+  const handleUpdate = async () => {
     await router.invalidate();
   };
 
@@ -72,7 +75,10 @@ function BudgetPage() {
 
   return (
     <>
-      {opened && <DynamicTransactionModal onClose={close} onSave={handleTransactionCreated} />}
+      {transactionOpened && (
+        <DynamicTransactionModal onClose={closeTransaction} onSave={handleUpdate} />
+      )}
+      {transferOpened && <DynamicNewTransferModal onClose={closeTransfer} onSave={handleUpdate} />}
       <AppShell className="BudgetPage" header={{ height: 60 }} padding="md">
         <AppShell.Header
           style={{
@@ -87,7 +93,10 @@ function BudgetPage() {
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={handleViewTransactions}>
                   <IconList size={24} />
                 </ActionIcon>
-                <ActionIcon variant="subtle" c="white" size="xl" onClick={open}>
+                <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransfer}>
+                  <IconArrowsExchange size={24} />
+                </ActionIcon>
+                <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransaction}>
                   <IconPlus size={24} />
                 </ActionIcon>
               </Group>
