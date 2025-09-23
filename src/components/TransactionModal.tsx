@@ -180,7 +180,7 @@ export function TransactionModal({
       amount: sign * dollarsToPennies(values.amount),
       vendor: values.vendor,
       description: values.description || undefined,
-      date: new Date(values.date).toISOString(),
+      date: new Date(values.date),
       categories: values.categoryAmounts.map((categoryAmount) => ({
         ...categoryAmount,
         amount: sign * dollarsToPennies(categoryAmount.amount),
