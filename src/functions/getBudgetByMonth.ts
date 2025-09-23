@@ -1,4 +1,6 @@
+import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { isAfter, startOfMonth } from "date-fns";
 import { object } from "zod";
 import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateFundBalance";
 import { monthToString } from "~/lib/monthToString";
@@ -13,6 +15,14 @@ const inputSchema = object({
 export const getBudgetByMonth = createServerFn()
   .validator(inputSchema)
   .handler(async ({ data: { month } }) => {
+    const currentMonth = startOfMonth(new Date());
+    if (isAfter(startOfMonth(month), currentMonth)) {
+      throw redirect({
+        to: "/budget/$month",
+        params: { month: monthToString(currentMonth) },
+      });
+    }
+
     const monthString = monthToString(month);
     const budget =
       (await prisma.budget.findFirst({
