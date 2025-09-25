@@ -9,7 +9,7 @@ const inputSchema = transactionSchema.extend({
 });
 
 export const editTransaction = createServerFn({ method: "POST" })
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { id, categories, ...attributes } }) => {
     const existingCategories = await prisma.transactionCategory.findMany({
       where: { transactionId: id },

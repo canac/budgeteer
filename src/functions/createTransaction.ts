@@ -3,7 +3,7 @@ import { prisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
 
 export const createTransaction = createServerFn({ method: "POST" })
-  .validator(transactionSchema)
+  .inputValidator(transactionSchema)
   .handler(({ data: { categories, ...attributes } }) => {
     return prisma.transaction.create({
       data: {

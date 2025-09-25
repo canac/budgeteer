@@ -8,7 +8,7 @@ const inputSchema = object({
 });
 
 export const setBudgetIncome = createServerFn({ method: "POST" })
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { month, income } }) => {
     await prisma.budget.updateMany({
       where: { month },

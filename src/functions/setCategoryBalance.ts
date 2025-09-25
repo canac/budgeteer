@@ -12,7 +12,7 @@ const inputSchema = object({
 });
 
 export const setCategoryBalance = createServerFn({ method: "POST" })
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { categoryId, month, targetBalance } }) => {
     const category = await prisma.category.findUnique({
       where: { id: categoryId },

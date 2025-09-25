@@ -8,7 +8,7 @@ const inputSchema = object({
 });
 
 export const setCategoryName = createServerFn({ method: "POST" })
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { categoryId, name } }) => {
     await prisma.category.update({
       where: { id: categoryId },

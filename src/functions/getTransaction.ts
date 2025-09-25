@@ -7,7 +7,7 @@ const inputSchema = object({
 });
 
 export const getTransaction = createServerFn()
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { id } }) => {
     const transaction = await prisma.transaction.findUniqueOrThrow({
       where: { id },

@@ -9,7 +9,7 @@ const inputSchema = object({
 });
 
 export const getBudgetTransactions = createServerFn()
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { month } }) => {
     const startDate = startOfMonth(month);
     const endDate = endOfMonth(month);

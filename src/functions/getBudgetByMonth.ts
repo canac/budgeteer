@@ -1,6 +1,7 @@
-import { invariant, redirect } from "@tanstack/react-router";
+import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { isAfter, isBefore, parse, startOfMonth } from "date-fns";
+import invariant from "tiny-invariant";
 import { object } from "zod";
 import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateFundBalance";
 import { monthToString } from "~/lib/monthToString";
@@ -97,7 +98,7 @@ const inputSchema = object({
 });
 
 export const getBudgetByMonth = createServerFn()
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { month } }) => {
     const budget = await getBudget(month);
     const totalBudgetedAmount = budget.budgetCategories.reduce(

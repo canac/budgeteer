@@ -7,7 +7,7 @@ const inputSchema = object({
 });
 
 export const deleteTransaction = createServerFn({ method: "POST" })
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { transactionId } }) => {
     await prisma.transaction.delete({
       where: { id: transactionId },

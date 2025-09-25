@@ -15,7 +15,7 @@ const inputSchema = object({
 });
 
 export const getBudgetCategory = createServerFn()
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { month, categoryId } }) => {
     const category = await prisma.category.findUnique({
       where: { id: categoryId },

@@ -7,7 +7,7 @@ const inputSchema = object({
 });
 
 export const deleteCategory = createServerFn({ method: "POST" })
-  .validator(inputSchema)
+  .inputValidator(inputSchema)
   .handler(async ({ data: { categoryId } }) => {
     await prisma.category.delete({
       where: { id: categoryId },
