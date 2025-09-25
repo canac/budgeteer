@@ -21,30 +21,25 @@ const formSchema = object({
   }),
 );
 
-type Schema = {
-  amount: number;
-  sourceCategoryId: string | null;
-  destinationCategoryId: string | null;
-};
-
 export interface NewTransferModalProps {
   onClose: () => void;
   onSave: () => void;
-  sourceCategoryId?: number;
+  sourceCategoryId?: string;
 }
 
 export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTransferModalProps) {
   const { budgetCategories, month } = useLoaderData({ from: "/budget/$month" });
   const { close, modalProps } = useOpened({ onClose });
 
-  const form = useForm<Schema>({
+  const form = useForm({
     validateInputOnBlur: true,
     initialValues: {
       amount: 0,
-      sourceCategoryId: sourceCategoryId?.toString() ?? null,
-      destinationCategoryId: null,
+      sourceCategoryId: sourceCategoryId ?? null,
+      destinationCategoryId: null as string | null,
     },
     validate: zod4Resolver(formSchema),
+    transformValues: (values) => formSchema.parse(values),
   });
 
   form.watch("sourceCategoryId", ({ value }) => {
@@ -54,7 +49,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
   });
 
   const categoryOptions = budgetCategories.map((category) => ({
-    value: category.categoryId.toString(),
+    value: category.categoryId,
     label: `${category.name} (${formatCurrency(category.balance)})`,
   }));
 
@@ -70,8 +65,8 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
       data: {
         amount: dollarsToPennies(values.amount),
         date: transferDate,
-        sourceCategoryId: Number(values.sourceCategoryId),
-        destinationCategoryId: Number(values.destinationCategoryId),
+        sourceCategoryId: values.sourceCategoryId,
+        destinationCategoryId: values.destinationCategoryId,
       },
     });
 

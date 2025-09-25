@@ -1,11 +1,11 @@
 import { mapNotNullish } from "@std/collections";
 import { createServerFn } from "@tanstack/react-start";
-import { number } from "zod";
+import { string } from "zod";
 import { prisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
 
 const inputSchema = transactionSchema.extend({
-  id: number(),
+  id: string(),
 });
 
 export const editTransaction = createServerFn({ method: "POST" })

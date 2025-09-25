@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { number, object } from "zod";
+import { number, object, string } from "zod";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
-  budgetCategoryId: number(),
+  budgetCategoryId: string(),
   budgetedAmount: number().int().min(0),
 });
 

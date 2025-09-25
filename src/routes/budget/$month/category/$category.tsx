@@ -28,13 +28,8 @@ import "./CategoryDetailsPage.css";
 export const Route = createFileRoute("/budget/$month/category/$category")({
   component: CategoryDetailsPage,
   loader: async ({ params: { month, category } }) => {
-    const categoryId = Number.parseInt(category, 10);
-    if (Number.isNaN(categoryId)) {
-      throw new Response("Invalid category ID", { status: 400 });
-    }
-
     const budgetCategory = await getBudgetCategory({
-      data: { month, categoryId },
+      data: { month, categoryId: category },
     });
     return { budgetCategory };
   },

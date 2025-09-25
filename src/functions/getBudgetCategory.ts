@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, startOfMonth } from "date-fns";
-import { number, object } from "zod";
+import { object, string } from "zod";
 import {
   calculateCategoryBalance,
   calculateCategoryStartingBalance,
@@ -11,7 +11,7 @@ import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
   month: monthDate(),
-  categoryId: number(),
+  categoryId: string(),
 });
 
 export const getBudgetCategory = createServerFn()

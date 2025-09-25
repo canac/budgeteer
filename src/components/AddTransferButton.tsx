@@ -5,7 +5,7 @@ import { useRouter } from "@tanstack/react-router";
 import { NewTransferModal } from "~/components/NewTransferModal";
 
 export interface AddTransferButtonProps {
-  sourceCategoryId?: number;
+  sourceCategoryId?: string;
 }
 
 export function AddTransferButton({ sourceCategoryId }: AddTransferButtonProps) {

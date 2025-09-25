@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { startOfMonth } from "date-fns";
-import { number, object } from "zod";
+import { number, object, string } from "zod";
 import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
-  categoryId: number(),
+  categoryId: string(),
   month: monthDate(),
   targetBalance: number().int(),
 });

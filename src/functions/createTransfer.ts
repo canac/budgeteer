@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { date, number, object } from "zod";
+import { date, number, object, string } from "zod";
 import { prisma } from "~/lib/prisma";
 
 const transferSchema = object({
   amount: number().int().positive(),
   date: date(),
-  sourceCategoryId: number(),
-  destinationCategoryId: number(),
+  sourceCategoryId: string(),
+  destinationCategoryId: string(),
 });
 
 export const createTransfer = createServerFn({ method: "POST" })

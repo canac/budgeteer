@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { number, object } from "zod";
+import { object, string } from "zod";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
-  transactionId: number(),
+  transactionId: string(),
 });
 
 export const deleteTransaction = createServerFn({ method: "POST" })

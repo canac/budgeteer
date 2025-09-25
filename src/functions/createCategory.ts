@@ -3,7 +3,7 @@ import { number, object, string } from "zod";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
-  budgetId: number(),
+  budgetId: string(),
   name: string().min(1),
   budgetedAmount: number().min(0).default(0),
 });

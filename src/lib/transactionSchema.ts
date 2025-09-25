@@ -11,7 +11,7 @@ export const transactionSchema = object({
   date: date(),
   categories: array(
     object({
-      categoryId: number(),
+      categoryId: string(),
       amount: amountSchema,
     }),
   ).min(1),

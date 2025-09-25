@@ -5,7 +5,7 @@ import { useRouter } from "@tanstack/react-router";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 
 export interface AddTransactionButtonProps {
-  initialCategoryId?: number;
+  initialCategoryId?: string;
 }
 
 export function AddTransactionButton({ initialCategoryId }: AddTransactionButtonProps) {

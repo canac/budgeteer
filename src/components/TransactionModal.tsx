@@ -27,13 +27,13 @@ import { formatCurrency } from "~/lib/formatCurrency";
 import "./TransactionModal.css";
 
 interface EditTransaction {
-  id: number;
+  id: string;
   amount: number;
   vendor: string;
   description: string | null;
   date: Date;
   transactionCategories: Array<{
-    id: number;
+    id: string;
     amount: number;
   }>;
 }
@@ -42,7 +42,7 @@ export interface TransactionModalProps {
   onClose: () => void;
   onSave: () => void;
   editingTransaction?: EditTransaction;
-  initialCategoryId?: number;
+  initialCategoryId?: string;
 }
 
 const amountSchema = number("Amount is required").check(positive("Amount must not be zero"));
@@ -56,7 +56,7 @@ const formSchema = object({
   selectedCategoryIds: array(string()).check(minLength(1, "At least one category is required")),
   categoryAmounts: array(
     object({
-      categoryId: number(),
+      categoryId: string(),
       amount: amountSchema,
     }),
   ),
@@ -98,8 +98,8 @@ export function TransactionModal({
           description: editingTransaction.description || "",
           date: format(editingTransaction.date, "yyyy-MM-dd"),
           isIncome: editingTransaction.amount > 0,
-          selectedCategoryIds: editingTransaction.transactionCategories.map((category) =>
-            category.id.toString(),
+          selectedCategoryIds: editingTransaction.transactionCategories.map(
+            (category) => category.id,
           ),
           categoryAmounts: editingTransaction.transactionCategories.map((category) => ({
             categoryId: category.id,
@@ -112,14 +112,14 @@ export function TransactionModal({
           description: "",
           date: format(new Date(), "yyyy-MM-dd"),
           isIncome: false,
-          selectedCategoryIds: initialCategoryId ? [initialCategoryId.toString()] : [],
+          selectedCategoryIds: initialCategoryId ? [initialCategoryId] : [],
           categoryAmounts: initialCategoryId ? [{ categoryId: initialCategoryId, amount: 0 }] : [],
         },
     validate: zod4Resolver(formSchema),
   });
 
   const categoryOptions = budgetCategories.map((category) => ({
-    value: category.categoryId.toString(),
+    value: category.categoryId,
     label: category.name,
   }));
 
@@ -127,17 +127,17 @@ export function TransactionModal({
 
   form.watch("selectedCategoryIds", ({ value, previousValue }) => {
     if (value.length === 1) {
-      form.setFieldValue("categoryAmounts", [{ categoryId: Number(value[0]), amount }]);
+      form.setFieldValue("categoryAmounts", [{ categoryId: value[0], amount }]);
     } else if (value.length === 2 && previousValue.length === 1) {
       form.setFieldValue("categoryAmounts", [
-        { categoryId: Number(value[0]), amount: 0 },
-        { categoryId: Number(value[1]), amount: 0 },
+        { categoryId: value[0], amount: 0 },
+        { categoryId: value[1], amount: 0 },
       ]);
     } else {
       const newCategoryAmounts = value.map(
         (categoryId) =>
-          categoryAmounts.find((category) => category.categoryId.toString() === categoryId) ?? {
-            categoryId: Number(categoryId),
+          categoryAmounts.find((category) => category.categoryId === categoryId) ?? {
+            categoryId: categoryId,
             amount: 0,
           },
       );
@@ -148,7 +148,7 @@ export function TransactionModal({
   form.watch("amount", ({ value }) => {
     if (selectedCategoryIds.length === 1 && value > 0) {
       form.setFieldValue("categoryAmounts", [
-        { categoryId: Number(selectedCategoryIds[0]), amount: value },
+        { categoryId: selectedCategoryIds[0], amount: value },
       ]);
     }
   });
@@ -165,7 +165,7 @@ export function TransactionModal({
   };
 
   const removeCategory = (index: number) => {
-    const categoryId = categoryAmounts[index].categoryId.toString();
+    const categoryId = categoryAmounts[index].categoryId;
     form.setFieldValue(
       "selectedCategoryIds",
       selectedCategoryIds.filter((id) => id !== categoryId),
@@ -256,7 +256,7 @@ export function TransactionModal({
             classNames={{ dropdown: "TransactionModal-dropdown" }}
             renderOption={({ option, checked }) => {
               const category = budgetCategories.find(
-                (category) => category.categoryId.toString() === option.value,
+                (category) => category.categoryId === option.value,
               );
               return (
                 category && (
