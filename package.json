@@ -8,6 +8,7 @@
     "build": "pnpm lint:ts && vite build",
     "build:analyze": "ANALYZE=true pnpm build",
     "start": "vite start",
+    "prepare": "lefthook install",
     "console": "node --env-file=.env repl.ts",
     "db:format": "prisma format",
     "db:generate": "prisma generate",
@@ -42,6 +43,7 @@
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react-swc": "^4.0.0",
+    "lefthook": "^1.13.4",
     "typescript": "^5.9.2",
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^5.1.4"
