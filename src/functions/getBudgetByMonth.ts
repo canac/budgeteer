@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { isAfter, isBefore, parse, startOfMonth } from "date-fns";
 import invariant from "tiny-invariant";
 import { object } from "zod";
+import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateFundBalance";
 import { monthToString } from "~/lib/monthToString";
 import { prisma } from "~/lib/prisma";
@@ -99,6 +100,7 @@ const inputSchema = object({
 
 export const getBudgetByMonth = createServerFn()
   .inputValidator(inputSchema)
+  .middleware([requireAuth])
   .handler(async ({ data: { month } }) => {
     const budget = await getBudget(month);
     const totalBudgetedAmount = budget.budgetCategories.reduce(

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { object, string } from "zod";
+import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
@@ -8,6 +9,7 @@ const inputSchema = object({
 
 export const getTransaction = createServerFn()
   .inputValidator(inputSchema)
+  .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
     const transaction = await prisma.transaction.findUniqueOrThrow({
       where: { id },

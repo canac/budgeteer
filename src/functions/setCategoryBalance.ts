@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { startOfMonth } from "date-fns";
 import { number, object, string } from "zod";
+import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance } from "~/lib/calculateFundBalance";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
@@ -13,6 +14,7 @@ const inputSchema = object({
 
 export const setCategoryBalance = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
+  .middleware([requireAuth])
   .handler(async ({ data: { categoryId, month, targetBalance } }) => {
     const category = await prisma.category.findUnique({
       where: { id: categoryId },

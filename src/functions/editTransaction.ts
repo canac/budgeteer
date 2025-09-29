@@ -1,6 +1,7 @@
 import { mapNotNullish } from "@std/collections";
 import { createServerFn } from "@tanstack/react-start";
 import { string } from "zod";
+import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
 
@@ -10,6 +11,7 @@ const inputSchema = transactionSchema.extend({
 
 export const editTransaction = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
+  .middleware([requireAuth])
   .handler(async ({ data: { id, categories, ...attributes } }) => {
     const existingCategories = await prisma.transactionCategory.findMany({
       where: { transactionId: id },

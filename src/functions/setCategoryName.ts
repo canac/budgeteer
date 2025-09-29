@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { object, string } from "zod";
+import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({
@@ -9,6 +10,7 @@ const inputSchema = object({
 
 export const setCategoryName = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
+  .middleware([requireAuth])
   .handler(async ({ data: { categoryId, name } }) => {
     await prisma.category.update({
       where: { id: categoryId },

@@ -4,3 +4,4 @@
 /dist/
 /generated/
 /src/routeTree.gen.ts
+/.env.local

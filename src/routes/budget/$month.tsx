@@ -12,7 +12,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconArrowsExchange, IconList, IconPlus } from "@tabler/icons-react";
+import { IconArrowsExchange, IconList, IconLogout, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { BudgetMonthSelector } from "~/components/BudgetMonthSelector";
@@ -23,6 +23,7 @@ import { MantineLink } from "~/components/MantineLink";
 import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
+import { logout } from "~/functions/logout";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./BudgetPage.css";
@@ -73,6 +74,10 @@ function BudgetPage() {
     });
   };
 
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <>
       {transactionOpened && (
@@ -98,6 +103,9 @@ function BudgetPage() {
                 </ActionIcon>
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransaction}>
                   <IconPlus size={24} />
+                </ActionIcon>
+                <ActionIcon variant="subtle" c="white" size="xl" onClick={handleLogout}>
+                  <IconLogout size={24} />
                 </ActionIcon>
               </Group>
             </Flex>
