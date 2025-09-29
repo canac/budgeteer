@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Alert,
+  Autocomplete,
   Button,
   CheckIcon,
   Group,
@@ -21,7 +22,9 @@ import type z from "zod/mini";
 import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
+import { getVendors } from "~/functions/getVendors";
 import { useOpened } from "~/hooks/useOpened";
+import { useServerFnData } from "~/hooks/useServerFnData";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./TransactionModal.css";
@@ -85,6 +88,7 @@ export function TransactionModal({
   initialCategoryId,
 }: TransactionModalProps) {
   const { budgetCategories } = useLoaderData({ from: "/budget/$month" });
+  const vendors = useServerFnData(getVendors) ?? [];
   const { close, modalProps } = useOpened({ onClose });
 
   const isEditing = !!editingTransaction;
@@ -227,10 +231,11 @@ export function TransactionModal({
             decimalScale={2}
             fixedDecimalScale
           />
-          <TextInput
+          <Autocomplete
             label="Vendor"
             key={form.key("vendor")}
             {...form.getInputProps("vendor")}
+            data={vendors}
             required
           />
           <TextInput
