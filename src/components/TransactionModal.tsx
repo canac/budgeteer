@@ -25,6 +25,7 @@ import { editTransaction } from "~/functions/editTransaction";
 import { getVendors } from "~/functions/getVendors";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
+import { useSortedBudgetCategories } from "~/hooks/useSortedBudgetCategories";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./TransactionModal.css";
@@ -89,6 +90,7 @@ export function TransactionModal({
 }: TransactionModalProps) {
   const { budgetCategories } = useLoaderData({ from: "/budget/$month" });
   const vendors = useServerFnData(getVendors) ?? [];
+  const sortedBudgetCategories = useSortedBudgetCategories(budgetCategories);
   const { close, modalProps } = useOpened({ onClose });
 
   const isEditing = !!editingTransaction;
@@ -122,7 +124,7 @@ export function TransactionModal({
     validate: zod4Resolver(formSchema),
   });
 
-  const categoryOptions = budgetCategories.map((category) => ({
+  const categoryOptions = sortedBudgetCategories.map((category) => ({
     value: category.categoryId,
     label: category.name,
   }));

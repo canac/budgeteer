@@ -7,6 +7,7 @@ import { zod4Resolver } from "mantine-form-zod-resolver";
 import { number, object, positive, refine, string } from "zod/mini";
 import { createTransfer } from "~/functions/createTransfer";
 import { useOpened } from "~/hooks/useOpened";
+import { useSortedBudgetCategories } from "~/hooks/useSortedBudgetCategories";
 import { dollarsToPennies } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
 
@@ -29,6 +30,7 @@ export interface NewTransferModalProps {
 
 export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTransferModalProps) {
   const { budgetCategories, month } = useLoaderData({ from: "/budget/$month" });
+  const sortedBudgetCategories = useSortedBudgetCategories(budgetCategories);
   const { close, modalProps } = useOpened({ onClose });
 
   const form = useForm({
@@ -48,7 +50,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
     }
   });
 
-  const categoryOptions = budgetCategories.map((category) => ({
+  const categoryOptions = sortedBudgetCategories.map((category) => ({
     value: category.categoryId,
     label: `${category.name} (${formatCurrency(category.balance)})`,
   }));
