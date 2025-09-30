@@ -1,4 +1,3 @@
-import { Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
@@ -19,35 +18,36 @@ export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
   };
 
   const handleSave = async () => {
-    await saveAmount(dollarsToPennies(Number(value)));
+    saveAmount(dollarsToPennies(Number(value))).catch(() => {});
     setEditing(false);
   };
 
-  if (editing) {
-    return (
-      <TextInput
-        className="EditableAmount"
-        classNames={{ input: "input" }}
-        ref={(input) => input?.focus()}
-        type="number"
-        aria-label="Edit amount"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        onBlur={handleSave}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            handleSave();
-          }
-        }}
-        min={0}
-        leftSection="$"
-      />
-    );
-  }
-
   return (
-    <Text component="span" className="text" onClick={handleEditClick}>
-      {formatCurrency(amount)}
-    </Text>
+    <span className="EditableAmount">
+      {editing ? (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSave();
+          }}
+        >
+          <input
+            className="input"
+            ref={(input) => input?.focus()}
+            inputMode="numeric"
+            pattern="[0-9]*(\.[0-9]{0,2})?"
+            min={0}
+            aria-label="Edit amount"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            onBlur={handleSave}
+          />
+        </form>
+      ) : (
+        <button type="button" className="text" aria-label="Edit amount" onClick={handleEditClick}>
+          {formatCurrency(amount)}
+        </button>
+      )}
+    </span>
   );
 }

@@ -1,13 +1,28 @@
 .EditableName {
   .text {
+    all: unset;
+    cursor: pointer;
+
     display: flex;
     align-items: center;
-    /* Matches --input-height-sm */
-    height: calc(2.25em * var(--mantine-scale));
-    cursor: pointer;
+    border-bottom: 2px solid transparent;
   }
 
   .input {
-    font-size: var(--mantine-font-size-md);
+    border: none;
+    padding: 0;
+    border-bottom: 2px solid transparent;
+
+    min-width: 4rem;
+    field-sizing: content;
+
+    &:focus-visible {
+      outline: none;
+      border-bottom-color: var(--mantine-color-blue-6);
+    }
+
+    &:invalid {
+      color: var(--mantine-color-red-5);
+    }
   }
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { TextInput, Text } from "@mantine/core";
 import "./EditableName.css";
 
 interface EditableNameProps {
@@ -9,40 +8,42 @@ interface EditableNameProps {
 
 export function EditableName({ name, saveName }: EditableNameProps) {
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(name.toString());
+  const [value, setValue] = useState(name);
 
   const handleEditClick = () => {
-    setValue(name.toString());
+    setValue(name);
     setEditing(true);
   };
 
   const handleSave = async () => {
-    await saveName(value);
+    saveName(value).catch(() => {});
     setEditing(false);
   };
 
-  if (editing) {
-    return (
-      <TextInput
-        classNames={{ input: "EditableName input" }}
-        ref={(input) => input?.focus()}
-        type="text"
-        aria-label="Edit name"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        onBlur={handleSave}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            handleSave();
-          }
-        }}
-      />
-    );
-  }
-
   return (
-    <Text className="EditableName text" onClick={handleEditClick}>
-      {name}
-    </Text>
+    <span className="EditableName">
+      {editing ? (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSave();
+          }}
+        >
+          <input
+            className="input"
+            ref={(input) => input?.focus()}
+            type="text"
+            aria-label="Edit name"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            onBlur={handleSave}
+          />
+        </form>
+      ) : (
+        <button type="button" className="text" aria-label="Edit name" onClick={handleEditClick}>
+          {name}
+        </button>
+      )}
+    </span>
   );
 }
