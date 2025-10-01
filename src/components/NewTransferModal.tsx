@@ -1,13 +1,15 @@
 import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconSwitch } from "@tabler/icons-react";
-import { useLoaderData } from "@tanstack/react-router";
-import { endOfMonth } from "date-fns";
+import { useParams } from "@tanstack/react-router";
+import { endOfMonth, format, parse } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { number, object, positive, refine, string } from "zod/mini";
 import { createTransfer } from "~/functions/createTransfer";
+import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { useOpened } from "~/hooks/useOpened";
-import { useSortedBudgetCategories } from "~/hooks/useSortedBudgetCategories";
+import { useServerFnData } from "~/hooks/useServerFnData";
+import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { dollarsToPennies } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
 
@@ -29,8 +31,13 @@ export interface NewTransferModalProps {
 }
 
 export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTransferModalProps) {
-  const { budgetCategories, month } = useLoaderData({ from: "/_layout/budget/$month" });
-  const sortedBudgetCategories = useSortedBudgetCategories(budgetCategories);
+  const month = useParams({
+    from: "/_layout/budget/$month",
+    shouldThrow: false,
+    select: (params) => params.month,
+  });
+  const categories = useServerFnData(getCategoriesWithBalances) ?? [];
+  const sortedCategories = useSortedCategories(categories);
   const { close, modalProps } = useOpened({ onClose });
 
   const form = useForm({
@@ -50,12 +57,14 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
     }
   });
 
-  const categoryOptions = sortedBudgetCategories.map((category) => ({
-    value: category.categoryId,
+  const categoryOptions = sortedCategories.map((category) => ({
+    value: category.id,
     label: `${category.name} (${formatCurrency(category.balance)})`,
   }));
 
-  const transferDate = endOfMonth(new Date(month));
+  const transferDate = endOfMonth(
+    typeof month === "string" ? parse(month, "MM-yyyy", new Date()) : new Date(),
+  );
 
   const handleSwitch = () => {
     form.setFieldValue("sourceCategoryId", form.values.destinationCategoryId);
@@ -124,7 +133,10 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
             required
             searchable
           />
-          <Group justify="flex-end">
+          <Group justify="space-between">
+            <Text size="sm" c="dimmed">
+              Transfer Date: {format(transferDate, "MMM dd, yyyy")}
+            </Text>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               Save
             </Button>

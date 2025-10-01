@@ -65,21 +65,19 @@ function LayoutRoute() {
               <Flex flex={1} />
               <Group gap="xs">
                 {month && (
-                  <>
-                    <MantineActionIconLink
-                      variant="subtle"
-                      c="white"
-                      size="xl"
-                      to="/budget/$month/transactions"
-                      params={{ month }}
-                    >
-                      <IconList size={24} />
-                    </MantineActionIconLink>
-                    <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransfer}>
-                      <IconArrowsExchange size={24} />
-                    </ActionIcon>
-                  </>
+                  <MantineActionIconLink
+                    variant="subtle"
+                    c="white"
+                    size="xl"
+                    to="/budget/$month/transactions"
+                    params={{ month }}
+                  >
+                    <IconList size={24} />
+                  </MantineActionIconLink>
                 )}
+                <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransfer}>
+                  <IconArrowsExchange size={24} />
+                </ActionIcon>
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransaction}>
                   <IconPlus size={24} />
                 </ActionIcon>
