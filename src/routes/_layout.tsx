@@ -78,11 +78,11 @@ function LayoutRoute() {
                     <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransfer}>
                       <IconArrowsExchange size={24} />
                     </ActionIcon>
-                    <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransaction}>
-                      <IconPlus size={24} />
-                    </ActionIcon>
                   </>
                 )}
+                <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransaction}>
+                  <IconPlus size={24} />
+                </ActionIcon>
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={handleLogout}>
                   <IconLogout size={24} />
                 </ActionIcon>

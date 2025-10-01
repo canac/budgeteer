@@ -15,17 +15,17 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
-import { useLoaderData } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import type z from "zod/mini";
 import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
+import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { getVendors } from "~/functions/getVendors";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
-import { useSortedBudgetCategories } from "~/hooks/useSortedBudgetCategories";
+import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./TransactionModal.css";
@@ -88,9 +88,9 @@ export function TransactionModal({
   editingTransaction,
   initialCategoryId,
 }: TransactionModalProps) {
-  const { budgetCategories } = useLoaderData({ from: "/_layout/budget/$month" });
   const vendors = useServerFnData(getVendors) ?? [];
-  const sortedBudgetCategories = useSortedBudgetCategories(budgetCategories);
+  const categories = useServerFnData(getCategoriesWithBalances) ?? [];
+  const sortedCategories = useSortedCategories(categories);
   const { close, modalProps } = useOpened({ onClose });
 
   const isEditing = !!editingTransaction;
@@ -124,8 +124,8 @@ export function TransactionModal({
     validate: zod4Resolver(formSchema),
   });
 
-  const categoryOptions = sortedBudgetCategories.map((category) => ({
-    value: category.categoryId,
+  const categoryOptions = sortedCategories.map((category) => ({
+    value: category.id,
     label: category.name,
   }));
 
@@ -262,9 +262,7 @@ export function TransactionModal({
             searchable
             classNames={{ dropdown: "TransactionModal-dropdown" }}
             renderOption={({ option, checked }) => {
-              const category = budgetCategories.find(
-                (category) => category.categoryId === option.value,
-              );
+              const category = categories.find((category) => category.id === option.value);
               return (
                 category && (
                   <>
@@ -288,40 +286,42 @@ export function TransactionModal({
                 </Alert>
               )}
               {categoryAmounts.map((categoryAmount, index) => {
-                const budgetCategory = budgetCategories.find(
-                  (budgetCategory) => budgetCategory.categoryId === categoryAmount.categoryId,
+                const category = categories.find(
+                  (category) => category.id === categoryAmount.categoryId,
                 );
                 return (
-                  <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
-                    <NumberInput
-                      placeholder={`${budgetCategory?.name} amount`}
-                      leftSection="$"
-                      key={form.key(`categoryAmounts.${index}.amount`)}
-                      {...form.getInputProps(`categoryAmounts.${index}.amount`)}
-                      min={0}
-                      decimalScale={2}
-                      fixedDecimalScale
-                      style={{ flex: 1 }}
-                    />
-                    <ActionIcon
-                      variant="subtle"
-                      color="red"
-                      onClick={() => removeCategory(index)}
-                      title="Remove category"
-                    >
-                      <IconTrash size={16} />
-                    </ActionIcon>
-                    {remainingAmount !== 0 && (
+                  category && (
+                    <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
+                      <NumberInput
+                        placeholder={`${category.name} amount`}
+                        leftSection="$"
+                        key={form.key(`categoryAmounts.${index}.amount`)}
+                        {...form.getInputProps(`categoryAmounts.${index}.amount`)}
+                        min={0}
+                        decimalScale={2}
+                        fixedDecimalScale
+                        style={{ flex: 1 }}
+                      />
                       <ActionIcon
                         variant="subtle"
-                        color="green"
-                        onClick={() => assignRemainingAmount(index)}
-                        title="Assign remaining amount"
+                        color="red"
+                        onClick={() => removeCategory(index)}
+                        title="Remove category"
                       >
-                        <IconCircleCheck size={16} />
+                        <IconTrash size={16} />
                       </ActionIcon>
-                    )}
-                  </Group>
+                      {remainingAmount !== 0 && (
+                        <ActionIcon
+                          variant="subtle"
+                          color="green"
+                          onClick={() => assignRemainingAmount(index)}
+                          title="Assign remaining amount"
+                        >
+                          <IconCircleCheck size={16} />
+                        </ActionIcon>
+                      )}
+                    </Group>
+                  )
                 );
               })}
             </Stack>
