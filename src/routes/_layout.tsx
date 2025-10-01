@@ -1,4 +1,4 @@
-import { ActionIcon, AppShell, Container, Flex, Group } from "@mantine/core";
+import { ActionIcon, AppShell, Box, Container, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconArrowsExchange, IconList, IconLogout, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useParams, useRouter } from "@tanstack/react-router";
@@ -62,7 +62,7 @@ function LayoutRoute() {
             <Group align="center" h="100%">
               <BudgetMonthSelector budgetMonths={budgetMonths} currentMonth={month ?? null} />
               <CategorySelector categories={categories} currentCategory={category ?? null} />
-              <Flex flex={1} />
+              <Box flex={1} />
               <Group gap="xs">
                 {month && (
                   <MantineActionIconLink
