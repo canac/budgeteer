@@ -10,13 +10,14 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconTrash } from "@tabler/icons-react";
+import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
+import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
@@ -25,7 +26,7 @@ import { useOpened } from "~/hooks/useOpened";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./CategoryDetailsPage.css";
 
-export const Route = createFileRoute("/budget/$month/category/$category")({
+export const Route = createFileRoute("/_layout/budget/$month/category/$category")({
   component: CategoryDetailsPage,
   loader: async ({ params: { month, category } }) => {
     const budgetCategory = await getBudgetCategory({
@@ -37,8 +38,8 @@ export const Route = createFileRoute("/budget/$month/category/$category")({
 
 function CategoryDetailsPage() {
   const { budgetCategory } = Route.useLoaderData();
-  const { month } = Route.useParams();
-  const { month: monthDate } = useLoaderData({ from: "/budget/$month" });
+  const { month, category } = Route.useParams();
+  const { month: monthDate } = useLoaderData({ from: "/_layout/budget/$month" });
   const router = useRouter();
   const { close, modalProps } = useOpened({
     onClose: () => router.navigate({ to: "/budget/$month", params: { month } }),
@@ -124,6 +125,15 @@ function CategoryDetailsPage() {
               Transactions
               <AddTransactionButton initialCategoryId={budgetCategory.category.id} />
               <AddTransferButton sourceCategoryId={budgetCategory.category.id} />
+              <MantineActionIconLink
+                variant="subtle"
+                size="md"
+                aria-label="Full History"
+                to="/category/$category"
+                params={{ category }}
+              >
+                <IconHistory size={16} />
+              </MantineActionIconLink>
             </Group>
           </Title>
           <TransactionTable

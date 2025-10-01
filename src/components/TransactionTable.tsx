@@ -14,8 +14,8 @@ import "./TransactionTable.css";
 
 interface TransactionTableProps {
   transactions: Awaited<ReturnType<typeof getBudgetCategory>>["transactions"];
-  startingBalance: number;
-  startingBalanceDate: Date;
+  startingBalance?: number | null;
+  startingBalanceDate?: Date;
   onUpdate: () => Promise<void>;
 }
 
@@ -101,15 +101,17 @@ export function TransactionTable({
               </Table.Td>
             </Table.Tr>
           ))}
-          <Table.Tr className="starting-balance">
-            <Table.Td>{format(startingBalanceDate, "MMM dd")}</Table.Td>
-            <Table.Td>Starting Balance</Table.Td>
-            <Table.Td></Table.Td>
-            <Table.Td ta="right" c={startingBalance < 0 ? "red" : "green"}>
-              {formatCurrency(startingBalance)}
-            </Table.Td>
-            <Table.Td />
-          </Table.Tr>
+          {startingBalance !== null && startingBalance !== undefined && startingBalanceDate && (
+            <Table.Tr className="starting-balance">
+              <Table.Td>{format(startingBalanceDate, "MMM dd")}</Table.Td>
+              <Table.Td>Starting Balance</Table.Td>
+              <Table.Td></Table.Td>
+              <Table.Td ta="right" c={startingBalance < 0 ? "red" : "green"}>
+                {formatCurrency(startingBalance)}
+              </Table.Td>
+              <Table.Td />
+            </Table.Tr>
+          )}
         </Table.Tbody>
       </Table>
     </>

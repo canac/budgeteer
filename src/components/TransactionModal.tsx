@@ -88,7 +88,7 @@ export function TransactionModal({
   editingTransaction,
   initialCategoryId,
 }: TransactionModalProps) {
-  const { budgetCategories } = useLoaderData({ from: "/budget/$month" });
+  const { budgetCategories } = useLoaderData({ from: "/_layout/budget/$month" });
   const vendors = useServerFnData(getVendors) ?? [];
   const sortedBudgetCategories = useSortedBudgetCategories(budgetCategories);
   const { close, modalProps } = useOpened({ onClose });

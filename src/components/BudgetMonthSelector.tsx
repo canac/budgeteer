@@ -6,7 +6,7 @@ import "./BudgetMonthSelector.css";
 
 interface BudgetMonthSelectorProps {
   budgetMonths: Date[];
-  currentMonth: Date;
+  currentMonth: string | null;
 }
 
 export function BudgetMonthSelector({ budgetMonths, currentMonth }: BudgetMonthSelectorProps) {
@@ -27,8 +27,9 @@ export function BudgetMonthSelector({ budgetMonths, currentMonth }: BudgetMonthS
     <Select
       className="BudgetMonthSelector"
       data={options}
-      value={monthToString(currentMonth)}
+      value={currentMonth}
       onChange={handleChange}
+      placeholder="Select Month"
       variant="subtle"
       color="white"
       size="lg"

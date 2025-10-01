@@ -17,7 +17,7 @@ import { formatCurrency } from "~/lib/formatCurrency";
 type DeleteTransaction = DeleteTransactionModalProps["transaction"];
 type EditTransaction = TransactionModalProps["editingTransaction"];
 
-export const Route = createFileRoute("/budget/$month/transactions")({
+export const Route = createFileRoute("/_layout/budget/$month/transactions")({
   component: TransactionsPage,
   loader: async ({ params: { month } }) => {
     const transactions = await getBudgetTransactions({ data: { month } });

@@ -29,7 +29,7 @@ export interface NewTransferModalProps {
 }
 
 export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTransferModalProps) {
-  const { budgetCategories, month } = useLoaderData({ from: "/budget/$month" });
+  const { budgetCategories, month } = useLoaderData({ from: "/_layout/budget/$month" });
   const sortedBudgetCategories = useSortedBudgetCategories(budgetCategories);
   const { close, modalProps } = useOpened({ onClose });
 

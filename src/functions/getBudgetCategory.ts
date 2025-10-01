@@ -19,7 +19,7 @@ export const getBudgetCategory = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, categoryId } }) => {
-    const category = await prisma.category.findUnique({
+    const category = await prisma.category.findUniqueOrThrow({
       where: { id: categoryId },
       include: {
         budgetCategories: {
@@ -32,9 +32,6 @@ export const getBudgetCategory = createServerFn()
         },
       },
     });
-    if (!category) {
-      throw new Response("Category not found", { status: 404 });
-    }
 
     const startDate = startOfMonth(month);
     const endDate = endOfMonth(month);
