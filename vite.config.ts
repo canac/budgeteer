@@ -8,5 +8,8 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.PORT ?? "", 10) || 3000,
   },
+  build: {
+    sourcemap: true,
+  },
   plugins: [react(), tsConfigPaths({ projects: ["./tsconfig.json"] }), tanstackStart(), netlify()],
 });
