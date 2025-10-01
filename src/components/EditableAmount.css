@@ -1,12 +1,14 @@
 .EditableAmount {
   font-weight: bold;
 
+  form {
+    display: inline;
+  }
+
   .text {
     all: unset;
     cursor: pointer;
 
-    display: flex;
-    align-items: center;
     border-bottom: 2px solid transparent;
   }
 
@@ -15,7 +17,7 @@
     padding: 0;
     border-bottom: 2px solid transparent;
 
-    width: 6rem;
+    field-sizing: content;
     text-align: right;
 
     &:focus-visible {

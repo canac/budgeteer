@@ -1,14 +1,4 @@
-import {
-  ActionIcon,
-  Divider,
-  Drawer,
-  Group,
-  Progress,
-  Space,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { ActionIcon, Divider, Drawer, Group, Progress, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
@@ -99,10 +89,9 @@ function CategoryDetailsPage() {
         </div>
 
         <div>
-          <Group>
+          <Group justify="space-between">
             <Title order={3}>Spent</Title>
-            <Space flex={1} />
-            <Text size="sm" c="dimmed" ml="md">
+            <Text component="div" size="sm" c="dimmed">
               {formatCurrency(-budgetCategory.transactionTotal)} of{" "}
               <EditableAmount
                 amount={budgetCategory.budgetCategory.budgetedAmount}
