@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "pnpm lint:ts && vite build",
+    "build": "pnpm db:generate && vite build",
     "build:analyze": "ANALYZE=true pnpm build",
     "start": "vite start",
     "prepare": "lefthook install",
