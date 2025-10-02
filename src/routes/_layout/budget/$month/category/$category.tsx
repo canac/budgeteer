@@ -1,7 +1,18 @@
-import { ActionIcon, Divider, Drawer, Group, Progress, Stack, Text, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Divider,
+  Drawer,
+  Group,
+  Progress,
+  Stack,
+  Switch,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
@@ -11,7 +22,7 @@ import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
-import { setCategoryName } from "~/functions/setCategoryName";
+import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./CategoryDetailsPage.css";
@@ -37,9 +48,22 @@ function CategoryDetailsPage() {
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
 
+  const [fund, setFund] = useState(budgetCategory.category.fund);
+  useEffect(() => {
+    setFund(budgetCategory.category.fund);
+  }, [budgetCategory.category.fund]);
+
   const handleSaveCategoryName = async (newName: string) => {
-    await setCategoryName({
+    await updateCategory({
       data: { categoryId: budgetCategory.category.id, name: newName },
+    });
+    await router.invalidate();
+  };
+
+  const handleToggleFund = async (checked: boolean) => {
+    setFund(checked);
+    await updateCategory({
+      data: { categoryId: budgetCategory.category.id, fund: checked },
     });
     await router.invalidate();
   };
@@ -83,9 +107,16 @@ function CategoryDetailsPage() {
       <Stack gap="lg">
         <div>
           <Title order={3}>Current Balance</Title>
-          <Text size="xl" fw={700} c={budgetCategory.currentBalance >= 0 ? "green" : "red"}>
-            {formatCurrency(budgetCategory.currentBalance)}
-          </Text>
+          <Group gap="xl">
+            <Text size="xl" fw={700} c={budgetCategory.currentBalance >= 0 ? "green" : "red"}>
+              {formatCurrency(budgetCategory.currentBalance)}
+            </Text>
+            <Switch
+              label="Fund"
+              checked={fund}
+              onChange={(event) => handleToggleFund(event.target.checked)}
+            />
+          </Group>
         </div>
 
         <div>
