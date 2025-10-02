@@ -12,7 +12,6 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
@@ -24,6 +23,7 @@ import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
+import { useSyncedState } from "~/hooks/useSyncedState";
 import { formatCurrency } from "~/lib/formatCurrency";
 import "./CategoryDetailsPage.css";
 
@@ -48,10 +48,7 @@ function CategoryDetailsPage() {
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
 
-  const [fund, setFund] = useState(budgetCategory.category.fund);
-  useEffect(() => {
-    setFund(budgetCategory.category.fund);
-  }, [budgetCategory.category.fund]);
+  const [fund, setFund] = useSyncedState(budgetCategory.category.fund);
 
   const handleSaveCategoryName = async (newName: string) => {
     await updateCategory({
