@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { monthToString } from "~/lib/monthToString";
+import { monthToString } from "~/lib/month";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {

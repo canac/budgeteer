@@ -1,10 +1,11 @@
 import { NEVER, string } from "zod";
+import { monthToDate, type Month } from "./month";
 
 export function monthString() {
   return string().regex(/^\d{2}-\d{4}$/, "Invalid month format");
 }
 
-export function monthDate() {
+export function month() {
   return monthString().transform((monthString, ctx) => {
     const [monthPart, yearPart] = monthString.split("-");
     const month = parseInt(monthPart, 10);
@@ -18,6 +19,10 @@ export function monthDate() {
       return NEVER;
     }
 
-    return new Date(year, month - 1);
+    return { month, year } satisfies Month;
   });
+}
+
+export function monthDate() {
+  return month().transform((month) => monthToDate(month));
 }

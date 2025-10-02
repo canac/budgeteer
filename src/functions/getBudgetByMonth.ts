@@ -5,7 +5,7 @@ import invariant from "tiny-invariant";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateFundBalance";
-import { monthToString } from "~/lib/monthToString";
+import { dateToMonth, monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -110,7 +110,7 @@ export const getBudgetByMonth = createServerFn()
 
     return {
       budget,
-      month,
+      month: dateToMonth(month),
       totalBudgetedAmount,
       budgetCategories: await Promise.all(
         budget.budgetCategories.map(async (budgetCategory) => ({

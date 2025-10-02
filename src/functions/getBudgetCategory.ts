@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { object, string } from "zod";
+import { dateToMonth, monthToString } from "~/lib/month";
 import { requireAuth } from "~/lib/authMiddleware";
 import {
   calculateCategoryBalance,
   calculateCategoryStartingBalance,
 } from "~/lib/calculateFundBalance";
-import { monthToString } from "~/lib/monthToString";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -71,6 +71,6 @@ export const getBudgetCategory = createServerFn()
         ...transaction,
         amount,
       })),
-      month,
+      month: dateToMonth(month),
     };
   });

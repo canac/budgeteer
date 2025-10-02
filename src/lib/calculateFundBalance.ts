@@ -1,7 +1,7 @@
 import { endOfMonth, startOfMonth } from "date-fns";
 import { prisma } from "~/lib/prisma";
 import type { CategoryModel } from "../../generated/prisma/models";
-import { monthToString } from "./monthToString";
+import { monthToString } from "./month";
 
 export async function calculateCategorySpent({
   month,

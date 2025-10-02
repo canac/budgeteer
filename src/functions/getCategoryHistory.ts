@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eachMonthOfInterval } from "date-fns";
 import { boolean, date, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { monthToString } from "~/lib/monthToString";
+import { monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 
 const inputSchema = object({

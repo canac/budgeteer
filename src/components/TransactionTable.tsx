@@ -9,13 +9,14 @@ import {
 import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { monthToDate, type Month } from "~/lib/month";
 import { TransactionModal, type TransactionModalProps } from "./TransactionModal";
 import "./TransactionTable.css";
 
 interface TransactionTableProps {
   transactions: Awaited<ReturnType<typeof getBudgetCategory>>["transactions"];
   startingBalance?: number | null;
-  startingBalanceDate?: Date;
+  startingBalanceDate?: Month;
   onUpdate: () => Promise<void>;
 }
 
@@ -103,7 +104,7 @@ export function TransactionTable({
           ))}
           {startingBalance !== null && startingBalance !== undefined && startingBalanceDate && (
             <Table.Tr className="starting-balance">
-              <Table.Td>{format(startingBalanceDate, "MMM dd")}</Table.Td>
+              <Table.Td>{format(monthToDate(startingBalanceDate), "MMM dd")}</Table.Td>
               <Table.Td>Starting Balance</Table.Td>
               <Table.Td></Table.Td>
               <Table.Td ta="right" c={startingBalance < 0 ? "red" : "green"}>
