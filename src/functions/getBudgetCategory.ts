@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { object, string } from "zod";
-import { dateToMonth, monthToString } from "~/lib/month";
 import { requireAuth } from "~/lib/authMiddleware";
 import {
   calculateCategoryBalance,
   calculateCategoryStartingBalance,
 } from "~/lib/calculateFundBalance";
+import { dateToMonth, monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -33,14 +33,11 @@ export const getBudgetCategory = createServerFn()
       },
     });
 
-    const startDate = startOfMonth(month);
-    const endDate = endOfMonth(month);
-
     const transactionCategories = await prisma.transactionCategory.findMany({
       where: {
         categoryId,
         transaction: {
-          date: { gte: startDate, lte: endDate },
+          date: { gte: startOfMonth(month), lte: endOfMonth(month) },
         },
       },
       include: {
@@ -51,22 +48,15 @@ export const getBudgetCategory = createServerFn()
       orderBy: [{ transaction: { date: "desc" } }, { transaction: { createdAt: "desc" } }],
     });
 
-    const currentBalance = await calculateCategoryBalance({ month, category });
-    const startingBalance = await calculateCategoryStartingBalance({ month, category });
-
-    const transactionTotal = transactionCategories.reduce(
-      (total, transaction) => total + transaction.amount,
-      0,
-    );
-
-    const budgetCategory = category.budgetCategories[0];
-
     return {
       category,
-      budgetCategory,
-      currentBalance: currentBalance,
-      startingBalance: startingBalance,
-      transactionTotal: transactionTotal,
+      budgetCategory: category.budgetCategories[0],
+      currentBalance: await calculateCategoryBalance({ month, category }),
+      startingBalance: await calculateCategoryStartingBalance({ month, category }),
+      transactionTotal: transactionCategories.reduce(
+        (total, transaction) => total + transaction.amount,
+        0,
+      ),
       transactions: transactionCategories.map(({ amount, transaction }) => ({
         ...transaction,
         amount,
