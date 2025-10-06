@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
+import { pluck } from "~/lib/pluck";
 import { prisma } from "~/lib/prisma";
 
 export const getTopCategories = createServerFn()
@@ -22,5 +23,5 @@ export const getTopCategories = createServerFn()
       take: 3,
     });
 
-    return transactionCounts.map((item) => item.categoryId);
+    return pluck(transactionCounts, "categoryId");
   });

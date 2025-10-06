@@ -2,6 +2,7 @@ import { mapNotNullish } from "@std/collections";
 import { createServerFn } from "@tanstack/react-start";
 import { string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
+import { pluck } from "~/lib/pluck";
 import { prisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
 
@@ -16,7 +17,7 @@ export const editTransaction = createServerFn({ method: "POST" })
     const existingCategories = await prisma.transactionCategory.findMany({
       where: { transactionId: id },
     });
-    const existingCategoryIds = new Set(existingCategories.map(({ categoryId }) => categoryId));
+    const existingCategoryIds = new Set(pluck(existingCategories, "categoryId"));
     const newCategories = new Map(categories.map((category) => [category.categoryId, category]));
 
     return prisma.transaction.update({

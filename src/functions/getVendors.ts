@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
+import { pluck } from "~/lib/pluck";
 import { prisma } from "~/lib/prisma";
 
 export const getVendors = createServerFn()
@@ -19,5 +20,5 @@ export const getVendors = createServerFn()
         vendor: "asc",
       },
     });
-    return vendors.map((transaction) => transaction.vendor);
+    return pluck(vendors, "vendor");
   });

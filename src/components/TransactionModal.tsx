@@ -28,6 +28,7 @@ import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { pluck } from "~/lib/pluck";
 import "./TransactionModal.css";
 
 interface EditTransaction {
@@ -104,9 +105,7 @@ export function TransactionModal({
           description: editingTransaction.description || "",
           date: format(editingTransaction.date, "yyyy-MM-dd"),
           isIncome: editingTransaction.amount > 0,
-          selectedCategoryIds: editingTransaction.transactionCategories.map(
-            (category) => category.id,
-          ),
+          selectedCategoryIds: pluck(editingTransaction.transactionCategories, "id"),
           categoryAmounts: editingTransaction.transactionCategories.map((category) => ({
             categoryId: category.id,
             amount: penniesToDollars(Math.abs(category.amount)),
