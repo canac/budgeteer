@@ -99,23 +99,3 @@ export async function calculateCategoryStartingBalance({
 
   return totalBudgetedAmount + totalTransactionAmount;
 }
-
-export async function calculateCurrentCategoryBalance(categoryId: string): Promise<number> {
-  const aggregateBudgetCategories = await prisma.budgetCategory.aggregate({
-    _sum: { budgetedAmount: true },
-    where: {
-      categoryId,
-    },
-  });
-  const totalBudgetedAmount = aggregateBudgetCategories._sum.budgetedAmount ?? 0;
-
-  const aggregateTransactions = await prisma.transactionCategory.aggregate({
-    _sum: { amount: true },
-    where: {
-      categoryId,
-    },
-  });
-  const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
-
-  return totalBudgetedAmount + totalTransactionAmount;
-}
