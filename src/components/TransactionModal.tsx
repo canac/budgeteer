@@ -26,9 +26,9 @@ import { getVendors } from "~/functions/getVendors";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
+import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
-import { pluck } from "~/lib/pluck";
 import "./TransactionModal.css";
 
 interface EditTransaction {

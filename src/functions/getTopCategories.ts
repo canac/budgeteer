@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
-import { pluck } from "~/lib/pluck";
+import { pluck } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
 
 export const getTopCategories = createServerFn()

@@ -2,7 +2,7 @@ import { mapNotNullish } from "@std/collections";
 import { createServerFn } from "@tanstack/react-start";
 import { string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { pluck } from "~/lib/pluck";
+import { pluck } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
 

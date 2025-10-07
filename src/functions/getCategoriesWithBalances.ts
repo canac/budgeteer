@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
+import { find } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
 
 export const getCategoriesWithBalances = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
-    const [categories, budgetAggregates, transactionAggregates] = await Promise.all([
+    const [categories, budgets, transactions] = await Promise.all([
       prisma.category.findMany({
         orderBy: { name: "asc" },
       }),
@@ -19,19 +20,12 @@ export const getCategoriesWithBalances = createServerFn()
       }),
     ]);
 
-    const budgetMap = new Map(
-      budgetAggregates.flatMap(({ categoryId, _sum: { budgetedAmount } }) =>
-        budgetedAmount === null ? [] : [[categoryId, budgetedAmount]],
-      ),
-    );
-    const transactionMap = new Map(
-      transactionAggregates.flatMap(({ categoryId, _sum: { amount } }) =>
-        amount === null ? [] : [[categoryId, amount]],
-      ),
-    );
-
-    return categories.map((category) => ({
-      ...category,
-      balance: (budgetMap.get(category.id) ?? 0) + (transactionMap.get(category.id) ?? 0),
-    }));
+    return categories.map((category) => {
+      const totalBudgeted = find(budgets, "categoryId", category.id)?._sum.budgetedAmount ?? 0;
+      const totalSpent = find(transactions, "categoryId", category.id)?._sum.amount ?? 0;
+      return {
+        ...category,
+        balance: totalBudgeted + totalSpent,
+      };
+    });
   });
