@@ -4,7 +4,7 @@ import { isAfter, isBefore, parse, startOfMonth } from "date-fns";
 import invariant from "tiny-invariant";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateFundBalance";
+import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateBalance";
 import { dateToMonth, monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";

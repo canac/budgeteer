@@ -2,10 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import {
-  calculateCategoryBalance,
-  calculateCategoryStartingBalance,
-} from "~/lib/calculateFundBalance";
+import { calculateCategoryBalance, calculateCategoryStartingBalance } from "~/lib/calculateBalance";
 import { dateToMonth, monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
