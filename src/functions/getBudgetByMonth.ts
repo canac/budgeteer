@@ -1,13 +1,14 @@
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { isAfter, isBefore, parse, startOfMonth } from "date-fns";
+import { isAfter, isBefore, startOfMonth } from "date-fns";
 import invariant from "tiny-invariant";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateBalance";
-import { dateToMonth, monthToString } from "~/lib/month";
+import { dateToMonth, monthToDate, monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
+import { getFirstMonth } from "./getFirstMonth";
 
 async function getBudget(requestedMonth: Date) {
   const currentMonth = startOfMonth(new Date());
@@ -36,13 +37,8 @@ async function getBudget(requestedMonth: Date) {
     return actualBudget;
   }
 
-  const initialBudget = await prisma.budget.findFirst({
-    select: {
-      month: true,
-    },
-    orderBy: { month: "asc" },
-  });
-  if (!initialBudget) {
+  const initialBudgetMonth = await getFirstMonth();
+  if (!initialBudgetMonth) {
     // Regardless of the requested month, create the initial budget for the current month and redirect to it
     await prisma.budget.create({
       data: {
@@ -56,12 +52,11 @@ async function getBudget(requestedMonth: Date) {
     });
   }
 
-  const initialBudgetMonth = parse(initialBudget.month, "MM-yyyy", new Date());
-  if (isBefore(requestedMonth, initialBudgetMonth)) {
+  if (isBefore(requestedMonth, monthToDate(initialBudgetMonth))) {
     // A month before the initial budget was requested, so redirect to the initial budget
     throw redirect({
       to: "/budget/$month",
-      params: { month: initialBudget.month },
+      params: { month: monthToString(initialBudgetMonth) },
     });
   }
 

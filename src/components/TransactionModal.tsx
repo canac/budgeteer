@@ -22,6 +22,7 @@ import { array, boolean, minLength, number, object, positive, refine, string } f
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
+import { getFirstMonth } from "~/functions/getFirstMonth";
 import { getVendors } from "~/functions/getVendors";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
@@ -29,6 +30,7 @@ import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { monthToDate } from "~/lib/month";
 import "./TransactionModal.css";
 
 interface EditTransaction {
@@ -91,6 +93,7 @@ export function TransactionModal({
 }: TransactionModalProps) {
   const vendors = useServerFnData(getVendors) ?? [];
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
+  const firstMonth = useServerFnData(getFirstMonth);
   const sortedCategories = useSortedCategories(categories);
   const { close, modalProps } = useOpened({ onClose });
 
@@ -250,6 +253,7 @@ export function TransactionModal({
             key={form.key("date")}
             {...form.getInputProps("date")}
             required
+            min={firstMonth ? monthToDate(firstMonth).toISOString().slice(0, 10) : undefined}
           />
           <MultiSelect
             label="Category"

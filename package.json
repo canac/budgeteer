@@ -24,6 +24,7 @@
     "@mantine/form": "^8.2.7",
     "@mantine/hooks": "^8.2.7",
     "@prisma/client": "^6.16.0",
+    "@std/cache": "jsr:^0.2.0",
     "@std/collections": "jsr:^1.1.3",
     "@tabler/icons-react": "^3.34.1",
     "@tanstack/react-router": "^1.132.7",
