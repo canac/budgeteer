@@ -150,14 +150,14 @@ function TransactionsPage() {
                         onClick={() => handleEditTransaction(transaction)}
                         disabled={transaction.transfer !== null}
                       >
-                        <IconEdit size={16} />
+                        <IconEdit />
                       </ActionIcon>
                       <ActionIcon
                         variant="subtle"
                         color="red"
                         onClick={() => handleDeleteTransaction(transaction)}
                       >
-                        <IconTrash size={16} />
+                        <IconTrash />
                       </ActionIcon>
                     </Group>
                   </Table.Td>

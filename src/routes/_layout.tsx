@@ -72,17 +72,17 @@ function LayoutRoute() {
                     to="/budget/$month/transactions"
                     params={{ month }}
                   >
-                    <IconList size={24} />
+                    <IconList />
                   </MantineActionIconLink>
                 )}
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransfer}>
-                  <IconArrowsExchange size={24} />
+                  <IconArrowsExchange />
                 </ActionIcon>
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransaction}>
-                  <IconPlus size={24} />
+                  <IconPlus />
                 </ActionIcon>
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={handleLogout}>
-                  <IconLogout size={24} />
+                  <IconLogout />
                 </ActionIcon>
               </Group>
             </Group>

@@ -94,7 +94,7 @@ function CategoryDetailsPage() {
             title="Delete category"
             size="md"
           >
-            <IconTrash size={16} />
+            <IconTrash />
           </ActionIcon>
         </Group>
       }
@@ -149,7 +149,7 @@ function CategoryDetailsPage() {
                 to="/category/$category"
                 params={{ category }}
               >
-                <IconHistory size={16} />
+                <IconHistory />
               </MantineActionIconLink>
             </Group>
           </Title>

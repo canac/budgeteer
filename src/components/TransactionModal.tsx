@@ -307,7 +307,7 @@ export function TransactionModal({
                         onClick={() => removeCategory(index)}
                         title="Remove category"
                       >
-                        <IconTrash size={16} />
+                        <IconTrash />
                       </ActionIcon>
                       {remainingAmount !== 0 && (
                         <ActionIcon
@@ -316,7 +316,7 @@ export function TransactionModal({
                           onClick={() => assignRemainingAmount(index)}
                           title="Assign remaining amount"
                         >
-                          <IconCircleCheck size={16} />
+                          <IconCircleCheck />
                         </ActionIcon>
                       )}
                     </Group>

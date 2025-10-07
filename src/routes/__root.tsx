@@ -3,10 +3,14 @@ import { mantineHtmlProps, MantineProvider } from "@mantine/core";
 import mantineCss from "@mantine/core/styles.css?url";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import globalCss from "~/global.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
-    links: [{ rel: "stylesheet", href: mantineCss }],
+    links: [
+      { rel: "stylesheet", href: mantineCss },
+      { rel: "stylesheet", href: globalCss },
+    ],
   }),
   component: RootComponent,
 });

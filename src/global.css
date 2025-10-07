@@ -1,0 +1,4 @@
+.mantine-ActionIcon-icon .tabler-icon {
+  width: calc(var(--ai-size) / 1.5);
+  height: calc(var(--ai-size) / 1.5);
+}
