@@ -12,7 +12,6 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
-import type { CategoryType } from "generated/prisma/enums";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
@@ -63,7 +62,7 @@ function CategoryDetailsPage() {
       return;
     }
 
-    const newType = value as CategoryType;
+    const newType = value as "SAVINGS" | "ACCUMULATING" | "NON_ACCUMULATING";
     setCategoryType(newType);
     await updateCategory({
       data: { categoryId: budgetCategory.category.id, type: newType },
@@ -120,7 +119,6 @@ function CategoryDetailsPage() {
             value={categoryType}
             onChange={handleChangeType}
             data={[
-              { value: "FIXED", label: "Fixed" },
               { value: "SAVINGS", label: "Savings" },
               { value: "ACCUMULATING", label: "Accumulating" },
               { value: "NON_ACCUMULATING", label: "Non-Accumulating" },

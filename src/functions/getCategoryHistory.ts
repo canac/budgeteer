@@ -1,3 +1,4 @@
+import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { eachMonthOfInterval } from "date-fns";
 import { boolean, date, object, string } from "zod";
@@ -16,9 +17,15 @@ export const getCategoryHistory = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, startDate, endDate, includeTransfers } }) => {
-    const category = await prisma.category.findUniqueOrThrow({
-      where: { id: categoryId },
+    const category = await prisma.category.findUnique({
+      where: {
+        id: categoryId,
+        type: { not: "FIXED" },
+      },
     });
+    if (!category) {
+      throw notFound();
+    }
 
     const transactionCategories = await prisma.transactionCategory.findMany({
       where: {

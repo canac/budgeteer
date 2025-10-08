@@ -1,3 +1,4 @@
+import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
@@ -11,7 +12,7 @@ export const getTransaction = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
-    const transaction = await prisma.transaction.findUniqueOrThrow({
+    const transaction = await prisma.transaction.findUnique({
       where: { id },
       include: {
         transactionCategories: {
@@ -19,6 +20,9 @@ export const getTransaction = createServerFn()
         },
       },
     });
+    if (!transaction) {
+      throw notFound();
+    }
 
     return {
       ...transaction,

@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { CategoryType } from "generated/prisma/enums";
 import { object, string, enum as zodEnum } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
@@ -7,7 +6,7 @@ import { prisma } from "~/lib/prisma";
 const inputSchema = object({
   categoryId: string(),
   name: string().min(1).optional(),
-  type: zodEnum(Object.values(CategoryType)).optional(),
+  type: zodEnum(["SAVINGS", "ACCUMULATING", "NON_ACCUMULATING"]).optional(),
 });
 
 export const updateCategory = createServerFn({ method: "POST" })
@@ -15,7 +14,11 @@ export const updateCategory = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, ...fields } }) => {
     await prisma.category.update({
-      where: { id: categoryId },
+      where: {
+        id: categoryId,
+        // The type of fixed categories cannot be changed
+        ...(fields.type && { type: { not: "FIXED" } }),
+      },
       data: fields,
     });
   });

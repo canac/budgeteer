@@ -1,3 +1,4 @@
+import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { object, string } from "zod";
@@ -16,8 +17,11 @@ export const getBudgetCategory = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, categoryId } }) => {
-    const category = await prisma.category.findUniqueOrThrow({
-      where: { id: categoryId },
+    const category = await prisma.category.findUnique({
+      where: {
+        id: categoryId,
+        type: { not: "FIXED" },
+      },
       include: {
         budgetCategories: {
           where: {
@@ -29,6 +33,9 @@ export const getBudgetCategory = createServerFn()
         },
       },
     });
+    if (!category) {
+      throw notFound();
+    }
 
     const transactionCategories = await prisma.transactionCategory.findMany({
       where: {

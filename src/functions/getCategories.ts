@@ -6,6 +6,9 @@ export const getCategories = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
     return await prisma.category.findMany({
+      where: {
+        type: { not: "FIXED" },
+      },
       orderBy: { name: "asc" },
     });
   });
