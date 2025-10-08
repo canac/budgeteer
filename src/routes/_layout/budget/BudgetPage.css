@@ -6,4 +6,11 @@
       font-size: var(--mantine-font-size-lg);
     }
   }
+
+  .EditableAmount {
+    .text,
+    .input {
+      font-weight: normal;
+    }
+  }
 }
