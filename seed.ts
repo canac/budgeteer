@@ -9,14 +9,14 @@ await prisma.budget.deleteMany();
 const emergencyFund = await prisma.category.create({
   data: {
     name: "Emergency Fund",
-    fund: true,
+    type: "SAVINGS",
   },
 });
 
 const vacationFund = await prisma.category.create({
   data: {
     name: "Vacation Fund",
-    fund: true,
+    type: "ACCUMULATING",
   },
 });
 

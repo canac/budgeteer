@@ -4,14 +4,15 @@ import {
   Drawer,
   Group,
   Progress,
+  Select,
   Stack,
-  Switch,
   Text,
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
+import type { CategoryType } from "generated/prisma/enums";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
@@ -48,7 +49,7 @@ function CategoryDetailsPage() {
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
 
-  const [fund, setFund] = useSyncedState(budgetCategory.category.fund);
+  const [categoryType, setCategoryType] = useSyncedState(budgetCategory.category.type);
 
   const handleSaveCategoryName = async (newName: string) => {
     await updateCategory({
@@ -57,10 +58,15 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
-  const handleToggleFund = async (checked: boolean) => {
-    setFund(checked);
+  const handleChangeType = async (value: string | null) => {
+    if (!value) {
+      return;
+    }
+
+    const newType = value as CategoryType;
+    setCategoryType(newType);
     await updateCategory({
-      data: { categoryId: budgetCategory.category.id, fund: checked },
+      data: { categoryId: budgetCategory.category.id, type: newType },
     });
     await router.invalidate();
   };
@@ -102,19 +108,25 @@ function CategoryDetailsPage() {
       size="xl"
     >
       <Stack gap="lg">
-        <div>
-          <Title order={3}>Current Balance</Title>
-          <Group gap="xl">
+        <Group>
+          <div>
+            <Title order={3}>Current Balance</Title>
             <Text size="xl" fw={700} c={budgetCategory.currentBalance >= 0 ? "green" : "red"}>
               {formatCurrency(budgetCategory.currentBalance)}
             </Text>
-            <Switch
-              label="Fund"
-              checked={fund}
-              onChange={(event) => handleToggleFund(event.target.checked)}
-            />
-          </Group>
-        </div>
+          </div>
+          <Select
+            label={<Title order={3}>Type</Title>}
+            value={categoryType}
+            onChange={handleChangeType}
+            data={[
+              { value: "FIXED", label: "Fixed" },
+              { value: "SAVINGS", label: "Savings" },
+              { value: "ACCUMULATING", label: "Accumulating" },
+              { value: "NON_ACCUMULATING", label: "Non-Accumulating" },
+            ]}
+          />
+        </Group>
 
         <div>
           <Group justify="space-between">

@@ -1,13 +1,16 @@
 import { partition } from "@std/collections";
 import { endOfMonth, startOfMonth } from "date-fns";
-import type { BudgetCategory, Category } from "generated/prisma/client";
+import type { BudgetCategory, Category, CategoryType } from "generated/prisma/client";
 import { find, pluck } from "~/lib/collections";
 import { monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
-import type { CategoryModel } from "../../generated/prisma/models";
+
+function isFund(categoryType: CategoryType): boolean {
+  return categoryType === "SAVINGS" || categoryType === "ACCUMULATING";
+}
 
 type BudgetCategoryWithCategory = Pick<BudgetCategory, "categoryId"> & {
-  category: Pick<Category, "fund">;
+  category: Pick<Category, "type">;
 };
 
 interface BalanceFields {
@@ -24,9 +27,8 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
   const startDate = startOfMonth(month);
   const endDate = endOfMonth(month);
 
-  const [fundCategories, regularCategories] = partition(
-    budgetCategories,
-    ({ category }) => category.fund,
+  const [fundCategories, regularCategories] = partition(budgetCategories, ({ category }) =>
+    isFund(category.type),
   );
   const fundCategoryIds = pluck(fundCategories, "categoryId");
   const regularCategoryIds = pluck(regularCategories, "categoryId");
@@ -72,14 +74,14 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
 
   return budgetCategories.map((budgetCategory) => {
     const { categoryId } = budgetCategory;
-    const fund = budgetCategory.category.fund;
+    const isCategoryFund = isFund(budgetCategory.category.type);
     const spent = find(monthlySpent, "categoryId", categoryId)?._sum.amount ?? 0;
-    const transactionTotal = fund
+    const transactionTotal = isCategoryFund
       ? (find(fundTransactionTotal, "categoryId", categoryId)?._sum.amount ?? 0)
       : spent;
     const budgeted =
-      find(fund ? fundBudgeted : regularBudgeted, "categoryId", categoryId)?._sum.budgetedAmount ??
-      0;
+      find(isCategoryFund ? fundBudgeted : regularBudgeted, "categoryId", categoryId)?._sum
+        .budgetedAmount ?? 0;
 
     return {
       ...budgetCategory,
@@ -95,13 +97,13 @@ async function getTotalBudgetedAmount({
   category,
 }: {
   month: string;
-  category: Pick<CategoryModel, "id" | "fund">;
+  category: Pick<Category, "id" | "type">;
 }): Promise<number> {
   const aggregateBudgetCategories = await prisma.budgetCategory.aggregate({
     _sum: { budgetedAmount: true },
     where: {
       categoryId: category.id,
-      budget: { month: category.fund ? { lte: month } : month },
+      budget: { month: isFund(category.type) ? { lte: month } : month },
     },
   });
   return aggregateBudgetCategories._sum.budgetedAmount ?? 0;
@@ -112,7 +114,7 @@ export async function calculateCategoryBalance({
   category,
 }: {
   month: Date;
-  category: Pick<CategoryModel, "id" | "fund">;
+  category: Pick<Category, "id" | "type">;
 }): Promise<number> {
   const aggregateTransactions = await prisma.transactionCategory.aggregate({
     _sum: { amount: true },
@@ -120,7 +122,7 @@ export async function calculateCategoryBalance({
       categoryId: category.id,
       transaction: {
         date: {
-          gte: category.fund ? undefined : startOfMonth(month),
+          gte: isFund(category.type) ? undefined : startOfMonth(month),
           lte: endOfMonth(month),
         },
       },
@@ -139,14 +141,14 @@ export async function calculateCategoryStartingBalance({
   category,
 }: {
   month: Date;
-  category: Pick<CategoryModel, "id" | "fund">;
+  category: Pick<Category, "id" | "type">;
 }): Promise<number> {
   const totalBudgetedAmount = await getTotalBudgetedAmount({
     month: monthToString(month),
     category,
   });
 
-  if (!category.fund) {
+  if (!isFund(category.type)) {
     return totalBudgetedAmount;
   }
 

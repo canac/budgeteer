@@ -16,6 +16,13 @@ datasource db {
   url      = env("VITE_DATABASE_URL")
 }
 
+enum CategoryType {
+  FIXED
+  SAVINGS
+  ACCUMULATING
+  NON_ACCUMULATING
+}
+
 model Budget {
   id               String           @id @default(uuid(7))
   createdAt        DateTime         @default(now())
@@ -30,7 +37,7 @@ model Category {
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
   name                  String
-  fund                  Boolean               @default(false)
+  type                  CategoryType          @default(NON_ACCUMULATING)
   transactionCategories TransactionCategory[]
   budgetCategories      BudgetCategory[]
   transfersFrom         Transfer[]            @relation("TransferSource")
