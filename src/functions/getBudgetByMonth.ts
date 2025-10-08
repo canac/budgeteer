@@ -4,7 +4,7 @@ import { isAfter, isBefore, startOfMonth } from "date-fns";
 import invariant from "tiny-invariant";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { calculateCategoryBalance, calculateCategorySpent } from "~/lib/calculateBalance";
+import { calculateBalances } from "~/lib/calculateBalance";
 import { dateToMonth, monthToDate, monthToString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
@@ -103,23 +103,14 @@ export const getBudgetByMonth = createServerFn()
       0,
     );
 
+    const budgetCategories = await calculateBalances(budget.budgetCategories, month);
     return {
       budget,
       month: dateToMonth(month),
       totalBudgetedAmount,
-      budgetCategories: await Promise.all(
-        budget.budgetCategories.map(async (budgetCategory) => ({
-          ...budgetCategory,
-          name: budgetCategory.category.name,
-          spent: await calculateCategorySpent({
-            month,
-            category: budgetCategory.category,
-          }),
-          balance: await calculateCategoryBalance({
-            month,
-            category: budgetCategory.category,
-          }),
-        })),
-      ),
+      budgetCategories: budgetCategories.map((budgetCategory) => ({
+        ...budgetCategory,
+        name: budgetCategory.category.name,
+      })),
     };
   });
