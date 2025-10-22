@@ -1,18 +1,18 @@
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { isAfter, isBefore, startOfMonth } from "date-fns";
+import { isAfter, isBefore, parseISO, startOfMonth } from "date-fns";
 import invariant from "tiny-invariant";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
-import { dateToMonth, monthToDate, monthToString } from "~/lib/month";
+import { serializeISO } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 import { getFirstMonth } from "./getFirstMonth";
 
 async function getBudget(requestedMonth: Date) {
   const currentMonth = startOfMonth(new Date());
-  const currentMonthString = monthToString(currentMonth);
+  const currentMonthString = serializeISO(currentMonth);
   if (isAfter(requestedMonth, currentMonth)) {
     // A future month was requested, so redirect to the current month
     throw redirect({
@@ -21,7 +21,7 @@ async function getBudget(requestedMonth: Date) {
     });
   }
 
-  const requestedMonthString = monthToString(requestedMonth);
+  const requestedMonthString = serializeISO(requestedMonth);
   const actualBudget = await prisma.budget.findFirst({
     where: {
       month: requestedMonthString,
@@ -52,11 +52,11 @@ async function getBudget(requestedMonth: Date) {
     });
   }
 
-  if (isBefore(requestedMonth, monthToDate(initialBudgetMonth))) {
+  if (isBefore(requestedMonth, parseISO(initialBudgetMonth))) {
     // A month before the initial budget was requested, so redirect to the initial budget
     throw redirect({
       to: "/budget/$month",
-      params: { month: monthToString(initialBudgetMonth) },
+      params: { month: initialBudgetMonth },
     });
   }
 
@@ -106,7 +106,7 @@ export const getBudgetByMonth = createServerFn()
     const budgetCategories = await calculateBalances(budget.budgetCategories, month);
     return {
       budget,
-      month: dateToMonth(month),
+      month: serializeISO(month),
       totalBudgetedAmount,
       budgetCategories: budgetCategories.map((budgetCategory) => ({
         ...budgetCategory,

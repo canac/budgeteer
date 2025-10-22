@@ -1,22 +1,23 @@
 import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { eachMonthOfInterval } from "date-fns";
-import { boolean, date, object, string } from "zod";
+import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { monthToString } from "~/lib/month";
+import { serializeISO } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
+import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
   categoryId: string(),
-  startDate: date(),
-  endDate: date(),
+  startMonth: monthDate(),
+  endMonth: monthDate(),
   includeTransfers: boolean().default(false),
 });
 
 export const getCategoryHistory = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { categoryId, startDate, endDate, includeTransfers } }) => {
+  .handler(async ({ data: { categoryId, startMonth, endMonth, includeTransfers } }) => {
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
@@ -31,7 +32,7 @@ export const getCategoryHistory = createServerFn()
       where: {
         categoryId,
         transaction: {
-          date: { gte: startDate, lte: endDate },
+          date: { gte: startMonth, lte: endMonth },
           ...(includeTransfers ? {} : { transfer: null }),
         },
       },
@@ -43,8 +44,8 @@ export const getCategoryHistory = createServerFn()
       orderBy: [{ transaction: { date: "desc" } }, { transaction: { createdAt: "desc" } }],
     });
 
-    const budgetMonths = eachMonthOfInterval({ start: startDate, end: endDate }).map((date) =>
-      monthToString(date),
+    const budgetMonths = eachMonthOfInterval({ start: startMonth, end: endMonth }).map((date) =>
+      serializeISO(date),
     );
     const budgetCategories = await prisma.budgetCategory.findMany({
       where: {

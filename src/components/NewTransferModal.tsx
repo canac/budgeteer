@@ -2,7 +2,7 @@ import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Text } fr
 import { useForm } from "@mantine/form";
 import { IconSwitch } from "@tabler/icons-react";
 import { useParams } from "@tanstack/react-router";
-import { endOfMonth, format, parse } from "date-fns";
+import { endOfMonth, format, parseISO } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { number, object, positive, refine, string } from "zod/mini";
 import { createTransfer } from "~/functions/createTransfer";
@@ -62,9 +62,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
     label: `${category.name} (${formatCurrency(category.balance)})`,
   }));
 
-  const transferDate = endOfMonth(
-    typeof month === "string" ? parse(month, "MM-yyyy", new Date()) : new Date(),
-  );
+  const transferDate = endOfMonth(typeof month === "string" ? parseISO(month) : new Date());
 
   const handleSwitch = () => {
     form.setFieldValue("sourceCategoryId", form.values.destinationCategoryId);

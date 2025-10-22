@@ -1,22 +1,20 @@
+import { parseISO } from "date-fns";
 import { array, date, number, object, string } from "zod";
 import { getFirstMonth } from "~/functions/getFirstMonth";
-import { monthToDate } from "./month";
 
 const amountSchema = number()
   .int()
   .refine((value) => value !== 0, { error: "Must not be zero" });
 
+const startDate = await getFirstMonth();
+
 export const transactionSchema = object({
   amount: amountSchema,
   vendor: string().min(1),
   description: string().optional(),
-  date: date().refine(
-    async (value) => {
-      const startDate = await getFirstMonth();
-      return !startDate || value >= monthToDate(startDate);
-    },
-    { error: "Must not be before the first budget" },
-  ),
+  date: date().refine((value) => !startDate || value >= parseISO(startDate), {
+    error: "Must not be before the first budget",
+  }),
   categories: array(
     object({
       categoryId: string(),

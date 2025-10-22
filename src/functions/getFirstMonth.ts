@@ -2,7 +2,6 @@ import { memoize } from "@std/cache";
 import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
-import { month } from "~/lib/zod";
 
 export const getFirstMonth = createServerFn()
   .middleware([requireAuth])
@@ -14,6 +13,6 @@ export const getFirstMonth = createServerFn()
         },
         orderBy: { month: "asc" },
       });
-      return oldestBudget && month().parse(oldestBudget.month);
+      return oldestBudget?.month ?? null;
     }),
   );

@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
-import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
@@ -40,7 +40,6 @@ export const Route = createFileRoute("/_layout/budget/$month/category/$category"
 function CategoryDetailsPage() {
   const { budgetCategory } = Route.useLoaderData();
   const { month, category } = Route.useParams();
-  const { month: monthDate } = useLoaderData({ from: "/_layout/budget/$month" });
   const router = useRouter();
   const { close, modalProps } = useOpened({
     onClose: () => router.navigate({ to: "/budget/$month", params: { month } }),
@@ -166,7 +165,7 @@ function CategoryDetailsPage() {
           <TransactionTable
             transactions={budgetCategory.transactions}
             startingBalance={budgetCategory.startingBalance}
-            startingBalanceDate={monthDate}
+            startingBalanceMonth={month}
             onUpdate={handleUpdate}
           />
         </div>

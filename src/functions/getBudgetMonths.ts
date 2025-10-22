@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { differenceInMonths, parse, startOfMonth, subMonths } from "date-fns";
+import { differenceInMonths, parseISO, startOfMonth, subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
-import { dateToMonth } from "~/lib/month";
+import { serializeISO } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 
 export const getBudgetMonths = createServerFn()
@@ -15,9 +15,9 @@ export const getBudgetMonths = createServerFn()
     });
     const currentMonth = startOfMonth(new Date());
     const monthSpan = oldestBudget
-      ? differenceInMonths(currentMonth, parse(oldestBudget.month, "MM-yyyy", new Date()))
+      ? differenceInMonths(currentMonth, parseISO(oldestBudget.month))
       : 0;
     return Array.from({ length: monthSpan + 1 }, (_, index) =>
-      dateToMonth(subMonths(currentMonth, index)),
+      serializeISO(subMonths(currentMonth, index)),
     );
   });

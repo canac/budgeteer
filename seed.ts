@@ -40,7 +40,7 @@ const entertainmentCategory = await prisma.category.create({
 
 await prisma.budget.create({
   data: {
-    month: "07-2025",
+    month: "2025-07",
     income: 500000,
     budgetCategories: {
       create: [
@@ -56,7 +56,7 @@ await prisma.budget.create({
 
 await prisma.budget.create({
   data: {
-    month: "08-2025",
+    month: "2025-08",
     income: 500000,
     budgetCategories: {
       create: [

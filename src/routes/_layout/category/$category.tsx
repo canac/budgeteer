@@ -10,11 +10,12 @@ import {
   Title,
 } from "@mantine/core";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { endOfMonth, format, startOfMonth, subMonths } from "date-fns";
+import { format, parseISO, subMonths } from "date-fns";
 import { _default, coerce, object } from "zod/mini";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency } from "~/lib/formatCurrency";
+import { serializeISO } from "~/lib/month";
 
 const searchSchema = object({
   months: _default(coerce.number(), 6),
@@ -32,17 +33,21 @@ export const Route = createFileRoute("/_layout/category/$category")({
   }),
   loader: async ({ params: { category }, deps: { months, incomplete, transfers } }) => {
     const currentDate = new Date();
-    const startDate = startOfMonth(subMonths(currentDate, months));
-    const endDate = endOfMonth(incomplete ? currentDate : subMonths(currentDate, 1));
+    const startMonth = serializeISO(subMonths(currentDate, months));
+    const endMonth = serializeISO(incomplete ? currentDate : subMonths(currentDate, 1));
     const categoryHistory = await getCategoryHistory({
       data: {
         categoryId: category,
-        startDate,
-        endDate,
+        startMonth,
+        endMonth,
         includeTransfers: transfers,
       },
     });
-    return { categoryHistory, startDate, endDate };
+    return {
+      categoryHistory,
+      startMonth,
+      endMonth,
+    };
   },
 });
 
@@ -55,7 +60,7 @@ const monthOptions = [
 ];
 
 function CategoryHistoryPage() {
-  const { categoryHistory, startDate, endDate } = Route.useLoaderData();
+  const { categoryHistory, startMonth, endMonth } = Route.useLoaderData();
   const { months, incomplete, transfers } = Route.useSearch();
   const router = useRouter();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -76,7 +81,7 @@ function CategoryHistoryPage() {
             {categoryHistory.category.name}
           </Title>
           <Text size="lg" c="gray.6">
-            {format(new Date(startDate), "MMMM yyyy")} - {format(new Date(endDate), "MMMM yyyy")}
+            {format(parseISO(startMonth), "MMMM yyyy")} - {format(parseISO(endMonth), "MMMM yyyy")}
           </Text>
         </div>
 

@@ -1,11 +1,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { monthToString } from "~/lib/month";
+import { serializeISO } from "~/lib/month";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
     throw redirect({
       to: "/budget/$month",
-      params: { month: monthToString(new Date()) },
+      params: { month: serializeISO(new Date()) },
     });
   },
 });

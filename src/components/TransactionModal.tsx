@@ -30,7 +30,6 @@ import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatCurrency";
-import { monthToDate } from "~/lib/month";
 import "./TransactionModal.css";
 
 interface EditTransaction {
@@ -253,7 +252,7 @@ export function TransactionModal({
             key={form.key("date")}
             {...form.getInputProps("date")}
             required
-            min={firstMonth ? monthToDate(firstMonth).toISOString().slice(0, 10) : undefined}
+            min={firstMonth ?? undefined}
           />
           <MultiSelect
             label="Category"
