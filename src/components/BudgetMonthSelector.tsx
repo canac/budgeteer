@@ -1,6 +1,7 @@
 import { Select } from "@mantine/core";
 import { useRouter } from "@tanstack/react-router";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
+import { monthFormatter } from "~/lib/formatters";
 import "./BudgetMonthSelector.css";
 
 interface BudgetMonthSelectorProps {
@@ -13,7 +14,7 @@ export function BudgetMonthSelector({ budgetMonths, currentMonth }: BudgetMonthS
 
   const options = budgetMonths.map((month) => ({
     value: month,
-    label: format(parseISO(month), "MMMM yyyy"),
+    label: monthFormatter.format(parseISO(month)),
   }));
 
   const handleChange = (value: string | null) => {

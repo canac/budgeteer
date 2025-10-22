@@ -24,7 +24,7 @@ import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
 import { useSyncedState } from "~/hooks/useSyncedState";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency } from "~/lib/formatters";
 import "./CategoryDetailsPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/category/$category")({

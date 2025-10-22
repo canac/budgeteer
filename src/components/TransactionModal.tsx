@@ -15,7 +15,6 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
-import { format } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import type z from "zod/mini";
 import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
@@ -29,7 +28,7 @@ import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency } from "~/lib/formatters";
 import "./TransactionModal.css";
 
 interface EditTransaction {
@@ -105,7 +104,7 @@ export function TransactionModal({
           amount: penniesToDollars(Math.abs(editingTransaction.amount)),
           vendor: editingTransaction.vendor,
           description: editingTransaction.description || "",
-          date: format(editingTransaction.date, "yyyy-MM-dd"),
+          date: editingTransaction.date.toISOString().slice(0, 10),
           isIncome: editingTransaction.amount > 0,
           selectedCategoryIds: pluck(editingTransaction.transactionCategories, "id"),
           categoryAmounts: editingTransaction.transactionCategories.map((category) => ({
@@ -117,7 +116,7 @@ export function TransactionModal({
           amount: 0,
           vendor: "",
           description: "",
-          date: format(new Date(), "yyyy-MM-dd"),
+          date: new Date().toISOString().slice(0, 10),
           isIncome: false,
           selectedCategoryIds: initialCategoryId ? [initialCategoryId] : [],
           categoryAmounts: initialCategoryId ? [{ categoryId: initialCategoryId, amount: 0 }] : [],

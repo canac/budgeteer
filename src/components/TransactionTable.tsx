@@ -1,6 +1,6 @@
 import { ActionIcon, Group, Table } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { useState } from "react";
 import {
   DeleteTransactionModal,
@@ -8,7 +8,7 @@ import {
 } from "~/components/DeleteTransactionModal";
 import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { getTransaction } from "~/functions/getTransaction";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
 import { TransactionModal, type TransactionModalProps } from "./TransactionModal";
 import "./TransactionTable.css";
 
@@ -74,7 +74,7 @@ export function TransactionTable({
         <Table.Tbody>
           {transactions.map((transaction) => (
             <Table.Tr key={transaction.id}>
-              <Table.Td>{format(transaction.date, "MMM dd")}</Table.Td>
+              <Table.Td>{shortDateFormatter.format(transaction.date)}</Table.Td>
               <Table.Td>{transaction.vendor}</Table.Td>
               <Table.Td>{transaction.description}</Table.Td>
               <Table.Td ta="right" c={transaction.amount < 0 ? undefined : "green"}>
@@ -103,7 +103,7 @@ export function TransactionTable({
           ))}
           {startingBalance !== null && startingBalance !== undefined && startingBalanceMonth && (
             <Table.Tr className="starting-balance">
-              <Table.Td>{format(parseISO(startingBalanceMonth), "MMM dd")}</Table.Td>
+              <Table.Td>{shortDateFormatter.format(parseISO(startingBalanceMonth))}</Table.Td>
               <Table.Td>Starting Balance</Table.Td>
               <Table.Td></Table.Td>
               <Table.Td ta="right" c={startingBalance < 0 ? "red" : "green"}>

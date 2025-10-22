@@ -1,7 +1,6 @@
 import { ActionIcon, Drawer, Group, Stack, Table } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { format } from "date-fns";
 import type { Category } from "generated/prisma/client";
 import { Fragment, useState } from "react";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
@@ -12,7 +11,7 @@ import { MantineLink } from "~/components/MantineLink";
 import type { TransactionModalProps } from "~/components/TransactionModal";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
 import { useOpened } from "~/hooks/useOpened";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
 
 type DeleteTransaction = DeleteTransactionModalProps["transaction"];
 type EditTransaction = TransactionModalProps["editingTransaction"];
@@ -111,7 +110,7 @@ function TransactionsPage() {
             <Table.Tbody>
               {transactions.map((transaction) => (
                 <Table.Tr key={transaction.id}>
-                  <Table.Td>{format(new Date(transaction.date), "MMM dd")}</Table.Td>
+                  <Table.Td>{shortDateFormatter.format(new Date(transaction.date))}</Table.Td>
                   <Table.Td>{transaction.vendor}</Table.Td>
                   <Table.Td>{transaction.description}</Table.Td>
                   <Table.Td>

@@ -13,7 +13,7 @@ import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { updateCategory } from "~/functions/updateCategory";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency } from "~/lib/formatters";
 import "./BudgetPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month")({

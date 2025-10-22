@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency } from "~/lib/formatters";
 import "./EditableAmount.css";
 
 interface EditableAmountProps {

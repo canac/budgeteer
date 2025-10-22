@@ -10,11 +10,11 @@ import {
   Title,
 } from "@mantine/core";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { format, parseISO, subMonths } from "date-fns";
+import { parseISO, subMonths } from "date-fns";
 import { _default, coerce, object } from "zod/mini";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency, monthFormatter } from "~/lib/formatters";
 import { serializeISO } from "~/lib/month";
 
 const searchSchema = object({
@@ -81,7 +81,8 @@ function CategoryHistoryPage() {
             {categoryHistory.category.name}
           </Title>
           <Text size="lg" c="gray.6">
-            {format(parseISO(startMonth), "MMMM yyyy")} - {format(parseISO(endMonth), "MMMM yyyy")}
+            {monthFormatter.format(parseISO(startMonth))} -{" "}
+            {monthFormatter.format(parseISO(endMonth))}
           </Text>
         </div>
 

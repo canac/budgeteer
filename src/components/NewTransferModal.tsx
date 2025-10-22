@@ -2,7 +2,7 @@ import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Text } fr
 import { useForm } from "@mantine/form";
 import { IconSwitch } from "@tabler/icons-react";
 import { useParams } from "@tanstack/react-router";
-import { endOfMonth, format, parseISO } from "date-fns";
+import { endOfMonth, parseISO } from "date-fns";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { number, object, positive, refine, string } from "zod/mini";
 import { createTransfer } from "~/functions/createTransfer";
@@ -11,7 +11,7 @@ import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { dollarsToPennies } from "~/lib/currencyConversion";
-import { formatCurrency } from "~/lib/formatCurrency";
+import { formatCurrency, fullDateFormatter } from "~/lib/formatters";
 
 const formSchema = object({
   amount: number("Amount is required").check(positive("Amount must be greater than zero")),
@@ -133,7 +133,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
           />
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
-              Transfer Date: {format(transferDate, "MMM dd, yyyy")}
+              Transfer Date: {fullDateFormatter.format(transferDate)}
             </Text>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               Save
