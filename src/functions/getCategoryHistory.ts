@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eachMonthOfInterval } from "date-fns";
 import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { toISOMonthString } from "~/lib/month";
+import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -32,7 +32,10 @@ export const getCategoryHistory = createServerFn()
       where: {
         categoryId,
         transaction: {
-          date: { gte: startMonth, lte: endMonth },
+          date: {
+            gte: toISODateString(startMonth),
+            lte: toISODateString(endMonth),
+          },
           ...(includeTransfers ? {} : { transfer: null }),
         },
       },

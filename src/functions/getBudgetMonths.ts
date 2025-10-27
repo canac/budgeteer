@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { differenceInMonths, parseISO, startOfMonth, subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
-import { toISOMonthString } from "~/lib/month";
+import { toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 
 export const getBudgetMonths = createServerFn()

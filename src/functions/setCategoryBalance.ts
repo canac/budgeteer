@@ -3,6 +3,7 @@ import { startOfMonth } from "date-fns";
 import { number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance } from "~/lib/calculateBalance";
+import { toISODateString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -36,7 +37,7 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
     await prisma.transaction.create({
       data: {
         amount: adjustmentAmount,
-        date: startOfMonth(month),
+        date: toISODateString(startOfMonth(month)),
         vendor: "Balance Adjustment",
         transactionCategories: {
           create: {

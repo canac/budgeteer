@@ -74,7 +74,7 @@ export function TransactionTable({
         <Table.Tbody>
           {transactions.map((transaction) => (
             <Table.Tr key={transaction.id}>
-              <Table.Td>{shortDateFormatter.format(transaction.date)}</Table.Td>
+              <Table.Td>{shortDateFormatter.format(parseISO(transaction.date))}</Table.Td>
               <Table.Td>{transaction.vendor}</Table.Td>
               <Table.Td>{transaction.description}</Table.Td>
               <Table.Td ta="right" c={transaction.amount < 0 ? undefined : "green"}>

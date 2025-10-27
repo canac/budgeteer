@@ -2,7 +2,7 @@ import { partition } from "@std/collections";
 import { endOfMonth, startOfMonth } from "date-fns";
 import type { BudgetCategory, Category, CategoryType } from "generated/prisma/client";
 import { find, pluck } from "~/lib/collections";
-import { toISOMonthString } from "~/lib/month";
+import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 
 function isFund(categoryType: CategoryType): boolean {
@@ -24,8 +24,8 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
   month: Date,
 ): Promise<Array<BC & BalanceFields>> {
   const monthString = toISOMonthString(month);
-  const startDate = startOfMonth(month);
-  const endDate = endOfMonth(month);
+  const startDate = toISODateString(startOfMonth(month));
+  const endDate = toISODateString(endOfMonth(month));
 
   const [fundCategories, regularCategories] = partition(budgetCategories, ({ category }) =>
     isFund(category.type),
@@ -122,8 +122,8 @@ export async function calculateCategoryBalance({
       categoryId: category.id,
       transaction: {
         date: {
-          gte: isFund(category.type) ? undefined : startOfMonth(month),
-          lte: endOfMonth(month),
+          gte: isFund(category.type) ? undefined : toISODateString(startOfMonth(month)),
+          lte: toISODateString(endOfMonth(month)),
         },
       },
     },
@@ -158,7 +158,7 @@ export async function calculateCategoryStartingBalance({
       categoryId: category.id,
       transaction: {
         // Only include transactions before the start of this budget
-        date: { lte: startOfMonth(month) },
+        date: { lte: toISODateString(startOfMonth(month)) },
       },
     },
   });

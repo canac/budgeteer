@@ -4,7 +4,7 @@ import { endOfMonth, startOfMonth } from "date-fns";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance, calculateCategoryStartingBalance } from "~/lib/calculateBalance";
-import { toISOMonthString } from "~/lib/month";
+import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -41,7 +41,10 @@ export const getBudgetCategory = createServerFn()
       where: {
         categoryId,
         transaction: {
-          date: { gte: startOfMonth(month), lte: endOfMonth(month) },
+          date: {
+            gte: toISODateString(startOfMonth(month)),
+            lte: toISODateString(endOfMonth(month)),
+          },
         },
       },
       include: {

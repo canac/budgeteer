@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
+import { toISODateString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -13,8 +14,8 @@ export const getBudgetTransactions = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month } }) => {
-    const startDate = startOfMonth(month);
-    const endDate = endOfMonth(month);
+    const startDate = toISODateString(startOfMonth(month));
+    const endDate = toISODateString(endOfMonth(month));
 
     const transactions = await prisma.transaction.findMany({
       where: {

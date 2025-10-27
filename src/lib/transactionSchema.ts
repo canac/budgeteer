@@ -1,5 +1,4 @@
-import { parseISO } from "date-fns";
-import { array, date, number, object, string } from "zod";
+import { array, number, object, string } from "zod";
 import { getFirstMonth } from "~/functions/getFirstMonth";
 
 const amountSchema = number()
@@ -12,7 +11,7 @@ export const transactionSchema = object({
   amount: amountSchema,
   vendor: string().min(1),
   description: string().optional(),
-  date: date().refine((value) => !startDate || value >= parseISO(startDate), {
+  date: string().refine((value) => !startDate || value >= startDate, {
     error: "Must not be before the first budget",
   }),
   categories: array(

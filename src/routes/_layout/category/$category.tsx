@@ -15,7 +15,7 @@ import { _default, coerce, object } from "zod/mini";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
-import { toISOMonthString } from "~/lib/month";
+import { toISOMonthString } from "~/lib/iso";
 
 const searchSchema = object({
   months: _default(coerce.number(), 6),

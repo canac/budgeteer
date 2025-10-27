@@ -62,7 +62,7 @@ model Transaction {
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
   amount                Int
-  date                  DateTime
+  date                  String
   vendor                String
   description           String?
   transactionCategories TransactionCategory[]

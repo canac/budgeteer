@@ -74,7 +74,7 @@ await prisma.budget.create({
 await prisma.transaction.create({
   data: {
     amount: -15000,
-    date: "2025-07-05T00:00:00.000Z",
+    date: "2025-07-05",
     vendor: "Supermarket",
     description: "Weekly groceries",
     transactionCategories: {
@@ -88,7 +88,7 @@ await prisma.transaction.create({
 await prisma.transaction.create({
   data: {
     amount: -15000,
-    date: "2025-08-05T00:00:00.000Z",
+    date: "2025-08-05",
     vendor: "Supermarket",
     description: "Weekly groceries",
     transactionCategories: {
@@ -102,7 +102,7 @@ await prisma.transaction.create({
 await prisma.transaction.create({
   data: {
     amount: -8000,
-    date: "2025-08-10T00:00:00.000Z",
+    date: "2025-08-10",
     vendor: "Electric Company",
     description: "Monthly bill",
     transactionCategories: {
@@ -118,7 +118,7 @@ await prisma.transaction.create({
 await prisma.transaction.create({
   data: {
     amount: -20000,
-    date: "2025-07-15T00:00:00.000Z",
+    date: "2025-07-15",
     vendor: "Car Repair",
     description: "Unexpected repair",
     transactionCategories: {
@@ -132,7 +132,7 @@ await prisma.transaction.create({
 await prisma.transaction.create({
   data: {
     amount: -50000,
-    date: "2025-08-20T00:00:00.000Z",
+    date: "2025-08-20",
     vendor: "Travel Agency",
     description: "Vacation deposit",
     transactionCategories: {
@@ -146,7 +146,7 @@ await prisma.transaction.create({
 await prisma.transaction.create({
   data: {
     amount: -25000,
-    date: "2025-08-22T00:00:00.000Z",
+    date: "2025-08-22",
     vendor: "Costco",
     description: "Bulk shopping trip",
     transactionCategories: {

@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { date, number, object, string } from "zod";
+import { number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
 
 const transferSchema = object({
   amount: number().int().positive(),
-  date: date(),
+  date: string().regex(/^\d{4}-\d{2}-\d{2}$/),
   sourceCategoryId: string(),
   destinationCategoryId: string(),
 });

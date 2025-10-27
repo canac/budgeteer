@@ -12,6 +12,7 @@ import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { dollarsToPennies } from "~/lib/currencyConversion";
 import { formatCurrency, fullDateFormatter } from "~/lib/formatters";
+import { toISODateString } from "~/lib/iso";
 
 const formSchema = object({
   amount: number("Amount is required").check(positive("Amount must be greater than zero")),
@@ -73,7 +74,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
     await createTransfer({
       data: {
         amount: dollarsToPennies(values.amount),
-        date: transferDate,
+        date: toISODateString(transferDate),
         sourceCategoryId: values.sourceCategoryId,
         destinationCategoryId: values.destinationCategoryId,
       },

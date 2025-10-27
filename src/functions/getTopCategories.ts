@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
+import { toISODateString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 
 export const getTopCategories = createServerFn()
@@ -11,7 +12,7 @@ export const getTopCategories = createServerFn()
       by: ["categoryId"],
       where: {
         transaction: {
-          date: { gte: subMonths(new Date(), 3) },
+          date: { gte: toISODateString(subMonths(new Date(), 3)) },
         },
       },
       _count: {

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
+import { toISODateString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 
 export const getVendors = createServerFn()
@@ -9,7 +10,7 @@ export const getVendors = createServerFn()
   .handler(async () => {
     const vendors = await prisma.transaction.findMany({
       where: {
-        date: { gte: subMonths(new Date(), 3) },
+        date: { gte: toISODateString(subMonths(new Date(), 3)) },
         transfer: null,
       },
       select: {

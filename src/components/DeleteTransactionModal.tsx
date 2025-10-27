@@ -1,4 +1,5 @@
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
+import { parseISO } from "date-fns";
 import type { Transaction } from "generated/prisma/client";
 import { deleteTransaction } from "~/functions/deleteTransaction";
 import { useOpened } from "~/hooks/useOpened";
@@ -36,7 +37,7 @@ export function DeleteTransactionModal({
       <Stack gap="md">
         <Text>
           Are you sure you want to delete the transaction "{transaction.vendor}" from{" "}
-          {fullDateFormatter.format(new Date(transaction.date))}?
+          {fullDateFormatter.format(parseISO(transaction.date))}?
         </Text>
         <Group justify="flex-end" gap="sm">
           <Button variant="default" onClick={close}>

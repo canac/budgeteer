@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { toISOMonthString } from "~/lib/month";
+import { toISOMonthString } from "~/lib/iso";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {

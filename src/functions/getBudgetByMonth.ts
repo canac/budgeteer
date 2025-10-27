@@ -5,7 +5,7 @@ import invariant from "tiny-invariant";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
-import { toISOMonthString } from "~/lib/month";
+import { toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 import { getFirstMonth } from "./getFirstMonth";

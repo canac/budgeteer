@@ -29,6 +29,7 @@ import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatters";
+import { toISODateString } from "~/lib/iso";
 import "./TransactionModal.css";
 
 interface EditTransaction {
@@ -36,7 +37,7 @@ interface EditTransaction {
   amount: number;
   vendor: string;
   description: string | null;
-  date: Date;
+  date: string;
   transactionCategories: Array<{
     id: string;
     amount: number;
@@ -104,7 +105,7 @@ export function TransactionModal({
           amount: penniesToDollars(Math.abs(editingTransaction.amount)),
           vendor: editingTransaction.vendor,
           description: editingTransaction.description || "",
-          date: editingTransaction.date.toISOString().slice(0, 10),
+          date: editingTransaction.date,
           isIncome: editingTransaction.amount > 0,
           selectedCategoryIds: pluck(editingTransaction.transactionCategories, "id"),
           categoryAmounts: editingTransaction.transactionCategories.map((category) => ({
@@ -116,7 +117,7 @@ export function TransactionModal({
           amount: 0,
           vendor: "",
           description: "",
-          date: new Date().toISOString().slice(0, 10),
+          date: toISODateString(new Date()),
           isIncome: false,
           selectedCategoryIds: initialCategoryId ? [initialCategoryId] : [],
           categoryAmounts: initialCategoryId ? [{ categoryId: initialCategoryId, amount: 0 }] : [],
@@ -184,7 +185,7 @@ export function TransactionModal({
       amount: sign * dollarsToPennies(values.amount),
       vendor: values.vendor,
       description: values.description || undefined,
-      date: new Date(values.date),
+      date: values.date,
       categories: values.categoryAmounts.map((categoryAmount) => ({
         ...categoryAmount,
         amount: sign * dollarsToPennies(categoryAmount.amount),
