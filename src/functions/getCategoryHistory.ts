@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eachMonthOfInterval } from "date-fns";
 import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { serializeISO } from "~/lib/month";
+import { toISOMonthString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -45,7 +45,7 @@ export const getCategoryHistory = createServerFn()
     });
 
     const budgetMonths = eachMonthOfInterval({ start: startMonth, end: endMonth }).map((date) =>
-      serializeISO(date),
+      toISOMonthString(date),
     );
     const budgetCategories = await prisma.budgetCategory.findMany({
       where: {

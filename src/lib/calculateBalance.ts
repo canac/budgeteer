@@ -2,7 +2,7 @@ import { partition } from "@std/collections";
 import { endOfMonth, startOfMonth } from "date-fns";
 import type { BudgetCategory, Category, CategoryType } from "generated/prisma/client";
 import { find, pluck } from "~/lib/collections";
-import { serializeISO } from "~/lib/month";
+import { toISOMonthString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 
 function isFund(categoryType: CategoryType): boolean {
@@ -23,7 +23,7 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
   budgetCategories: BC[],
   month: Date,
 ): Promise<Array<BC & BalanceFields>> {
-  const monthString = serializeISO(month);
+  const monthString = toISOMonthString(month);
   const startDate = startOfMonth(month);
   const endDate = endOfMonth(month);
 
@@ -131,7 +131,7 @@ export async function calculateCategoryBalance({
   const totalTransactionAmount = aggregateTransactions._sum.amount ?? 0;
 
   return (
-    (await getTotalBudgetedAmount({ month: serializeISO(month), category })) +
+    (await getTotalBudgetedAmount({ month: toISOMonthString(month), category })) +
     totalTransactionAmount
   );
 }
@@ -144,7 +144,7 @@ export async function calculateCategoryStartingBalance({
   category: Pick<Category, "id" | "type">;
 }): Promise<number> {
   const totalBudgetedAmount = await getTotalBudgetedAmount({
-    month: serializeISO(month),
+    month: toISOMonthString(month),
     category,
   });
 

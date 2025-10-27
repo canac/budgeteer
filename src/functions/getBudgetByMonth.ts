@@ -5,14 +5,14 @@ import invariant from "tiny-invariant";
 import { object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
-import { serializeISO } from "~/lib/month";
+import { toISOMonthString } from "~/lib/month";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 import { getFirstMonth } from "./getFirstMonth";
 
 async function getBudget(requestedMonth: Date) {
   const currentMonth = startOfMonth(new Date());
-  const currentMonthString = serializeISO(currentMonth);
+  const currentMonthString = toISOMonthString(currentMonth);
   if (isAfter(requestedMonth, currentMonth)) {
     // A future month was requested, so redirect to the current month
     throw redirect({
@@ -21,7 +21,7 @@ async function getBudget(requestedMonth: Date) {
     });
   }
 
-  const requestedMonthString = serializeISO(requestedMonth);
+  const requestedMonthString = toISOMonthString(requestedMonth);
   const actualBudget = await prisma.budget.findFirst({
     where: {
       month: requestedMonthString,
@@ -106,7 +106,7 @@ export const getBudgetByMonth = createServerFn()
     const budgetCategories = await calculateBalances(budget.budgetCategories, month);
     return {
       budget,
-      month: serializeISO(month),
+      month: toISOMonthString(month),
       totalBudgetedAmount,
       budgetCategories: budgetCategories.map((budgetCategory) => ({
         ...budgetCategory,

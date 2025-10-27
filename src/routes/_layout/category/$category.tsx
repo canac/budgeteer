@@ -15,7 +15,7 @@ import { _default, coerce, object } from "zod/mini";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
-import { serializeISO } from "~/lib/month";
+import { toISOMonthString } from "~/lib/month";
 
 const searchSchema = object({
   months: _default(coerce.number(), 6),
@@ -33,8 +33,8 @@ export const Route = createFileRoute("/_layout/category/$category")({
   }),
   loader: async ({ params: { category }, deps: { months, incomplete, transfers } }) => {
     const currentDate = new Date();
-    const startMonth = serializeISO(subMonths(currentDate, months));
-    const endMonth = serializeISO(incomplete ? currentDate : subMonths(currentDate, 1));
+    const startMonth = toISOMonthString(subMonths(currentDate, months));
+    const endMonth = toISOMonthString(incomplete ? currentDate : subMonths(currentDate, 1));
     const categoryHistory = await getCategoryHistory({
       data: {
         categoryId: category,
