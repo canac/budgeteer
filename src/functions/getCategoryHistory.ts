@@ -1,6 +1,6 @@
 import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { eachMonthOfInterval } from "date-fns";
+import { eachMonthOfInterval, endOfMonth } from "date-fns";
 import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
@@ -34,7 +34,7 @@ export const getCategoryHistory = createServerFn()
         transaction: {
           date: {
             gte: toISODateString(startMonth),
-            lte: toISODateString(endMonth),
+            lte: toISODateString(endOfMonth(endMonth)),
           },
           ...(includeTransfers ? {} : { transfer: null }),
         },
