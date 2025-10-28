@@ -16,6 +16,7 @@ export const createTransfer = createServerFn({ method: "POST" })
   .handler(async ({ data: { amount, date, sourceCategoryId, destinationCategoryId } }) => {
     const transaction = await prisma.transaction.create({
       data: {
+        type: "TRANSFER",
         amount: 0,
         date,
         vendor: "Transfer",
