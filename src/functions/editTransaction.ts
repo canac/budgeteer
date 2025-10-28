@@ -5,6 +5,7 @@ import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
+import { validateTransactionDate } from "~/lib/validation";
 
 const inputSchema = transactionSchema.extend({
   id: string(),
@@ -14,6 +15,8 @@ export const editTransaction = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, categories, ...attributes } }) => {
+    await validateTransactionDate(attributes.date, pluck(categories, "categoryId"));
+
     const existingCategories = await prisma.transactionCategory.findMany({
       where: { transactionId: id },
     });

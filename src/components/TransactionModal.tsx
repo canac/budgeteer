@@ -16,6 +16,7 @@ import {
 import { useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
 import { zod4Resolver } from "mantine-form-zod-resolver";
+import { useState } from "react";
 import type z from "zod/mini";
 import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
@@ -95,6 +96,7 @@ export function TransactionModal({
   const firstMonth = useServerFnData(getFirstMonth);
   const sortedCategories = useSortedCategories(categories);
   const { close, modalProps } = useOpened({ onClose });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isEditing = !!editingTransaction;
 
@@ -191,17 +193,25 @@ export function TransactionModal({
         amount: sign * dollarsToPennies(categoryAmount.amount),
       })),
     };
-    if (isEditing) {
-      await editTransaction({
-        data: {
-          id: editingTransaction.id,
-          ...transaction,
-        },
-      });
-    } else {
-      await createTransaction({
-        data: transaction,
-      });
+
+    try {
+      if (isEditing) {
+        await editTransaction({
+          data: {
+            id: editingTransaction.id,
+            ...transaction,
+          },
+        });
+      } else {
+        await createTransaction({
+          data: transaction,
+        });
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      }
+      return;
     }
 
     form.reset();
@@ -328,6 +338,7 @@ export function TransactionModal({
               })}
             </Stack>
           )}
+          {errorMessage !== null && <Alert color="red">{errorMessage}</Alert>}
           <Group justify="flex-end">
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               {isEditing ? "Update" : "Save"}

@@ -4,9 +4,9 @@ import { endOfMonth, startOfMonth } from "date-fns";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance, calculateCategoryStartingBalance } from "~/lib/calculateBalance";
-import { isCategoryDeletable } from "~/lib/categoryDeletable";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
+import { isCategoryDeletable } from "~/lib/validation";
 import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({

@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { isCategoryDeletable } from "~/lib/categoryDeletable";
 import { prisma } from "~/lib/prisma";
+import { isCategoryDeletable } from "~/lib/validation";
 import { monthString } from "~/lib/zod";
 
 const inputSchema = object({
