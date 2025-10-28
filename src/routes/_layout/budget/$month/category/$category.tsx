@@ -95,6 +95,7 @@ function CategoryDetailsPage() {
           <ActionIcon
             color="red"
             onClick={() => openDeleteModal()}
+            disabled={!budgetCategory.deletable}
             title="Delete category"
             size="md"
           >
@@ -174,7 +175,7 @@ function CategoryDetailsPage() {
           />
         </div>
       </Stack>
-      {deleteModalOpen && (
+      {deleteModalOpen && budgetCategory.deletable && (
         <DynamicDeleteCategoryModal
           onClose={() => closeDeleteModal()}
           category={budgetCategory.category}
