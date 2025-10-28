@@ -149,8 +149,12 @@ function CategoryDetailsPage() {
           <Title order={3}>
             <Group align="center" gap="xs">
               Transactions
-              <AddTransactionButton initialCategoryId={budgetCategory.category.id} />
-              <AddTransferButton sourceCategoryId={budgetCategory.category.id} />
+              {budgetCategory.category.deletedMonth === null && (
+                <>
+                  <AddTransactionButton initialCategoryId={budgetCategory.category.id} />
+                  <AddTransferButton sourceCategoryId={budgetCategory.category.id} />
+                </>
+              )}
               <MantineActionIconLink
                 variant="subtle"
                 size="md"
@@ -174,6 +178,7 @@ function CategoryDetailsPage() {
         <DynamicDeleteCategoryModal
           onClose={() => closeDeleteModal()}
           category={budgetCategory.category}
+          month={month}
           onDelete={close}
         />
       )}

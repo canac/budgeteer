@@ -6,15 +6,21 @@ import { useOpened } from "~/hooks/useOpened";
 export interface DeleteCategoryModalProps {
   onClose: () => void;
   category: Pick<Category, "id" | "name">;
+  month: string;
   onDelete: () => void;
 }
 
-export function DeleteCategoryModal({ onClose, category, onDelete }: DeleteCategoryModalProps) {
+export function DeleteCategoryModal({
+  onClose,
+  category,
+  month,
+  onDelete,
+}: DeleteCategoryModalProps) {
   const { close, modalProps } = useOpened({ onClose });
 
   const handleDeleteConfirm = async () => {
     await deleteCategory({
-      data: { categoryId: category.id },
+      data: { categoryId: category.id, month },
     });
     close();
     onDelete();

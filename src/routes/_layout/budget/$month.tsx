@@ -47,7 +47,7 @@ function BudgetPage() {
 
   const handleCreateCategory = async (type?: CategoryType) => {
     await createCategory({
-      data: { budgetId: budget.id, name: "New Category", type },
+      data: { month: budget.month, name: "New Category", type },
     });
     await router.invalidate();
   };

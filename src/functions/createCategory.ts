@@ -3,9 +3,10 @@ import { CategoryType } from "generated/prisma/enums";
 import { number, object, string, enum as zodEnum } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
+import { monthString } from "~/lib/zod";
 
 const inputSchema = object({
-  budgetId: string(),
+  month: monthString(),
   name: string().min(1),
   budgetedAmount: number().min(0).default(0),
   type: zodEnum(Object.values(CategoryType)).optional(),
@@ -14,16 +15,20 @@ const inputSchema = object({
 export const createCategory = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { budgetId, name, budgetedAmount, type } }) => {
+  .handler(async ({ data: { month, name, budgetedAmount, type } }) => {
+    const budget = await prisma.budget.findFirstOrThrow({
+      where: { month },
+    });
     const category = await prisma.category.create({
       data: {
         name,
         type,
+        createdMonth: month,
       },
     });
     await prisma.budgetCategory.create({
       data: {
-        budgetId,
+        budgetId: budget.id,
         categoryId: category.id,
         budgetedAmount,
       },

@@ -38,6 +38,8 @@ model Category {
   updatedAt             DateTime              @updatedAt
   name                  String
   type                  CategoryType          @default(NON_ACCUMULATING)
+  createdMonth          String
+  deletedMonth          String?
   transactionCategories TransactionCategory[]
   budgetCategories      BudgetCategory[]
   transfersFrom         Transfer[]            @relation("TransferSource")

@@ -8,6 +8,7 @@ export const getCategories = createServerFn()
     return await prisma.category.findMany({
       where: {
         type: { not: "FIXED" },
+        deletedMonth: null,
       },
       orderBy: { name: "asc" },
     });

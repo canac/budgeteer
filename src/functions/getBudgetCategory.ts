@@ -17,15 +17,17 @@ export const getBudgetCategory = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, categoryId } }) => {
+    const monthString = toISOMonthString(month);
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
         type: { not: "FIXED" },
+        OR: [{ deletedMonth: null }, { deletedMonth: { gt: monthString } }],
       },
       include: {
         budgetCategories: {
           where: {
-            budget: { month: toISOMonthString(month) },
+            budget: { month: monthString },
           },
           include: {
             budget: true,
