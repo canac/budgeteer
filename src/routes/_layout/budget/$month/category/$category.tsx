@@ -84,6 +84,8 @@ function CategoryDetailsPage() {
   };
 
   const { budgetedAmount } = budgetCategory.budgetCategory;
+  const percentageSpent =
+    (budgetedAmount === 0 ? 1 : -budgetCategory.transactionTotal / budgetedAmount) * 100;
 
   return (
     <Drawer
@@ -137,11 +139,7 @@ function CategoryDetailsPage() {
               />
             </Text>
           </Group>
-          <Progress
-            value={(-budgetCategory.transactionTotal / budgetedAmount) * 100}
-            color="green"
-            flex={1}
-          />
+          <Progress value={percentageSpent} color="green" flex={1} />
         </div>
 
         <Divider />

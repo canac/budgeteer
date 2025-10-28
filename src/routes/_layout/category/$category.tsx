@@ -71,7 +71,7 @@ function CategoryHistoryPage() {
 
   const { totalBudgeted, totalSpent } = categoryHistory;
   const totalTransactions = categoryHistory.transactions.length;
-  const percentageUsed = (totalSpent / totalBudgeted) * 100 || 0;
+  const percentageUsed = (totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted) * 100;
 
   return (
     <Container size="xl">
