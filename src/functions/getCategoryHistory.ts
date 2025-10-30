@@ -36,7 +36,9 @@ export const getCategoryHistory = createServerFn()
             gte: toISODateString(startMonth),
             lte: toISODateString(endOfMonth(endMonth)),
           },
-          ...(includeTransfers ? {} : { transfer: null }),
+          type: {
+            in: includeTransfers ? ["TRANSACTION", "TRANSFER"] : ["TRANSACTION"],
+          },
         },
       },
       include: {

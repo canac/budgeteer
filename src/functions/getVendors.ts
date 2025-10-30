@@ -11,7 +11,7 @@ export const getVendors = createServerFn()
     const vendors = await prisma.transaction.findMany({
       where: {
         date: { gte: toISODateString(subMonths(new Date(), 3)) },
-        transfer: null,
+        type: "TRANSACTION",
       },
       select: {
         vendor: true,

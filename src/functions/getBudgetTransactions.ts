@@ -20,6 +20,7 @@ export const getBudgetTransactions = createServerFn()
     const transactions = await prisma.transaction.findMany({
       where: {
         date: { gte: startDate, lte: endDate },
+        type: { not: "BALANCE_ADJUSTMENT" },
       },
       include: {
         transactionCategories: {

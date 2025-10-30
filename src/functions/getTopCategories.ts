@@ -13,6 +13,7 @@ export const getTopCategories = createServerFn()
       where: {
         transaction: {
           date: { gte: toISODateString(subMonths(new Date(), 3)) },
+          type: { not: "BALANCE_ADJUSTMENT" },
         },
       },
       _count: {
