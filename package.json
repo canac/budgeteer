@@ -51,7 +51,7 @@
     "@vitejs/plugin-react-swc": "^4.0.0",
     "lefthook": "^1.13.4",
     "typescript": "^5.9.2",
-    "vite": "^7.1.7",
+    "vite": "^7.1.11",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.6"
   }
