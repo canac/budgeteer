@@ -1,6 +1,6 @@
 import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { eachMonthOfInterval, endOfMonth } from "date-fns";
+import { eachMonthOfInterval, endOfMonth, parseISO } from "date-fns";
 import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
@@ -74,6 +74,21 @@ export const getCategoryHistory = createServerFn()
       0,
     );
 
+    const monthlyBreakdown = budgetCategories.map((budgetCategory) => {
+      const month = budgetCategory.budget.month;
+      const monthStart = toISODateString(parseISO(month));
+      const monthEnd = toISODateString(endOfMonth(parseISO(month)));
+      const spent = -transactionCategories
+        .filter(({ transaction }) => transaction.date >= monthStart && transaction.date <= monthEnd)
+        .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+      return {
+        month,
+        budgeted: budgetCategory.budgetedAmount,
+        spent,
+      };
+    });
+
     return {
       category,
       transactions: transactionCategories.map(({ amount, transaction }) => ({
@@ -82,5 +97,6 @@ export const getCategoryHistory = createServerFn()
       })),
       totalBudgeted,
       totalSpent,
+      monthlyBreakdown,
     };
   });

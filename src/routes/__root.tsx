@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import mantineChartsCss from "@mantine/charts/styles.css?url";
 import { mantineHtmlProps, MantineProvider } from "@mantine/core";
 import mantineCss from "@mantine/core/styles.css?url";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
@@ -9,6 +10,7 @@ export const Route = createRootRoute({
   head: () => ({
     links: [
       { rel: "stylesheet", href: mantineCss },
+      { rel: "stylesheet", href: mantineChartsCss },
       { rel: "stylesheet", href: globalCss },
     ],
   }),

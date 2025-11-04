@@ -12,6 +12,7 @@ import {
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
 import { _default, coerce, object } from "zod/mini";
+import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
@@ -174,6 +175,13 @@ function CategoryHistoryPage() {
             </Stack>
           </Card>
         </SimpleGrid>
+
+        <Card padding="lg" radius="md" withBorder>
+          <Stack gap="md">
+            <Title order={3}>Monthly Breakdown</Title>
+            <CategoryHistoryChart monthlyData={categoryHistory.monthlyBreakdown} />
+          </Stack>
+        </Card>
 
         <div>
           <Title order={3} mb="md">
