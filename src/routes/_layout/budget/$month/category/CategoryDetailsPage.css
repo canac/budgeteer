@@ -3,4 +3,16 @@
     font-size: var(--mantine-font-size-sm);
     margin-bottom: var(--mantine-spacing-xs);
   }
+
+  .balance {
+    font-size: var(--mantine-font-size-xl);
+    font-weight: bold;
+
+    &.positive {
+      color: var(--mantine-color-green-text);
+    }
+    &.negative {
+      color: var(--mantine-color-red-text);
+    }
+  }
 }

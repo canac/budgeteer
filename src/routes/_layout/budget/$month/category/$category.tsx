@@ -12,6 +12,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import clsx from "clsx";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
@@ -20,6 +21,7 @@ import { EditableName } from "~/components/EditableName";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
+import { setCategoryBalance } from "~/functions/setCategoryBalance";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
@@ -79,6 +81,17 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
+  const handleSaveBalance = async (newBalance: number) => {
+    await setCategoryBalance({
+      data: {
+        categoryId: budgetCategory.category.id,
+        month,
+        targetBalance: newBalance,
+      },
+    });
+    await router.invalidate();
+  };
+
   const handleUpdate = async () => {
     await router.invalidate();
   };
@@ -86,6 +99,10 @@ function CategoryDetailsPage() {
   const { budgetedAmount } = budgetCategory.budgetCategory;
   const percentageSpent =
     (budgetedAmount === 0 ? 1 : -budgetCategory.transactionTotal / budgetedAmount) * 100;
+  const balanceClassName = clsx([
+    "balance",
+    budgetCategory.currentBalance >= 0 ? "positive" : "negative",
+  ]);
 
   return (
     <Drawer
@@ -112,9 +129,17 @@ function CategoryDetailsPage() {
         <Group>
           <div>
             <Title order={3}>Current Balance</Title>
-            <Text size="xl" fw={700} c={budgetCategory.currentBalance >= 0 ? "green" : "red"}>
-              {formatCurrency(budgetCategory.currentBalance)}
-            </Text>
+            {categoryType === "SAVINGS" || categoryType === "ACCUMULATING" ? (
+              <EditableAmount
+                className={balanceClassName}
+                amount={budgetCategory.currentBalance}
+                saveAmount={handleSaveBalance}
+              />
+            ) : (
+              <Text className={balanceClassName}>
+                {formatCurrency(budgetCategory.currentBalance)}
+              </Text>
+            )}
           </div>
           <Select
             label={<Title order={3}>Type</Title>}

@@ -6,8 +6,10 @@
   }
 
   .text {
-    all: unset;
-    cursor: pointer;
+    /* Reset button user-agent styles */
+    border: none;
+    background: none;
+    padding: 0;
 
     border-bottom: 2px solid transparent;
   }

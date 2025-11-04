@@ -37,7 +37,6 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
       return;
     }
 
-    // Create a new balance adjustment transaction
     await prisma.transaction.create({
       data: {
         type: "BALANCE_ADJUSTMENT",

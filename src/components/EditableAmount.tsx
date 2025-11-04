@@ -1,14 +1,16 @@
+import clsx from "clsx";
 import { useState } from "react";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatters";
 import "./EditableAmount.css";
 
 interface EditableAmountProps {
+  className?: string;
   amount: number;
   saveAmount: (newAmount: number) => Promise<void>;
 }
 
-export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
+export function EditableAmount({ className, amount, saveAmount }: EditableAmountProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(penniesToDollars(amount).toString());
 
@@ -32,10 +34,10 @@ export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
           }}
         >
           <input
-            className="input"
+            className={clsx("input", className)}
             ref={(input) => input?.focus()}
             inputMode="numeric"
-            pattern="[0-9]*(\.[0-9]{0,2})?"
+            pattern="-?[0-9]*(\.[0-9]{0,2})?"
             min={0}
             aria-label="Edit amount"
             value={value}
@@ -44,7 +46,12 @@ export function EditableAmount({ amount, saveAmount }: EditableAmountProps) {
           />
         </form>
       ) : (
-        <button type="button" className="text" aria-label="Edit amount" onClick={handleEditClick}>
+        <button
+          type="button"
+          className={clsx("text", className)}
+          aria-label="Edit amount"
+          onClick={handleEditClick}
+        >
           {formatCurrency(amount)}
         </button>
       )}

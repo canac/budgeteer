@@ -158,7 +158,7 @@ export async function calculateCategoryStartingBalance({
       categoryId: category.id,
       transaction: {
         // Only include transactions before the start of this budget
-        date: { lte: toISODateString(startOfMonth(month)) },
+        date: { lt: toISODateString(startOfMonth(month)) },
       },
     },
   });
