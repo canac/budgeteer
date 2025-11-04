@@ -1,9 +1,9 @@
 import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { eachMonthOfInterval, endOfMonth, parseISO } from "date-fns";
+import { endOfMonth, parseISO } from "date-fns";
 import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { toISODateString, toISOMonthString } from "~/lib/iso";
+import { toISODateString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
@@ -49,16 +49,17 @@ export const getCategoryHistory = createServerFn()
       orderBy: [{ transaction: { date: "desc" } }, { transaction: { createdAt: "desc" } }],
     });
 
-    const budgetMonths = eachMonthOfInterval({ start: startMonth, end: endMonth }).map((date) =>
-      toISOMonthString(date),
-    );
     const budgetCategories = await prisma.budgetCategory.findMany({
       where: {
         categoryId,
         budget: {
-          month: { in: budgetMonths },
+          month: {
+            gte: toISODateString(startMonth),
+            lte: toISODateString(endMonth),
+          },
         },
       },
+      orderBy: [{ budget: { month: "asc" } }],
       include: {
         budget: true,
       },
@@ -74,8 +75,8 @@ export const getCategoryHistory = createServerFn()
       0,
     );
 
-    const monthlyBreakdown = budgetCategories.map((budgetCategory) => {
-      const month = budgetCategory.budget.month;
+    const monthlyBreakdown = budgetCategories.map(({ budget, budgetedAmount }) => {
+      const month = budget.month;
       const monthStart = toISODateString(parseISO(month));
       const monthEnd = toISODateString(endOfMonth(parseISO(month)));
       const spent = -transactionCategories
@@ -84,13 +85,15 @@ export const getCategoryHistory = createServerFn()
 
       return {
         month,
-        budgeted: budgetCategory.budgetedAmount,
+        budgeted: budgetedAmount,
         spent,
       };
     });
 
     return {
       category,
+      startMonth: budgetCategories[0].budget.month,
+      endMonth: toISODateString(endMonth),
       transactions: transactionCategories.map(({ amount, transaction }) => ({
         ...transaction,
         amount,

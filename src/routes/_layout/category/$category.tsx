@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_layout/category/$category")({
     const currentDate = new Date();
     const startMonth = toISOMonthString(subMonths(currentDate, months));
     const endMonth = toISOMonthString(incomplete ? currentDate : subMonths(currentDate, 1));
-    const categoryHistory = await getCategoryHistory({
+    return await getCategoryHistory({
       data: {
         categoryId: category,
         startMonth,
@@ -44,11 +44,6 @@ export const Route = createFileRoute("/_layout/category/$category")({
         includeTransfers: transfers,
       },
     });
-    return {
-      categoryHistory,
-      startMonth,
-      endMonth,
-    };
   },
 });
 
@@ -61,7 +56,7 @@ const monthOptions = [
 ];
 
 function CategoryHistoryPage() {
-  const { categoryHistory, startMonth, endMonth } = Route.useLoaderData();
+  const categoryHistory = Route.useLoaderData();
   const { months, incomplete, transfers } = Route.useSearch();
   const router = useRouter();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -70,7 +65,7 @@ function CategoryHistoryPage() {
     await router.invalidate();
   };
 
-  const { totalBudgeted, totalSpent } = categoryHistory;
+  const { startMonth, endMonth, totalBudgeted, totalSpent } = categoryHistory;
   const totalTransactions = categoryHistory.transactions.length;
   const percentageUsed = (totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted) * 100;
 
