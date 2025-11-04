@@ -1,5 +1,5 @@
-import { ActionIcon, Group, Table } from "@mantine/core";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
+import { ActionIcon, Group, Table, ThemeIcon } from "@mantine/core";
+import { IconArrowsRightLeft, IconEdit, IconPencilDollar, IconTrash } from "@tabler/icons-react";
 import { parseISO } from "date-fns";
 import { useState } from "react";
 import {
@@ -75,7 +75,21 @@ export function TransactionTable({
           {transactions.map((transaction) => (
             <Table.Tr key={transaction.id}>
               <Table.Td>{shortDateFormatter.format(parseISO(transaction.date))}</Table.Td>
-              <Table.Td>{transaction.vendor}</Table.Td>
+              <Table.Td>
+                <Group gap="xs">
+                  {transaction.type === "BALANCE_ADJUSTMENT" && (
+                    <ThemeIcon className="transaction-type">
+                      <IconPencilDollar />
+                    </ThemeIcon>
+                  )}
+                  {transaction.type === "TRANSFER" && (
+                    <ThemeIcon className="transaction-type">
+                      <IconArrowsRightLeft />
+                    </ThemeIcon>
+                  )}
+                  {transaction.vendor}
+                </Group>
+              </Table.Td>
               <Table.Td>{transaction.description}</Table.Td>
               <Table.Td ta="right" c={transaction.amount < 0 ? undefined : "green"}>
                 {formatCurrency(transaction.amount)}
@@ -86,7 +100,7 @@ export function TransactionTable({
                     variant="subtle"
                     color="blue"
                     onClick={() => handleEditTransaction(transaction)}
-                    disabled={transaction.transfer !== null}
+                    disabled={transaction.type === "TRANSACTION"}
                   >
                     <IconEdit />
                   </ActionIcon>

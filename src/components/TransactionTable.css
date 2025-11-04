@@ -2,4 +2,10 @@
   tr.starting-balance {
     border-top: 2px solid;
   }
+
+  .mantine-ThemeIcon-root.transaction-type {
+    --ti-bg: var(--mantine-color-blue-filled);
+    --ti-size: var(--ti-size-sm);
+    border-radius: 100%;
+  }
 }

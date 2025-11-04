@@ -2,3 +2,8 @@
   width: calc(var(--ai-size) / 1.5);
   height: calc(var(--ai-size) / 1.5);
 }
+
+.mantine-ThemeIcon-root .tabler-icon {
+  width: calc(var(--ti-size) / 1.5);
+  height: calc(var(--ti-size) / 1.5);
+}
