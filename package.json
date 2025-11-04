@@ -17,7 +17,9 @@
     "db:studio": "prisma studio",
     "db:seed": "node --env-file=.env seed.ts",
     "lint:biome": "biome check",
-    "lint:ts": "tsc --noEmit"
+    "lint:ts": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@mantine/core": "^8.2.7",
@@ -50,6 +52,7 @@
     "lefthook": "^1.13.4",
     "typescript": "^5.9.2",
     "vite": "^7.1.7",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.6"
   }
 }
