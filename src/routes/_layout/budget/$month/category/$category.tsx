@@ -156,9 +156,13 @@ function CategoryDetailsPage() {
         <div>
           <Group justify="space-between">
             <Title order={3}>Spent</Title>
-            <Text component="div" size="sm" c="dimmed">
-              {formatCurrency(-budgetCategory.transactionTotal)} of{" "}
+            <Text component="div" size="sm">
+              <Text span fw="bold">
+                {formatCurrency(-budgetCategory.transactionTotal)}
+              </Text>{" "}
+              of{" "}
               <EditableAmount
+                className="spent"
                 amount={budgetCategory.budgetCategory.budgetedAmount}
                 saveAmount={handleSaveBudgetedAmount}
               />

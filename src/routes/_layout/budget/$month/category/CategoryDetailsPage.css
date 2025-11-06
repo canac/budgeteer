@@ -15,4 +15,8 @@
       color: var(--mantine-color-red-text);
     }
   }
+
+  .spent {
+    font-weight: normal;
+  }
 }
