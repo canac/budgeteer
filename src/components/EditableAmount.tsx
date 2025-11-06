@@ -8,9 +8,15 @@ interface EditableAmountProps {
   className?: string;
   amount: number;
   saveAmount: (newAmount: number) => Promise<void>;
+  editable?: boolean;
 }
 
-export function EditableAmount({ className, amount, saveAmount }: EditableAmountProps) {
+export function EditableAmount({
+  className,
+  amount,
+  saveAmount,
+  editable = true,
+}: EditableAmountProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(penniesToDollars(amount).toString());
 
@@ -26,7 +32,7 @@ export function EditableAmount({ className, amount, saveAmount }: EditableAmount
 
   return (
     <span className="EditableAmount">
-      {editing ? (
+      {editing && editable ? (
         <form
           onSubmit={(event) => {
             event.preventDefault();

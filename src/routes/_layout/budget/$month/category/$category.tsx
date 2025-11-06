@@ -129,17 +129,12 @@ function CategoryDetailsPage() {
         <Group>
           <div>
             <Title order={3}>Current Balance</Title>
-            {categoryType === "SAVINGS" || categoryType === "ACCUMULATING" ? (
-              <EditableAmount
-                className={balanceClassName}
-                amount={budgetCategory.currentBalance}
-                saveAmount={handleSaveBalance}
-              />
-            ) : (
-              <Text className={balanceClassName}>
-                {formatCurrency(budgetCategory.currentBalance)}
-              </Text>
-            )}
+            <EditableAmount
+              className={balanceClassName}
+              editable={categoryType === "SAVINGS" || categoryType === "ACCUMULATING"}
+              amount={budgetCategory.currentBalance}
+              saveAmount={handleSaveBalance}
+            />
           </div>
           <Select
             label={<Title order={3}>Type</Title>}
