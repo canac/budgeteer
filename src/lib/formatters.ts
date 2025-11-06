@@ -25,3 +25,8 @@ export function formatCurrency(pennies: number): string {
   const dollars = penniesToDollars(pennies);
   return currencyFormatter.format(Object.is(dollars, -0) ? 0 : dollars);
 }
+
+export const percentageFormatter = new Intl.NumberFormat("en-US", {
+  style: "percent",
+  currency: "USD",
+});
