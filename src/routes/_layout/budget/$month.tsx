@@ -128,7 +128,7 @@ function BudgetPage() {
                       viewMode === "budgeted"
                         ? budgetCategory.budgetedAmount
                         : viewMode === "spent"
-                          ? -budgetCategory.spent
+                          ? budgetCategory.spent
                           : budgetCategory.balance,
                     )}
                   </Text>

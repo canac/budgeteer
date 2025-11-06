@@ -33,59 +33,61 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
   const fundCategoryIds = pluck(fundCategories, "categoryId");
   const regularCategoryIds = pluck(regularCategories, "categoryId");
 
-  const [monthlySpent, fundTransactionTotal, regularBudgeted, fundBudgeted] = await Promise.all([
-    prisma.transactionCategory.groupBy({
-      by: ["categoryId"],
-      where: {
-        categoryId: { in: pluck(budgetCategories, "categoryId") },
-        transaction: {
-          date: { gte: startDate, lte: endDate },
+  const [monthlyTransactionTotal, fundTransactionTotal, regularBudgeted, fundBudgeted] =
+    await Promise.all([
+      prisma.transactionCategory.groupBy({
+        by: ["categoryId"],
+        where: {
+          categoryId: { in: pluck(budgetCategories, "categoryId") },
+          transaction: {
+            date: { gte: startDate, lte: endDate },
+          },
         },
-      },
-      _sum: { amount: true },
-    }),
-    prisma.transactionCategory.groupBy({
-      by: ["categoryId"],
-      where: {
-        categoryId: { in: fundCategoryIds },
-        transaction: {
-          date: { lte: endDate },
+        _sum: { amount: true },
+      }),
+      prisma.transactionCategory.groupBy({
+        by: ["categoryId"],
+        where: {
+          categoryId: { in: fundCategoryIds },
+          transaction: {
+            date: { lte: endDate },
+          },
         },
-      },
-      _sum: { amount: true },
-    }),
-    prisma.budgetCategory.groupBy({
-      by: ["categoryId"],
-      where: {
-        categoryId: { in: regularCategoryIds },
-        budget: { month: monthString },
-      },
-      _sum: { budgetedAmount: true },
-    }),
-    prisma.budgetCategory.groupBy({
-      by: ["categoryId"],
-      where: {
-        categoryId: { in: fundCategoryIds },
-        budget: { month: { lte: monthString } },
-      },
-      _sum: { budgetedAmount: true },
-    }),
-  ]);
+        _sum: { amount: true },
+      }),
+      prisma.budgetCategory.groupBy({
+        by: ["categoryId"],
+        where: {
+          categoryId: { in: regularCategoryIds },
+          budget: { month: monthString },
+        },
+        _sum: { budgetedAmount: true },
+      }),
+      prisma.budgetCategory.groupBy({
+        by: ["categoryId"],
+        where: {
+          categoryId: { in: fundCategoryIds },
+          budget: { month: { lte: monthString } },
+        },
+        _sum: { budgetedAmount: true },
+      }),
+    ]);
 
   return budgetCategories.map((budgetCategory) => {
     const { categoryId } = budgetCategory;
     const isCategoryFund = isFund(budgetCategory.category.type);
-    const spent = find(monthlySpent, "categoryId", categoryId)?._sum.amount ?? 0;
+    const monthTransactionTotal =
+      find(monthlyTransactionTotal, "categoryId", categoryId)?._sum.amount ?? 0;
     const transactionTotal = isCategoryFund
       ? (find(fundTransactionTotal, "categoryId", categoryId)?._sum.amount ?? 0)
-      : spent;
+      : monthTransactionTotal;
     const budgeted =
       find(isCategoryFund ? fundBudgeted : regularBudgeted, "categoryId", categoryId)?._sum
         .budgetedAmount ?? 0;
 
     return {
       ...budgetCategory,
-      spent,
+      spent: -monthTransactionTotal,
       budgeted,
       balance: budgeted + transactionTotal,
     } satisfies BC & BalanceFields;
