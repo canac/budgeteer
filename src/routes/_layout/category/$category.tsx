@@ -32,11 +32,11 @@ export const Route = createFileRoute("/_layout/category/$category")({
     incomplete,
     transfers,
   }),
-  loader: async ({ params: { category }, deps: { months, incomplete, transfers } }) => {
+  loader: ({ params: { category }, deps: { months, incomplete, transfers } }) => {
     const currentDate = new Date();
     const startMonth = toISOMonthString(subMonths(currentDate, months));
     const endMonth = toISOMonthString(incomplete ? currentDate : subMonths(currentDate, 1));
-    return await getCategoryHistory({
+    return getCategoryHistory({
       data: {
         categoryId: category,
         startMonth,
