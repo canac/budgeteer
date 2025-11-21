@@ -18,7 +18,7 @@ export async function setup(project: TestProject) {
   url.searchParams.set("schema", schema);
   const connectionString = url.toString();
 
-  await execAsync("pnpm db:push --skip-generate", {
+  await execAsync("pnpm db:push", {
     env: { ...process.env, VITE_DATABASE_URL: connectionString },
   });
 
