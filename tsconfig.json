@@ -14,8 +14,8 @@
     "allowJs": true,
     "allowImportingTsExtensions": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
+      "*": ["./*"],
       "~/*": ["./src/*"]
     },
     "noEmit": true
