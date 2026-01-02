@@ -5,15 +5,17 @@ const amountSchema = number()
   .int()
   .refine((value) => value !== 0, { error: "Must not be zero" });
 
-const startDate = await getFirstMonth();
-
 export const transactionSchema = object({
   amount: amountSchema,
   vendor: string().min(1),
   description: string().optional(),
-  date: string().refine((value) => !startDate || value >= startDate, {
-    error: "Must not be before the first budget",
-  }),
+  date: string().refine(
+    async (value) => {
+      const startDate = await getFirstMonth();
+      return !startDate || value >= startDate;
+    },
+    { error: "Must not be before the first budget" },
+  ),
   categories: array(
     object({
       categoryId: string(),
