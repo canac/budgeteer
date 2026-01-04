@@ -15,7 +15,5 @@ export const login = createServerFn({ method: "POST" })
       return { success };
     }
 
-    throw redirect({
-      to: "/",
-    });
+    throw redirect({ to: "/" });
   });

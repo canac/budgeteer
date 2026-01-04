@@ -7,7 +7,5 @@ export const requireAuth = createMiddleware({ type: "function" }).server(async (
     return next();
   }
 
-  throw redirect({
-    to: "/login",
-  });
+  throw redirect({ to: "/login" });
 });

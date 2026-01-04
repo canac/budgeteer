@@ -2,6 +2,7 @@ import { ActionIcon, AppShell, Box, Container, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconArrowsExchange, IconHome, IconList, IconLogout, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useParams, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { BudgetMonthSelector } from "~/components/BudgetMonthSelector";
 import { CategorySelector } from "~/components/CategorySelector";
 import { DynamicNewTransferModal } from "~/components/DynamicNewTransferModal";
@@ -9,7 +10,7 @@ import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { getCategories } from "~/functions/getCategories";
-import { logout } from "~/functions/logout";
+import { logout as logoutServerFn } from "~/functions/logout";
 
 export const Route = createFileRoute("/_layout")({
   component: LayoutRoute,
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_layout")({
 
 function LayoutRoute() {
   const router = useRouter();
+  const logout = useServerFn(logoutServerFn);
   const [transactionOpened, { open: openTransaction, close: closeTransaction }] =
     useDisclosure(false);
   const [transferOpened, { open: openTransfer, close: closeTransfer }] = useDisclosure(false);

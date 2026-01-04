@@ -1,17 +1,15 @@
 import { Button, Container, Paper, PasswordInput, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { minLength, object, string } from "zod/mini";
-import { login } from "~/functions/login";
+import { login as loginServerFn } from "~/functions/login";
 import { isAuthenticated } from "~/lib/auth";
 
 const checkLogin = createServerFn().handler(async () => {
   if (await isAuthenticated()) {
-    throw redirect({
-      to: "/",
-    });
+    throw redirect({ to: "/" });
   }
 });
 
@@ -25,6 +23,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
+  const login = useServerFn(loginServerFn);
   const form = useForm({
     mode: "controlled",
     validateInputOnChange: true,
@@ -37,12 +36,12 @@ function LoginPage() {
   const handleSubmit = form.onSubmit(async (values, event) => {
     event?.preventDefault();
 
-    const { success } = await login({
+    const result = await login({
       data: {
         password: values.password,
       },
     });
-    if (!success) {
+    if (!result?.success) {
       form.setFieldError("password", "Invalid password");
     }
   });

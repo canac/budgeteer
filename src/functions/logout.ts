@@ -5,10 +5,8 @@ import { requireAuth } from "~/lib/authMiddleware";
 
 export const logout = createServerFn({ method: "POST" })
   .middleware([requireAuth])
-  .handler(async () => {
+  .handler(() => {
     clearAuth();
 
-    throw redirect({
-      to: "/login",
-    });
+    throw redirect({ to: "/login" });
   });
