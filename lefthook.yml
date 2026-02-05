@@ -1,6 +1,10 @@
 pre-commit:
   parallel: true
   commands:
-    biome:
-      run: pnpm biome check --write --unsafe --error-on-warnings --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+    oxfmt:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: pnpm oxfmt --write {staged_files}
       stage_fixed: true
+    oxlint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: pnpm oxlint --deny-warnings {staged_files}

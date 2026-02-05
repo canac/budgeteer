@@ -1,8 +1,8 @@
 {
   "name": "budgeteer",
   "private": true,
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "dev": "vite dev",
     "build": "pnpm db:generate && vite build",
@@ -16,7 +16,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "node --env-file=.env seed.ts",
-    "lint:biome": "biome check",
+    "fmt": "oxfmt --write .",
+    "lint": "oxlint",
     "lint:ts": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -45,7 +46,6 @@
     "zod": "^4.0.14"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.0",
     "@netlify/vite-plugin-tanstack-start": "^1.2.2",
     "@prisma/adapter-pg": "^7.1.0",
     "@types/node": "^22.17.0",
@@ -53,6 +53,8 @@
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react-swc": "^4.0.0",
     "lefthook": "^1.13.4",
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.43.0",
     "typescript": "^5.9.2",
     "vite": "^7.2.6",
     "vite-tsconfig-paths": "^5.1.4",

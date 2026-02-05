@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "no-console": "error"
+  },
+  "settings": {
+    "vitest": {
+      "typecheck": false
+    }
+  }
+}
