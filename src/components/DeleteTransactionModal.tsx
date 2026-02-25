@@ -1,6 +1,6 @@
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 import { parseISO } from "date-fns";
-import type { Transaction } from "generated/prisma/client";
+import type { Transaction } from "~/prisma/client";
 import { deleteTransaction } from "~/functions/deleteTransaction";
 import { useOpened } from "~/hooks/useOpened";
 import { fullDateFormatter } from "~/lib/formatters";

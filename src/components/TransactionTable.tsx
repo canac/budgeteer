@@ -2,11 +2,11 @@ import { ActionIcon, Group, Table, ThemeIcon } from "@mantine/core";
 import { IconArrowsRightLeft, IconEdit, IconPencilDollar, IconTrash } from "@tabler/icons-react";
 import { parseISO } from "date-fns";
 import { useState } from "react";
+import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import {
   DeleteTransactionModal,
   type DeleteTransactionModalProps,
 } from "~/components/DeleteTransactionModal";
-import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
 import { TransactionModal, type TransactionModalProps } from "./TransactionModal";

@@ -1,6 +1,6 @@
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { getDaysInMonth, parseISO } from "date-fns";
-import type { BudgetInclude } from "generated/prisma/models";
+import type { BudgetInclude } from "~/prisma/models";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
 import { toISOMonthString } from "~/lib/iso";

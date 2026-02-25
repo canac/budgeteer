@@ -1,6 +1,6 @@
+import type { TestProject } from "vitest/node";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
-import type { TestProject } from "vitest/node";
 import { connect } from "./helpers";
 
 const execAsync = promisify(exec);

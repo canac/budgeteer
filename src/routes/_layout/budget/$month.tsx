@@ -2,8 +2,8 @@ import { Button, ButtonGroup, Card, Group, Stack, Text, Title } from "@mantine/c
 import { partition } from "@std/collections";
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
-import type { CategoryType } from "generated/prisma/enums";
 import { useState } from "react";
+import type { CategoryType } from "~/prisma/enums";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
 import { MantineLink } from "~/components/MantineLink";

@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { inject } from "vitest";
-import { PrismaClient } from "../generated/prisma/client.ts";
+import { PrismaClient } from "../~/prisma/client.ts";
 
 let prisma: PrismaClient | null = null;
 

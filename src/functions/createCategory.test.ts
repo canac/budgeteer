@@ -1,6 +1,6 @@
-import type { Budget } from "generated/prisma/client.ts";
-import { CategoryType } from "generated/prisma/enums";
 import { beforeEach, describe, expect, it } from "vitest";
+import type { Budget } from "~/prisma/client.ts";
+import { CategoryType } from "~/prisma/enums";
 import { getPrisma } from "../../test/helpers.ts";
 import { createCategory } from "./createCategory.ts";
 

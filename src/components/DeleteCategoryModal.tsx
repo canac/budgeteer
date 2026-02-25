@@ -1,5 +1,5 @@
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
-import type { Category } from "generated/prisma/client";
+import type { Category } from "~/prisma/client";
 import { deleteCategory } from "~/functions/deleteCategory";
 import { useOpened } from "~/hooks/useOpened";
 

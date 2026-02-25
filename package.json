@@ -53,7 +53,7 @@
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react-swc": "^4.0.0",
     "lefthook": "^1.13.4",
-    "oxfmt": "^0.28.0",
+    "oxfmt": "^0.35.0",
     "oxlint": "^1.43.0",
     "typescript": "^5.9.2",
     "vite": "^7.2.6",

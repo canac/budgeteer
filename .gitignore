@@ -3,6 +3,6 @@
 /.netlify/
 /.tanstack/
 /dist/
-/generated/
+/src/prisma/
 /src/routeTree.gen.ts
 /.env.local

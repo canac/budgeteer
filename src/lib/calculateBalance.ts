@@ -1,6 +1,6 @@
 import { partition } from "@std/collections";
 import { endOfMonth, startOfMonth } from "date-fns";
-import type { BudgetCategory, Category, CategoryType } from "generated/prisma/client";
+import type { BudgetCategory, Category, CategoryType } from "~/prisma/client";
 import { find, pluck } from "~/lib/collections";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";

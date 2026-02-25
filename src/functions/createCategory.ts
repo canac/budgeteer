@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { CategoryType } from "generated/prisma/enums";
 import { number, object, string, enum as zodEnum } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
 import { monthString } from "~/lib/zod";
+import { CategoryType } from "~/prisma/enums";
 
 const inputSchema = object({
   month: monthString(),
