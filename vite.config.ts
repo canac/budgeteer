@@ -1,6 +1,6 @@
 import netlify from "@netlify/vite-plugin-tanstack-start";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -13,5 +13,5 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  plugins: [react(), tanstackStart(), netlify()],
+  plugins: [tanstackStart(), react(), netlify()],
 });
