@@ -1,8 +1,7 @@
 import { Button, Container, Paper, PasswordInput, Stack, Title } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { schemaResolver, useForm } from "@mantine/form";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { zod4Resolver } from "mantine-form-zod-resolver";
 import { minLength, object, string } from "zod/mini";
 import { login as loginServerFn } from "~/functions/login";
 import { isAuthenticated } from "~/lib/auth";
@@ -30,7 +29,7 @@ function LoginPage() {
     initialValues: {
       password: "",
     },
-    validate: zod4Resolver(formSchema),
+    validate: schemaResolver(formSchema, { sync: true }),
   });
 
   const handleSubmit = form.onSubmit(async (values, event) => {

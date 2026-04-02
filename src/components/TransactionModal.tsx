@@ -14,9 +14,8 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { schemaResolver, useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
-import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
 import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
@@ -124,7 +123,7 @@ export function TransactionModal({
           selectedCategoryIds: initialCategoryId ? [initialCategoryId] : [],
           categoryAmounts: initialCategoryId ? [{ categoryId: initialCategoryId, amount: 0 }] : [],
         },
-    validate: zod4Resolver(formSchema),
+    validate: schemaResolver(formSchema, { sync: true }),
   });
 
   const categoryOptions = sortedCategories.map((category) => ({

@@ -1,9 +1,8 @@
 import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Text } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { schemaResolver, useForm } from "@mantine/form";
 import { IconSwitch } from "@tabler/icons-react";
 import { useParams } from "@tanstack/react-router";
 import { endOfMonth, parseISO } from "date-fns";
-import { zod4Resolver } from "mantine-form-zod-resolver";
 import { number, object, positive, refine, string } from "zod/mini";
 import { createTransfer } from "~/functions/createTransfer";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
@@ -48,7 +47,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
       sourceCategoryId: sourceCategoryId ?? null,
       destinationCategoryId: null as string | null,
     },
-    validate: zod4Resolver(formSchema),
+    validate: schemaResolver(formSchema, { sync: true }),
     transformValues: (values) => formSchema.parse(values),
   });
 
