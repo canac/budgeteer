@@ -1,4 +1,3 @@
-import type z from "zod/mini";
 import {
   ActionIcon,
   Alert,
@@ -82,8 +81,6 @@ const formSchema = object({
   ),
 );
 
-type Schema = z.infer<typeof formSchema>;
-
 export function TransactionModal({
   onClose,
   onSave,
@@ -99,7 +96,7 @@ export function TransactionModal({
 
   const isEditing = !!editingTransaction;
 
-  const form = useForm<Schema>({
+  const form = useForm({
     validateInputOnBlur: true,
     initialValues: isEditing
       ? {
