@@ -1,7 +1,7 @@
 import { deleteCookie, getCookie, setCookie } from "@tanstack/react-start/server";
 import { jwtVerify, SignJWT } from "jose";
 
-const secret = new TextEncoder().encode(import.meta.env.VITE_JWT_SECRET);
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function isAuthenticated(): Promise<boolean> {
   const jwt = getCookie("auth");
@@ -18,7 +18,7 @@ export async function isAuthenticated(): Promise<boolean> {
 }
 
 export async function authenticateWithPassword(password: string): Promise<boolean> {
-  if (password !== import.meta.env.VITE_AUTH_PASSWORD) {
+  if (password !== process.env.AUTH_PASSWORD) {
     return false;
   }
 

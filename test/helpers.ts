@@ -5,7 +5,7 @@ import { PrismaClient } from "~/prisma/client.ts";
 let prisma: PrismaClient | null = null;
 
 export function connect(schema: string): PrismaClient {
-  const adapter = new PrismaPg({ connectionString: import.meta.env.VITE_DATABASE_URL }, { schema });
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL }, { schema });
   return new PrismaClient({ adapter });
 }
 

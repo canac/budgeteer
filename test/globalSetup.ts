@@ -1,3 +1,4 @@
+import "dotenv/config";
 import type { TestProject } from "vitest/node";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
@@ -14,12 +15,12 @@ declare module "vitest" {
 export async function setup(project: TestProject) {
   const schema = `test_${crypto.randomUUID().replace(/-/g, "")}`;
 
-  const url = new URL(import.meta.env.VITE_DATABASE_URL);
+  const url = new URL(process.env.DATABASE_URL!);
   url.searchParams.set("schema", schema);
   const connectionString = url.toString();
 
   await execAsync("pnpm db:push", {
-    env: { ...process.env, VITE_DATABASE_URL: connectionString },
+    env: { ...process.env, DATABASE_URL: connectionString },
   });
 
   const prisma = connect(schema);
