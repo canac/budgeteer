@@ -25,7 +25,7 @@ export function EditableAmount({
     setEditing(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     saveAmount(dollarsToPennies(Number(value))).catch(() => {});
     setEditing(false);
   };

@@ -15,7 +15,7 @@ export function EditableName({ name, saveName }: EditableNameProps) {
     setEditing(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     saveName(value).catch(() => {});
     setEditing(false);
   };

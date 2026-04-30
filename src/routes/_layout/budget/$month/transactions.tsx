@@ -50,8 +50,8 @@ function TransactionsPage() {
   const { transactions } = Route.useLoaderData();
   const { month } = Route.useParams();
   const { modalProps } = useOpened({
-    onClose: () => {
-      router.navigate({ to: "/budget/$month", params: { month } });
+    onClose: async () => {
+      await router.navigate({ to: "/budget/$month", params: { month } });
     },
   });
   const [editingTransaction, setEditingTransaction] = useState<EditTransaction | null>(null);

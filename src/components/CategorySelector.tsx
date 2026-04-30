@@ -16,9 +16,9 @@ export function CategorySelector({ categories, currentCategory }: CategorySelect
     label: category.name,
   }));
 
-  const handleChange = (value: string | null) => {
+  const handleChange = async (value: string | null) => {
     if (value) {
-      router.navigate({ to: "/category/$category", params: { category: value } });
+      await router.navigate({ to: "/category/$category", params: { category: value } });
     }
   };
 

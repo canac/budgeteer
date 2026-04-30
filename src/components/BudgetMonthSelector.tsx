@@ -17,9 +17,9 @@ export function BudgetMonthSelector({ budgetMonths, currentMonth }: BudgetMonthS
     label: monthFormatter.format(parseISO(month)),
   }));
 
-  const handleChange = (value: string | null) => {
+  const handleChange = async (value: string | null) => {
     if (value) {
-      router.navigate({ to: "/budget/$month", params: { month: value } });
+      await router.navigate({ to: "/budget/$month", params: { month: value } });
     }
   };
 
