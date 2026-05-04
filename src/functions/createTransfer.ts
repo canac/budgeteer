@@ -28,7 +28,7 @@ export const createTransfer = createServerFn({ method: "POST" })
             },
             {
               categoryId: destinationCategoryId,
-              amount: amount,
+              amount,
             },
           ],
         },

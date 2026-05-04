@@ -142,7 +142,7 @@ export function TransactionModal({
       const newCategoryAmounts = value.map(
         (categoryId) =>
           categoryAmounts.find((category) => category.categoryId === categoryId) ?? {
-            categoryId: categoryId,
+            categoryId,
             amount: 0,
           },
       );
