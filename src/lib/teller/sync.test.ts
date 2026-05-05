@@ -143,6 +143,8 @@ describe("syncAccount", () => {
     interceptTransactions(account.id, [], { start_date: "2026-03-22", count: "100" });
 
     await syncAccount(account, enrollment);
+
+    expect(() => agent.assertNoPendingInterceptors()).not.toThrow();
   });
 
   it("uses counterparty name when present, falls back to description", async () => {

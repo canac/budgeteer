@@ -4,7 +4,7 @@ import { CategoryType } from "~/prisma/enums";
 import { getPrisma } from "../../test/helpers.ts";
 import { createCategory } from "./createCategory.ts";
 
-describe("createCategory", async () => {
+describe("createCategory", () => {
   const prisma = getPrisma();
 
   describe("successful creation", () => {
@@ -77,7 +77,7 @@ describe("createCategory", async () => {
             name: "Groceries",
           },
         }),
-      ).rejects.toThrow();
+      ).rejects.toThrow("No record was found for a query");
     });
   });
 });

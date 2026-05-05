@@ -1,5 +1,9 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "react", "vitest"],
+  "options": {
+    "typeAware": true
+  },
   "rules": {
     "no-console": "error",
     "object-shorthand": "error"

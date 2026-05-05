@@ -165,6 +165,6 @@ describe("acceptTransaction", () => {
           },
         },
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow("Can only update rule when exactly one category is selected");
   });
 });

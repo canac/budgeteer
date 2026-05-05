@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { importTransactions } from "./importTransactions.ts";
 
 vi.mock("src/lib/teller/sync", () => ({
-  syncEnrollment: vi.fn(),
+  syncEnrollment: vi.fn<typeof sync.syncEnrollment>(),
 }));
 
 describe("importTransactions", () => {

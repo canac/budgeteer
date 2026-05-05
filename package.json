@@ -59,6 +59,7 @@
     "lefthook": "^1.13.4",
     "oxfmt": "^0.35.0",
     "oxlint": "^1.62.0",
+    "oxlint-tsgolint": "^0.22.1",
     "pg": "^8.20.0",
     "typescript": "npm:@typescript/native-preview@beta",
     "vite": "^8.0.10",

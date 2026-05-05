@@ -61,7 +61,7 @@ describe("getBudgetCategory", () => {
 
     await expect(() =>
       getBudgetCategory({ data: { month: "2025-01", categoryId: fixed.id } }),
-    ).rejects.toThrow();
+    ).rejects.toMatchObject({ isNotFound: true });
   });
 
   it("throws notFound when the category was deleted on or before the queried month", async () => {
@@ -72,6 +72,6 @@ describe("getBudgetCategory", () => {
 
     await expect(() =>
       getBudgetCategory({ data: { month: "2025-01", categoryId } }),
-    ).rejects.toThrow();
+    ).rejects.toMatchObject({ isNotFound: true });
   });
 });
