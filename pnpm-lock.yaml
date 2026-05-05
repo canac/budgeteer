@@ -25,7 +25,7 @@ importers:
         version: 9.1.0(@mantine/core@9.1.0(@mantine/hooks@9.1.0(react@19.2.4))(@types/react@19.1.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@mantine/hooks@9.1.0(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@prisma/client':
         specifier: ^7.6.0
-        version: 7.6.0(prisma@7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.2))(typescript@6.0.2)
+        version: 7.6.0(@typescript/native-preview@7.0.0-dev.20260421.2)(prisma@7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(@typescript/native-preview@7.0.0-dev.20260421.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
       '@std/cache':
         specifier: jsr:^0.2.0
         version: '@jsr/std__cache@0.2.0'
@@ -55,7 +55,7 @@ importers:
         version: 6.1.0
       prisma:
         specifier: ^7.6.0
-        version: 7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.2)
+        version: 7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(@typescript/native-preview@7.0.0-dev.20260421.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
         specifier: ^19.2.0
         version: 19.2.4
@@ -115,8 +115,8 @@ importers:
         specifier: ^8.20.0
         version: 8.20.0
       typescript:
-        specifier: ^6.0.2
-        version: 6.0.2
+        specifier: npm:@typescript/native-preview@beta
+        version: '@typescript/native-preview@7.0.0-dev.20260421.2'
       vite:
         specifier: ^8.0.10
         version: 8.0.10(@types/node@22.17.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
@@ -1931,6 +1931,45 @@ packages:
   '@typescript-eslint/visitor-keys@8.48.1':
     resolution: {integrity: sha512-BmxxndzEWhE4TIEEMBs8lP3MBWN3jFPs/p6gPm/wkv02o41hI6cq9AuSmGAaTTHPtA1FTi2jBre4A9rm5ZmX+Q==, tarball: https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-8.48.1.tgz}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-fHv1r3ZmVo6zxuAIFmuX3w9QxbcauoG0SsWhmDwm6VmRubLlOJIcmTtlmV3JAb9oOnq8LuzZljzT7Q39fSMQDw==, tarball: https://registry.npmjs.org/@typescript/native-preview-darwin-arm64/-/native-preview-darwin-arm64-7.0.0-dev.20260421.2.tgz}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-KWTR6xbW9t+JS7D5DQIzo75pqVXVWUxF9PMv/+S6xsnOjCVd6g0ixHcFpFMJMKSUQpGPr8Z5f7b8ks6LHW01jg==, tarball: https://registry.npmjs.org/@typescript/native-preview-darwin-x64/-/native-preview-darwin-x64-7.0.0-dev.20260421.2.tgz}
+    cpu: [x64]
+    os: [darwin]
+
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-VLMEuml3BhUb+jaL0TXQ4xvVODxJF+RhkI+tBWvlynsJI4khTXEiwWh+wPOJrsfBRYFRMXEu28Odl/HXkYze8w==, tarball: https://registry.npmjs.org/@typescript/native-preview-linux-arm64/-/native-preview-linux-arm64-7.0.0-dev.20260421.2.tgz}
+    cpu: [arm64]
+    os: [linux]
+
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-BWLQO3nemLDSV5PoE5GPHe1dU9Dth77Kv8/cle9Ujcp4LhPo0KincdPqFH/qKeU/xvW25mgFueflZ1nc4rKuww==, tarball: https://registry.npmjs.org/@typescript/native-preview-linux-arm/-/native-preview-linux-arm-7.0.0-dev.20260421.2.tgz}
+    cpu: [arm]
+    os: [linux]
+
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-qUrJWTB5/wv4wnRG0TRXElAxc2kykNiRNyEIEqBbLmzDlrcvAW7RRy8MXoY1ZyTiKGMu14itZ3x9oW6+blFpRw==, tarball: https://registry.npmjs.org/@typescript/native-preview-linux-x64/-/native-preview-linux-x64-7.0.0-dev.20260421.2.tgz}
+    cpu: [x64]
+    os: [linux]
+
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-Rc6NsWlZmCs5YUKVzKgwoBOoRUGsPzct4BDMRX0csD1devLBBc4AbUXWKsJRbpwIAnqMO1ld4sNHEb+wXgfNHQ==, tarball: https://registry.npmjs.org/@typescript/native-preview-win32-arm64/-/native-preview-win32-arm64-7.0.0-dev.20260421.2.tgz}
+    cpu: [arm64]
+    os: [win32]
+
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-GQv1+dya1t6EqF2Cpsb+xoozovdX10JUSf6Kl/8xNkTapzmlHd+uMr+8ku3jIASTxoRGn0Mklgjj3MDKrOTuLg==, tarball: https://registry.npmjs.org/@typescript/native-preview-win32-x64/-/native-preview-win32-x64-7.0.0-dev.20260421.2.tgz}
+    cpu: [x64]
+    os: [win32]
+
+  '@typescript/native-preview@7.0.0-dev.20260421.2':
+    resolution: {integrity: sha512-CmajHI25HpVWE9R1XFoxr+cphJPxoYD3eFioQtAvXYkMFKnLdICMS9pXre9Pybizb75ejRxjKD5/CVG055rEIg==, tarball: https://registry.npmjs.org/@typescript/native-preview/-/native-preview-7.0.0-dev.20260421.2.tgz}
+    hasBin: true
 
   '@vercel/nft@0.29.4':
     resolution: {integrity: sha512-6lLqMNX3TuycBPABycx7A9F1bHQR7kiQln6abjFbPrf5C/05qHM9M5E4PeTE59c7z8g6vHnx1Ioihb2AQl7BTA==, tarball: https://registry.npmjs.org/@vercel/nft/-/nft-0.29.4.tgz}
@@ -4218,11 +4257,6 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@6.0.2:
-    resolution: {integrity: sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==, tarball: https://registry.npmjs.org/typescript/-/typescript-6.0.2.tgz}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   ufo@1.6.3:
     resolution: {integrity: sha512-yDJTmhydvl5lJzBmy/hyOAA0d+aqCBuwl818haVdYCRrWV84o7YyeVm4QlVHStqNrrJSTb6jKuFAVqAFsr+K3Q==, tarball: https://registry.npmjs.org/ufo/-/ufo-1.6.3.tgz}
 
@@ -5830,12 +5864,12 @@ snapshots:
 
   '@prisma/client-runtime-utils@7.6.0': {}
 
-  '@prisma/client@7.6.0(prisma@7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.2))(typescript@6.0.2)':
+  '@prisma/client@7.6.0(@typescript/native-preview@7.0.0-dev.20260421.2)(prisma@7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(@typescript/native-preview@7.0.0-dev.20260421.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
     dependencies:
       '@prisma/client-runtime-utils': 7.6.0
     optionalDependencies:
-      prisma: 7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.2)
-      typescript: 6.0.2
+      prisma: 7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(@typescript/native-preview@7.0.0-dev.20260421.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      typescript: '@typescript/native-preview@7.0.0-dev.20260421.2'
 
   '@prisma/config@7.6.0':
     dependencies:
@@ -5850,7 +5884,7 @@ snapshots:
 
   '@prisma/debug@7.6.0': {}
 
-  '@prisma/dev@0.24.3(typescript@6.0.2)':
+  '@prisma/dev@0.24.3(@typescript/native-preview@7.0.0-dev.20260421.2)':
     dependencies:
       '@electric-sql/pglite': 0.4.1
       '@electric-sql/pglite-socket': 0.1.1(@electric-sql/pglite@0.4.1)
@@ -5867,7 +5901,7 @@ snapshots:
       proper-lockfile: 4.1.2
       remeda: 2.33.4
       std-env: 3.10.0
-      valibot: 1.2.0(typescript@6.0.2)
+      valibot: 1.2.0(@typescript/native-preview@7.0.0-dev.20260421.2)
       zeptomatch: 2.1.0
     transitivePeerDependencies:
       - typescript
@@ -6362,6 +6396,37 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.48.1
       eslint-visitor-keys: 4.2.1
+
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260421.2':
+    optional: true
+
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20260421.2':
+    optional: true
+
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20260421.2':
+    optional: true
+
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20260421.2':
+    optional: true
+
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20260421.2':
+    optional: true
+
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20260421.2':
+    optional: true
+
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20260421.2':
+    optional: true
+
+  '@typescript/native-preview@7.0.0-dev.20260421.2':
+    optionalDependencies:
+      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20260421.2
+      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20260421.2
+      '@typescript/native-preview-linux-arm': 7.0.0-dev.20260421.2
+      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20260421.2
+      '@typescript/native-preview-linux-x64': 7.0.0-dev.20260421.2
+      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260421.2
+      '@typescript/native-preview-win32-x64': 7.0.0-dev.20260421.2
 
   '@vercel/nft@0.29.4':
     dependencies:
@@ -8158,16 +8223,16 @@ snapshots:
 
   prettier@3.8.1: {}
 
-  prisma@7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.2):
+  prisma@7.6.0(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(@typescript/native-preview@7.0.0-dev.20260421.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@prisma/config': 7.6.0
-      '@prisma/dev': 0.24.3(typescript@6.0.2)
+      '@prisma/dev': 0.24.3(@typescript/native-preview@7.0.0-dev.20260421.2)
       '@prisma/engines': 7.6.0
       '@prisma/studio-core': 0.27.3(@types/react-dom@19.1.9(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       mysql2: 3.15.3
       postgres: 3.4.7
     optionalDependencies:
-      typescript: 6.0.2
+      typescript: '@typescript/native-preview@7.0.0-dev.20260421.2'
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
@@ -8676,8 +8741,6 @@ snapshots:
 
   typescript@5.9.2: {}
 
-  typescript@6.0.2: {}
-
   ufo@1.6.3: {}
 
   ulid@3.0.2: {}
@@ -8759,9 +8822,9 @@ snapshots:
 
   uuid@13.0.0: {}
 
-  valibot@1.2.0(typescript@6.0.2):
+  valibot@1.2.0(@typescript/native-preview@7.0.0-dev.20260421.2):
     optionalDependencies:
-      typescript: 6.0.2
+      typescript: '@typescript/native-preview@7.0.0-dev.20260421.2'
 
   validate-npm-package-license@3.0.4:
     dependencies:
