@@ -1,0 +1,13 @@
+import { createServerFn } from "@tanstack/react-start";
+import { object, string } from "zod";
+import { requireAuth } from "~/lib/authMiddleware";
+import { prisma } from "~/lib/prisma";
+
+const inputSchema = object({
+  id: string(),
+});
+
+export const deleteCategorizationRule = createServerFn({ method: "POST" })
+  .inputValidator(inputSchema)
+  .middleware([requireAuth])
+  .handler(({ data: { id } }) => prisma.categorizationRule.delete({ where: { id } }));

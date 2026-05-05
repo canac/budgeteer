@@ -49,6 +49,7 @@ model Category {
   budgetCategories      BudgetCategory[]
   transfersFrom         Transfer[]            @relation("TransferSource")
   transfersTo           Transfer[]            @relation("TransferDestination")
+  categorizationRules   CategorizationRule[]
 }
 
 model BudgetCategory {
@@ -75,6 +76,7 @@ model Transaction {
   description           String?
   transactionCategories TransactionCategory[]
   transfer              Transfer?
+  tellerId              String?               @unique
 }
 
 model TransactionCategory {
@@ -98,7 +100,50 @@ model Transfer {
   sourceCategoryId      String
   destinationCategoryId String
   transactionId         String      @unique
-  transaction           Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   sourceCategory        Category    @relation("TransferSource", fields: [sourceCategoryId], references: [id], onDelete: Cascade)
   destinationCategory   Category    @relation("TransferDestination", fields: [destinationCategoryId], references: [id], onDelete: Cascade)
+  transaction           Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+model TellerEnrollment {
+  id          String          @id // The teller ID
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  accessToken String
+  accounts    TellerAccount[]
+}
+
+model TellerAccount {
+  id           String              @id // The teller ID
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  name         String
+  institution  String
+  enabled      Boolean             @default(true)
+  lastSyncedAt DateTime?
+  enrollmentId String
+  enrollment   TellerEnrollment    @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  transactions TellerTransaction[]
+}
+
+model TellerTransaction {
+  id        String        @id // The teller ID
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  amount    Int
+  date      String
+  vendor    String
+  reviewed  Boolean       @default(false)
+  accountId String
+  account   TellerAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model CategorizationRule {
+  id           String    @id @default(uuid(7))
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  tellerVendor String    @unique
+  vendor       String
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
 }

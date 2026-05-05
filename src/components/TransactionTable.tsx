@@ -100,7 +100,7 @@ export function TransactionTable({
                     variant="subtle"
                     color="blue"
                     onClick={() => handleEditTransaction(transaction)}
-                    disabled={transaction.type === "TRANSACTION"}
+                    disabled={transaction.type !== "TRANSACTION"}
                   >
                     <IconEdit />
                   </ActionIcon>

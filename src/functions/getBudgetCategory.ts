@@ -6,7 +6,7 @@ import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance, calculateCategoryStartingBalance } from "~/lib/calculateBalance";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
-import { isCategoryDeletable } from "~/lib/validation";
+import { validateCategoryDeletion } from "~/lib/validation";
 import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
@@ -72,6 +72,6 @@ export const getBudgetCategory = createServerFn()
         amount,
       })),
       month,
-      deletable: await isCategoryDeletable(categoryId, monthString),
+      deletable: await validateCategoryDeletion(categoryId, monthString),
     };
   });

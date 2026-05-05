@@ -37,6 +37,7 @@ interface EditTransaction {
   vendor: string;
   description: string | null;
   date: string;
+  tellerId: string | null;
   transactionCategories: Array<{
     id: string;
     amount: number;
@@ -95,6 +96,7 @@ export function TransactionModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isEditing = !!editingTransaction;
+  const external = !!editingTransaction?.tellerId;
 
   const form = useForm({
     validateInputOnBlur: true,
@@ -229,6 +231,7 @@ export function TransactionModal({
             label="Income"
             key={form.key("isIncome")}
             {...form.getInputProps("isIncome", { type: "checkbox" })}
+            disabled={external}
           />
           <NumberInput
             label="Amount"
@@ -236,6 +239,7 @@ export function TransactionModal({
             key={form.key("amount")}
             {...form.getInputProps("amount")}
             required
+            disabled={external}
             min={0}
             decimalScale={2}
             fixedDecimalScale
@@ -258,6 +262,7 @@ export function TransactionModal({
             key={form.key("date")}
             {...form.getInputProps("date")}
             required
+            disabled={external}
             min={firstMonth ?? undefined}
           />
           <MultiSelect

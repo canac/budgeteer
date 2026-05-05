@@ -2,6 +2,8 @@
 import mantineChartsCss from "@mantine/charts/styles.css?url";
 import { mantineHtmlProps, MantineProvider } from "@mantine/core";
 import mantineCss from "@mantine/core/styles.css?url";
+import { Notifications } from "@mantine/notifications";
+import mantineNotificationsCss from "@mantine/notifications/styles.css?url";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import globalCss from "~/global.css?url";
@@ -11,6 +13,7 @@ export const Route = createRootRoute({
     links: [
       { rel: "stylesheet", href: mantineCss },
       { rel: "stylesheet", href: mantineChartsCss },
+      { rel: "stylesheet", href: mantineNotificationsCss },
       { rel: "stylesheet", href: globalCss },
     ],
   }),
@@ -25,6 +28,7 @@ function RootComponent() {
       </head>
       <body>
         <MantineProvider>
+          <Notifications />
           <Outlet />
         </MantineProvider>
         <TanStackRouterDevtools position="bottom-right" />

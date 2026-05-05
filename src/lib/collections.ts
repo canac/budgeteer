@@ -5,3 +5,7 @@ export function find<T, K extends keyof T>(array: T[], key: K, value: T[K]): T |
 export function pluck<T, K extends keyof T>(array: T[], field: K): T[K][] {
   return array.map((item) => item[field]);
 }
+
+export function range(size: number): number[] {
+  return Array.from({ length: size }, (_, index) => index);
+}

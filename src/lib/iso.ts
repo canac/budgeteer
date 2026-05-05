@@ -9,15 +9,15 @@ function pad(num: number, length: number): string {
  * Convert a Date to a month string in "YYYY-MM" format
  */
 export function toISOMonthString(date: Date): string {
-  return toISODateString(date).slice(0, 7);
+  const year = pad(date.getFullYear(), 4);
+  const month = pad(date.getMonth() + 1, 2);
+  return `${year}-${month}`;
 }
 
 /**
  * Convert a Date to a date string in "YYYY-MM-DD" format
  */
 export function toISODateString(date: Date): string {
-  const year = pad(date.getFullYear(), 4);
-  const month = pad(date.getMonth() + 1, 2);
   const day = pad(date.getDate(), 2);
-  return `${year}-${month}-${day}`;
+  return `${toISOMonthString(date)}-${day}`;
 }

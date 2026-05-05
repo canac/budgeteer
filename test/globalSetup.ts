@@ -1,33 +1,42 @@
 import "dotenv/config";
-import type { TestProject } from "vitest/node";
 import { exec } from "node:child_process";
+import { randomUUID } from "node:crypto";
+import { mkdir, rm, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { promisify } from "node:util";
-import { connect } from "./helpers";
+import { Client } from "pg";
 
 const execAsync = promisify(exec);
+const CACHE_DIR = path.join(process.cwd(), "node_modules", ".cache", "vitest-db");
 
-declare module "vitest" {
-  export interface ProvidedContext {
-    schema: string;
-  }
-}
+export async function setup() {
+  const runId = randomUUID().replace(/-/g, "").slice(0, 12);
+  await mkdir(CACHE_DIR, { recursive: true });
 
-export async function setup(project: TestProject) {
-  const schema = `test_${crypto.randomUUID().replace(/-/g, "")}`;
+  const { stdout: ddl } = await execAsync(
+    "pnpm prisma migrate diff --from-empty --to-schema ./prisma/schema.prisma --script",
+  );
+  const ddlPath = path.join(CACHE_DIR, `${runId}.sql`);
+  await writeFile(ddlPath, ddl);
 
-  const url = new URL(process.env.DATABASE_URL!);
-  url.searchParams.set("schema", schema);
-  const connectionString = url.toString();
-
-  await execAsync("pnpm db:push", {
-    env: { ...process.env, DATABASE_URL: connectionString },
-  });
-
-  const prisma = connect(schema);
-  project.provide("schema", schema);
+  process.env.TEST_RUN_ID = runId;
+  process.env.TEST_DDL_PATH = ddlPath;
 
   return async () => {
-    await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schema}" CASCADE;`);
-    await prisma.$disconnect();
+    const client = new Client({ connectionString: process.env.DATABASE_URL });
+    await client.connect();
+    try {
+      const { rows } = await client.query<{ schema_name: string }>(
+        `SELECT schema_name::text FROM information_schema.schemata
+         WHERE schema_name LIKE $1`,
+        [`test_${runId}_%`],
+      );
+      for (const { schema_name } of rows) {
+        await client.query(`DROP SCHEMA IF EXISTS "${schema_name}" CASCADE`);
+      }
+    } finally {
+      await client.end();
+    }
+    await rm(ddlPath, { force: true });
   };
 }

@@ -1,4 +1,4 @@
-import { ActionIcon, AppShell, Box, Container, Group } from "@mantine/core";
+import { ActionIcon, AppShell, Box, Container, Group, Indicator } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconArrowsExchange, IconHome, IconList, IconLogout, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useParams, useRouter } from "@tanstack/react-router";
@@ -8,15 +8,21 @@ import { CategorySelector } from "~/components/CategorySelector";
 import { DynamicNewTransferModal } from "~/components/DynamicNewTransferModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
+import { MantineLink } from "~/components/MantineLink";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { getCategories } from "~/functions/getCategories";
+import { getUnreviewedTransactionCount } from "~/functions/getUnreviewedTransactionCount";
 import { logout as logoutServerFn } from "~/functions/logout";
 
 export const Route = createFileRoute("/_layout")({
   component: LayoutRoute,
   loader: async () => {
-    const [budgetMonths, categories] = await Promise.all([getBudgetMonths(), getCategories()]);
-    return { budgetMonths, categories };
+    const [budgetMonths, categories, unreviewedCount] = await Promise.all([
+      getBudgetMonths(),
+      getCategories(),
+      getUnreviewedTransactionCount(),
+    ]);
+    return { budgetMonths, categories, unreviewedCount };
   },
 });
 
@@ -26,7 +32,7 @@ function LayoutRoute() {
   const [transactionOpened, { open: openTransaction, close: closeTransaction }] =
     useDisclosure(false);
   const [transferOpened, { open: openTransfer, close: closeTransfer }] = useDisclosure(false);
-  const { budgetMonths, categories } = Route.useLoaderData();
+  const { budgetMonths, categories, unreviewedCount } = Route.useLoaderData();
   const month = useParams({
     from: "/_layout/budget/$month",
     shouldThrow: false,
@@ -67,6 +73,18 @@ function LayoutRoute() {
               </MantineActionIconLink>
               <BudgetMonthSelector budgetMonths={budgetMonths} currentMonth={month ?? null} />
               <CategorySelector categories={categories} currentCategory={category ?? null} />
+              <Indicator
+                label={unreviewedCount}
+                showZero={false}
+                maxValue={99}
+                size={16}
+                color="red"
+                offset={{ x: -16, y: 4 }}
+              >
+                <MantineLink to="/import" c="white" fw="bold">
+                  Import
+                </MantineLink>
+              </Indicator>
               <Box flex={1} />
               <Group gap="xs">
                 {month && (

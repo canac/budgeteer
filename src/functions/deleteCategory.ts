@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
-import { isCategoryDeletable } from "~/lib/validation";
+import { ensureValid, validateCategoryDeletion } from "~/lib/validation";
 import { monthString } from "~/lib/zod";
 
 const inputSchema = object({
@@ -14,11 +14,7 @@ export const deleteCategory = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, month } }) => {
-    if (!(await isCategoryDeletable(categoryId, month))) {
-      throw new Error(
-        "Cannot delete category: it has transactions in the current or future months",
-      );
-    }
+    ensureValid(await validateCategoryDeletion(categoryId, month));
 
     await prisma.category.update({
       where: { id: categoryId },

@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
@@ -111,15 +112,20 @@ function CategoryDetailsPage() {
       title={
         <Group>
           <EditableName name={budgetCategory.category.name} saveName={handleSaveCategoryName} />
-          <ActionIcon
-            color="red"
-            onClick={() => openDeleteModal()}
-            disabled={!budgetCategory.deletable}
-            title="Delete category"
-            size="md"
+          <Tooltip
+            label={!budgetCategory.deletable.valid && budgetCategory.deletable.message}
+            disabled={budgetCategory.deletable.valid}
           >
-            <IconTrash />
-          </ActionIcon>
+            <ActionIcon
+              color="red"
+              onClick={() => openDeleteModal()}
+              disabled={!budgetCategory.deletable.valid}
+              title="Delete category"
+              size="md"
+            >
+              <IconTrash />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       }
       position="right"
@@ -197,7 +203,7 @@ function CategoryDetailsPage() {
           />
         </div>
       </Stack>
-      {deleteModalOpen && budgetCategory.deletable && (
+      {deleteModalOpen && budgetCategory.deletable.valid && (
         <DynamicDeleteCategoryModal
           onClose={() => closeDeleteModal()}
           category={budgetCategory.category}
