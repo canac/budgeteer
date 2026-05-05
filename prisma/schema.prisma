@@ -119,6 +119,7 @@ model TellerAccount {
   updatedAt    DateTime            @updatedAt
   name         String
   institution  String
+  creditCard   Boolean             @default(false)
   enabled      Boolean             @default(true)
   lastSyncedAt DateTime?
   enrollmentId String

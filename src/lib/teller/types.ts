@@ -3,6 +3,7 @@ import z, { array, literal, object, string, union } from "zod";
 export const tellerAccountSchema = object({
   id: string(),
   name: string(),
+  type: string(),
   institution: object({
     name: string(),
   }),

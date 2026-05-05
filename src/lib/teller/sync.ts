@@ -38,12 +38,14 @@ export async function syncAccount(
     (tx) => tx.status === "posted" && tx.date >= syncStartIso,
   );
 
+  const sign = account.creditCard ? -1 : 1;
+
   let imported = 0;
   for await (const batch of chunks(transactions, TRANSACTION_BATCH_SIZE)) {
     const { count } = await prisma.tellerTransaction.createMany({
       data: batch.map((tx) => ({
         id: tx.id,
-        amount: dollarsToPennies(parseFloat(tx.amount)),
+        amount: sign * dollarsToPennies(parseFloat(tx.amount)),
         date: tx.date,
         vendor: tx.details.counterparty?.name ?? tx.description,
         accountId: account.id,
@@ -72,6 +74,7 @@ async function syncAccounts(
       id: account.id,
       name: account.name,
       institution: account.institution.name,
+      creditCard: account.type === "credit",
       enrollmentId: enrollment.id,
     })),
     skipDuplicates: true,

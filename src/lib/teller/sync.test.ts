@@ -21,6 +21,7 @@ function apiAccount(fields?: Partial<TellerApiAccount>): TellerApiAccount {
   return {
     id: "acc_remote",
     name: "Checking",
+    type: "depository",
     institution: { name: "Chase" },
     ...fields,
   };
@@ -234,6 +235,32 @@ describe("syncAccount", () => {
     expect(ts).toBeLessThanOrEqual(after);
   });
 
+  it("negates amounts for credit card accounts", async () => {
+    const { enrollment } = await seedAccount();
+    const ccAccount = await createTellerAccount({
+      id: "acc_cc",
+      creditCard: true,
+      enrollment: { connect: { id: enrollment.id } },
+    });
+    await createBudget({ month: "2026-04" });
+
+    interceptTransactions(ccAccount.id, [
+      apiTransaction({ id: "t_charge", amount: "12.34", date: "2026-04-15" }),
+      apiTransaction({ id: "t_payment", amount: "-50.00", date: "2026-04-16" }),
+    ]);
+
+    await syncAccount(ccAccount, enrollment);
+
+    const stored = await prisma.tellerTransaction.findMany({
+      where: { accountId: ccAccount.id },
+      orderBy: { id: "asc" },
+    });
+    expect(stored.map((tx) => [tx.id, tx.amount])).toEqual([
+      ["t_charge", -1234],
+      ["t_payment", 5000],
+    ]);
+  });
+
   it("sends the access token in the Authorization header", async () => {
     const { enrollment, account } = await seedAccount();
     await createBudget({ month: "2026-04" });
@@ -286,6 +313,31 @@ describe("syncEnrollment", () => {
 
     const txs = await prisma.tellerTransaction.findMany();
     expect(pluck(txs, "accountId")).toEqual(["acc_new_enabled"]);
+  });
+
+  it("sets creditCard for accounts with type credit", async () => {
+    await createBudget({ month: "2026-04" });
+    const enrollment = await createTellerEnrollment({ accessToken: "tok_test" });
+
+    interceptAccounts([
+      apiAccount({ id: "acc_check", type: "depository" }),
+      apiAccount({ id: "acc_card", type: "credit" }),
+    ]);
+    interceptTransactions("acc_check", []);
+    interceptTransactions("acc_card", []);
+
+    const enrollmentWithAccounts = await prisma.tellerEnrollment.findUniqueOrThrow({
+      where: { id: enrollment.id },
+      include: { accounts: true },
+    });
+
+    await syncEnrollment(enrollmentWithAccounts);
+
+    const accounts = await prisma.tellerAccount.findMany({ orderBy: { id: "asc" } });
+    expect(accounts.map((account) => [account.id, account.creditCard])).toEqual([
+      ["acc_card", true],
+      ["acc_check", false],
+    ]);
   });
 
   it("sums imported counts across multiple enabled accounts", async () => {
