@@ -2,6 +2,7 @@ import { Button, ButtonGroup, Card, Group, Stack, Text, Title } from "@mantine/c
 import { partition } from "@std/collections";
 import { IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
+import { parseISO } from "date-fns";
 import { useState } from "react";
 import type { CategoryType } from "~/prisma/enums";
 import { EditableAmount } from "~/components/EditableAmount";
@@ -13,7 +14,7 @@ import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { updateCategory } from "~/functions/updateCategory";
-import { formatCurrency } from "~/lib/formatters";
+import { formatCurrency, monthFormatter } from "~/lib/formatters";
 import "./BudgetPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month")({
@@ -24,6 +25,10 @@ export const Route = createFileRoute("/_layout/budget/$month")({
       getBudgetMonths(),
     ]);
     return { ...budget, budgetMonths };
+  },
+  head: ({ params }) => {
+    const month = monthFormatter.format(parseISO(params.month));
+    return { meta: [{ title: `${month} | Budgeteer` }] };
   },
 });
 

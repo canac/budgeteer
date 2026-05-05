@@ -19,6 +19,7 @@ const formSchema = object({
 export const Route = createFileRoute("/login")({
   beforeLoad: () => checkLogin(),
   component: LoginPage,
+  head: () => ({ meta: [{ title: "Login | Budgeteer" }] }),
 });
 
 function LoginPage() {

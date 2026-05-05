@@ -24,6 +24,7 @@ export const Route = createFileRoute("/_layout/import/")({
   loaderDeps: ({ search: { page } }) => ({ page }),
   loader: ({ deps: { page } }) =>
     getUnreviewedTransactions({ data: { page, pageSize: PAGE_SIZE } }),
+  head: () => ({ meta: [{ title: "Import Transactions | Budgeteer" }] }),
 });
 
 function ImportTransactionsPage() {

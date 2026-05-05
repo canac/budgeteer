@@ -3,6 +3,7 @@ import { createFileRoute, Outlet, useMatchRoute, useNavigate } from "@tanstack/r
 
 export const Route = createFileRoute("/_layout/import")({
   component: ImportLayout,
+  head: () => ({ meta: [{ title: "Import | Budgeteer" }] }),
 });
 
 function ImportLayout() {

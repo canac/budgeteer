@@ -8,6 +8,7 @@ import { formatCurrency, monthFormatter, percentageFormatter } from "~/lib/forma
 export const Route = createFileRoute("/_layout/")({
   component: OverviewPage,
   loader: () => getOverview(),
+  head: () => ({ meta: [{ title: "Overview | Budgeteer" }] }),
 });
 
 function OverviewPage() {

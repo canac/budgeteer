@@ -5,6 +5,7 @@ import { getCategorizationRules } from "~/functions/getCategorizationRules";
 export const Route = createFileRoute("/_layout/import/rules")({
   component: ImportRulesPage,
   loader: () => getCategorizationRules(),
+  head: () => ({ meta: [{ title: "Rules | Budgeteer" }] }),
 });
 
 function ImportRulesPage() {

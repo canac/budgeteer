@@ -10,6 +10,7 @@ import globalCss from "~/global.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
+    meta: [{ title: "Budgeteer" }],
     links: [
       { rel: "stylesheet", href: mantineCss },
       { rel: "stylesheet", href: mantineChartsCss },

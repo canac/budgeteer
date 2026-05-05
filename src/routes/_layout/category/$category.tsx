@@ -45,6 +45,9 @@ export const Route = createFileRoute("/_layout/category/$category")({
       },
     });
   },
+  head: ({ loaderData }) => ({
+    meta: [{ title: `${loaderData?.category.name ?? "Category"} | Budgeteer` }],
+  }),
 });
 
 const monthOptions = [

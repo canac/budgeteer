@@ -66,6 +66,7 @@ function loadTellerScript(): Promise<void> {
 export const Route = createFileRoute("/_layout/import/accounts")({
   component: AccountsPage,
   loader: () => getTellerAccounts(),
+  head: () => ({ meta: [{ title: "Import Accounts | Budgeteer" }] }),
 });
 
 function AccountsPage() {

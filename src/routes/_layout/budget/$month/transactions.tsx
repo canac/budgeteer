@@ -12,7 +12,7 @@ import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { MantineLink } from "~/components/MantineLink";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
 import { useOpened } from "~/hooks/useOpened";
-import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
+import { formatCurrency, monthFormatter, shortDateFormatter } from "~/lib/formatters";
 
 type DeleteTransaction = DeleteTransactionModalProps["transaction"];
 type EditTransaction = TransactionModalProps["editingTransaction"];
@@ -22,6 +22,12 @@ export const Route = createFileRoute("/_layout/budget/$month/transactions")({
   loader: async ({ params: { month } }) => {
     const transactions = await getBudgetTransactions({ data: { month } });
     return { transactions };
+  },
+  head: ({ params }) => {
+    const month = monthFormatter.format(parseISO(params.month));
+    return {
+      meta: [{ title: `Transactions - ${month} | Budgeteer` }],
+    };
   },
 });
 
