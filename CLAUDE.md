@@ -1,6 +1,6 @@
 ## Helpers
 
-Use collections helpers in `src/lib/collections.ts`
+Use collections helpers in `src/lib/collections.ts`.
 
 - Use `find(array, 'id', id)` instead of `array.find(item => item.id === id)`
 - Use `pluck(arr, 'id')` instead of `arr.map(item => item.id`
@@ -16,3 +16,7 @@ The only allowed abbreviations are:
 ## Tests
 
 Use helpers in `test/mocks.ts` to generate test data.
+
+## Package Manager
+
+Use `pnpm` to manage dependencies and run scripts.
