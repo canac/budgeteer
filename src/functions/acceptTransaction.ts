@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { array, boolean, number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
+import { formatTellerVendor } from "~/lib/teller/formatVendor";
 
 const overrideSchema = object({
   vendor: string().min(1),
@@ -34,7 +35,7 @@ export const acceptTransaction = createServerFn({ method: "POST" })
       where: { tellerVendor: tellerTransaction.vendor },
     });
 
-    const vendor = override?.vendor ?? rule?.vendor ?? tellerTransaction.vendor;
+    const vendor = override?.vendor ?? rule?.vendor ?? formatTellerVendor(tellerTransaction.vendor);
     const categories =
       override?.categories ??
       (rule?.categoryId ? [{ categoryId: rule.categoryId, amount: tellerTransaction.amount }] : []);

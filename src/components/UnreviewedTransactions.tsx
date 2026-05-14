@@ -5,6 +5,7 @@ import { parseISO } from "date-fns";
 import { useState } from "react";
 import { DynamicImportTransactionModal } from "~/components/DynamicImportTransactionModal";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
+import { formatTellerVendor } from "~/lib/teller/formatVendor";
 import "./UnreviewedTransactions.css";
 
 interface Transaction {
@@ -111,7 +112,8 @@ export function UnreviewedTransactions({
             id: importingTransaction.id,
             amount: importingTransaction.amount,
             tellerVendor: importingTransaction.vendor,
-            vendor: importingTransaction.rule?.vendor ?? importingTransaction.vendor,
+            vendor:
+              importingTransaction.rule?.vendor ?? formatTellerVendor(importingTransaction.vendor),
             categoryId: importingTransaction.rule?.category?.id ?? null,
           }}
         />

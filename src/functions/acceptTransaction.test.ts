@@ -22,7 +22,7 @@ describe("acceptTransaction", () => {
     expect(transaction).toMatchObject({
       amount: -1000,
       date: "2025-01-15",
-      vendor: "AMZN MKTP",
+      vendor: "Amzn Mktp",
       tellerId: teller.id,
     });
     expect(
