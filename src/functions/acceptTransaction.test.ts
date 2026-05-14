@@ -16,21 +16,20 @@ describe("acceptTransaction", () => {
     });
   });
 
-  it("creates an empty transaction and marks reviewed when no rule or override exists", async () => {
-    const transaction = await acceptTransaction({ data: { id: teller.id } });
-
-    expect(transaction).toMatchObject({
-      amount: -1000,
-      date: "2025-01-15",
-      vendor: "Amzn Mktp",
-      tellerId: teller.id,
-    });
-    expect(
-      await prisma.transactionCategory.findMany({ where: { transactionId: transaction.id } }),
-    ).toEqual([]);
-
-    const updated = await prisma.tellerTransaction.findUniqueOrThrow({ where: { id: teller.id } });
-    expect(updated.reviewed).toBe(true);
+  it("rejects when override has no categories", async () => {
+    await expect(() =>
+      acceptTransaction({
+        data: {
+          id: teller.id,
+          override: {
+            vendor: "Amazon",
+            categories: [],
+            updateRuleVendor: false,
+            updateRuleCategory: false,
+          },
+        },
+      }),
+    ).rejects.toThrow("Too small");
   });
 
   it("uses an existing rule for vendor and category", async () => {

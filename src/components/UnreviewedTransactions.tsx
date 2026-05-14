@@ -79,6 +79,7 @@ export function UnreviewedTransactions({
                   variant="subtle"
                   color="green"
                   aria-label="Accept"
+                  style={{ visibility: transaction.rule?.category ? undefined : "hidden" }}
                   onClick={() => onAccept(transaction.id)}
                 >
                   <IconCheck />

@@ -11,7 +11,7 @@ const overrideSchema = object({
       categoryId: string(),
       amount: number().int(),
     }),
-  ),
+  ).min(1),
   updateRuleVendor: boolean(),
   updateRuleCategory: boolean(),
 }).refine((value) => !value.updateRuleCategory || value.categories.length === 1, {
