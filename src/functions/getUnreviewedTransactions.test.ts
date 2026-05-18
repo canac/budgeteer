@@ -63,10 +63,12 @@ describe("getUnreviewedTransactions", () => {
 
     const { transactions } = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10 } });
 
-    expect(transactions.find((tx) => tx.vendor === "AMAZON")?.rule).toEqual({
-      vendor: "Amazon",
-      category: expect.objectContaining({ id: category.id, name: "Shopping" }),
-    });
+    expect(transactions.find((tx) => tx.vendor === "AMAZON")?.rule).toEqual(
+      expect.objectContaining({
+        vendor: "Amazon",
+        category: { id: category.id, name: "Shopping" },
+      }),
+    );
     expect(transactions.find((tx) => tx.vendor === "UNKNOWN")?.rule).toBeNull();
   });
 });

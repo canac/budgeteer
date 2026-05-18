@@ -3,25 +3,13 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconCheck, IconEdit, IconX } from "@tabler/icons-react";
 import { parseISO } from "date-fns";
 import { useState } from "react";
+import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { DynamicImportTransactionModal } from "~/components/DynamicImportTransactionModal";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
-import { formatTellerVendor } from "~/lib/teller/formatVendor";
 import "./UnreviewedTransactions.css";
 
-interface Transaction {
-  id: string;
-  date: string;
-  vendor: string;
-  amount: number;
-  account: { name: string };
-  rule: {
-    vendor: string;
-    category: { id: string; name: string } | null;
-  } | null;
-}
-
 interface UnreviewedTransactionsProps {
-  transactions: Transaction[];
+  transactions: UnreviewedTransaction[];
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
   onEdit: (id: string) => void;
@@ -34,11 +22,11 @@ export function UnreviewedTransactions({
   onEdit,
 }: UnreviewedTransactionsProps) {
   const [modalOpen, { open, close }] = useDisclosure(false);
-  const [importingTransaction, setImportingTransaction] = useState<Transaction | undefined>(
-    undefined,
-  );
+  const [importingTransaction, setImportingTransaction] = useState<
+    UnreviewedTransaction | undefined
+  >(undefined);
 
-  const openImport = (transaction: Transaction) => {
+  const openImport = (transaction: UnreviewedTransaction) => {
     setImportingTransaction(transaction);
     open();
   };
@@ -109,14 +97,7 @@ export function UnreviewedTransactions({
         <DynamicImportTransactionModal
           onClose={close}
           onSave={handleImport}
-          transaction={{
-            id: importingTransaction.id,
-            amount: importingTransaction.amount,
-            tellerVendor: importingTransaction.vendor,
-            vendor:
-              importingTransaction.rule?.vendor ?? formatTellerVendor(importingTransaction.vendor),
-            categoryId: importingTransaction.rule?.category?.id ?? null,
-          }}
+          transaction={importingTransaction}
         />
       )}
     </>

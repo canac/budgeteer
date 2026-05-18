@@ -27,18 +27,23 @@ export const getUnreviewedTransactions = createServerFn()
 
     const rules = await prisma.categorizationRule.findMany({
       where: { tellerVendor: { in: pluck(transactions, "vendor") } },
-      include: { category: true },
+      include: {
+        category: {
+          select: { id: true, name: true },
+        },
+      },
     });
     const ruleByVendor = new Map(rules.map((rule) => [rule.tellerVendor, rule]));
 
     return {
-      transactions: transactions.map((transaction) => {
-        const rule = ruleByVendor.get(transaction.vendor);
-        return {
-          ...transaction,
-          rule: rule ? { vendor: rule.vendor, category: rule.category } : null,
-        };
-      }),
+      transactions: transactions.map((transaction) => ({
+        ...transaction,
+        rule: ruleByVendor.get(transaction.vendor) ?? null,
+      })),
       total,
     };
   });
+
+export type UnreviewedTransaction = Awaited<
+  ReturnType<typeof getUnreviewedTransactions>
+>["transactions"][number];

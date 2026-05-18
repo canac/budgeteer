@@ -14,7 +14,9 @@ import {
 } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
+import { formatTellerVendor } from "src/lib/teller/formatVendor";
 import { array, boolean, minLength, number, object, string } from "zod/mini";
+import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { acceptTransaction } from "~/functions/acceptTransaction";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { useOpened } from "~/hooks/useOpened";
@@ -24,18 +26,10 @@ import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatters";
 import "./TransactionModal.css";
 
-interface ImportTransaction {
-  id: string;
-  amount: number;
-  tellerVendor: string;
-  vendor: string;
-  categoryId: string | null;
-}
-
 export interface ImportTransactionModalProps {
   onClose: () => void;
   onSave: () => void;
-  transaction: ImportTransaction;
+  transaction: UnreviewedTransaction;
 }
 
 const formSchema = object({
@@ -66,13 +60,13 @@ export function ImportTransactionModal({
   const form = useForm({
     validateInputOnBlur: true,
     initialValues: {
-      vendor: transaction.vendor,
-      selectedCategoryIds: transaction.categoryId ? [transaction.categoryId] : [],
-      categoryAmounts: transaction.categoryId
-        ? [{ categoryId: transaction.categoryId, amount: totalDollars }]
+      vendor: transaction.rule?.vendor ?? formatTellerVendor(transaction.vendor),
+      selectedCategoryIds: transaction.rule?.category ? [transaction.rule.category.id] : [],
+      categoryAmounts: transaction.rule?.category
+        ? [{ categoryId: transaction.rule.category.id, amount: totalDollars }]
         : [],
       updateRuleVendor: true,
-      updateRuleCategory: true,
+      updateRuleCategory: transaction.rule?.category !== null,
     },
     validate: schemaResolver(formSchema, { sync: true }),
   });
@@ -157,7 +151,7 @@ export function ImportTransactionModal({
     >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
-          <TextInput label="Teller Vendor" value={transaction.tellerVendor} disabled />
+          <TextInput label="Teller Vendor" value={transaction.vendor} disabled />
           <Stack gap="xs">
             <TextInput
               label="Vendor"
