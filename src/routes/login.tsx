@@ -47,7 +47,7 @@ function LoginPage() {
   });
 
   return (
-    <Container size="xs" style={{ paddingTop: "20vh" }}>
+    <Container size="xs" style={{ paddingTop: "min(20vh, 12rem)" }}>
       <Paper shadow="md" p="xl" radius="md">
         <Stack gap="lg">
           <div>
