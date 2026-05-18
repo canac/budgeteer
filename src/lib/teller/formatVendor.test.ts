@@ -9,4 +9,8 @@ describe("formatTellerVendor", () => {
   it("preserves hyphenated words", () => {
     expect(formatTellerVendor("H-E-B")).toBe("H-E-B");
   });
+
+  it("lowercases possessives", () => {
+    expect(formatTellerVendor("SAM'S")).toBe("Sam's");
+  });
 });
