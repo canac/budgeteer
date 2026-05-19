@@ -17,7 +17,7 @@ export const getUnreviewedTransactions = createServerFn()
     const [transactions, total] = await Promise.all([
       prisma.tellerTransaction.findMany({
         where,
-        orderBy: [{ date: "desc" }, { vendor: "desc" }],
+        orderBy: [{ date: "desc" }, { id: "asc" }],
         include: { account: true },
         skip: (page - 1) * pageSize,
         take: pageSize,

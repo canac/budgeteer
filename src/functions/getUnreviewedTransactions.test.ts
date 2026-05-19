@@ -5,7 +5,7 @@ import {
   createTellerTransaction,
 } from "test/mocks.ts";
 import { beforeEach, describe, expect, it } from "vitest";
-import { range } from "~/lib/collections";
+import { find, pluck, range } from "~/lib/collections";
 import { getUnreviewedTransactions } from "./getUnreviewedTransactions.ts";
 
 describe("getUnreviewedTransactions", () => {
@@ -26,7 +26,7 @@ describe("getUnreviewedTransactions", () => {
     const result = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10 } });
 
     expect(result.total).toBe(2);
-    expect(result.transactions.map((t) => t.vendor)).toEqual(["B", "A"]);
+    expect(pluck(result.transactions, "vendor")).toEqual(["B", "A"]);
     expect(result.transactions[0].account.id).toBe(accountId);
   });
 
@@ -44,9 +44,9 @@ describe("getUnreviewedTransactions", () => {
     ]);
 
     expect(page1.total).toBe(5);
-    expect(page1.transactions.map((tx) => tx.vendor)).toEqual(["V4", "V3"]);
-    expect(page2.transactions.map((tx) => tx.vendor)).toEqual(["V2", "V1"]);
-    expect(page3.transactions.map((tx) => tx.vendor)).toEqual(["V0"]);
+    expect(pluck(page1.transactions, "vendor")).toEqual(["V4", "V3"]);
+    expect(pluck(page2.transactions, "vendor")).toEqual(["V2", "V1"]);
+    expect(pluck(page3.transactions, "vendor")).toEqual(["V0"]);
   });
 
   it("attaches matching categorization rule with category", async () => {
@@ -63,12 +63,12 @@ describe("getUnreviewedTransactions", () => {
 
     const { transactions } = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10 } });
 
-    expect(transactions.find((tx) => tx.vendor === "AMAZON")?.rule).toEqual(
+    expect(find(transactions, "vendor", "AMAZON")?.rule).toEqual(
       expect.objectContaining({
         vendor: "Amazon",
         category: { id: category.id, name: "Shopping" },
       }),
     );
-    expect(transactions.find((tx) => tx.vendor === "UNKNOWN")?.rule).toBeNull();
+    expect(find(transactions, "vendor", "UNKNOWN")?.rule).toBeNull();
   });
 });
