@@ -42,7 +42,7 @@ export function EditableAmount({
           <input
             className={clsx("input", className)}
             ref={(input) => input?.focus()}
-            inputMode="numeric"
+            inputMode="decimal"
             pattern="-?[0-9]*(\.[0-9]{0,2})?"
             min={0}
             aria-label="Edit amount"
