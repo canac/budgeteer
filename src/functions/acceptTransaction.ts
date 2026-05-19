@@ -6,6 +6,7 @@ import { formatTellerVendor } from "~/lib/teller/formatVendor";
 
 const overrideSchema = object({
   vendor: string().min(1),
+  description: string().optional(),
   categories: array(
     object({
       categoryId: string(),
@@ -55,6 +56,7 @@ export const acceptTransaction = createServerFn({ method: "POST" })
             amount: tellerTransaction.amount,
             date: tellerTransaction.date,
             vendor,
+            description: override?.description,
             tellerId: tellerTransaction.id,
             transactionCategories: {
               create: categories.map(({ categoryId, amount }) => ({ categoryId, amount })),

@@ -34,6 +34,7 @@ export interface ImportTransactionModalProps {
 
 const formSchema = object({
   vendor: string().check(minLength(1, "Vendor is required")),
+  description: string(),
   selectedCategoryIds: array(string()).check(minLength(1, "At least one category is required")),
   categoryAmounts: array(
     object({
@@ -61,6 +62,7 @@ export function ImportTransactionModal({
     validateInputOnBlur: true,
     initialValues: {
       vendor: transaction.rule?.vendor ?? formatTellerVendor(transaction.vendor),
+      description: "",
       selectedCategoryIds: transaction.rule?.category ? [transaction.rule.category.id] : [],
       categoryAmounts: transaction.rule?.category
         ? [{ categoryId: transaction.rule.category.id, amount: totalDollars }]
@@ -126,6 +128,7 @@ export function ImportTransactionModal({
         id: transaction.id,
         override: {
           vendor: values.vendor.trim(),
+          description: values.description.trim() || undefined,
           categories: values.categoryAmounts.map(({ categoryId, amount }) => ({
             categoryId,
             amount: sign * dollarsToPennies(amount),
@@ -165,6 +168,11 @@ export function ImportTransactionModal({
               {...form.getInputProps("updateRuleVendor", { type: "checkbox" })}
             />
           </Stack>
+          <TextInput
+            label="Description"
+            key={form.key("description")}
+            {...form.getInputProps("description")}
+          />
           <Stack gap="xs">
             <MultiSelect
               label="Category"

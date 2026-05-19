@@ -81,6 +81,25 @@ describe("acceptTransaction", () => {
     expect(await prisma.categorizationRule.count()).toBe(0);
   });
 
+  it("sets the description", async () => {
+    const category = await createCategory();
+
+    const transaction = await acceptTransaction({
+      data: {
+        id: teller.id,
+        override: {
+          vendor: "Amazon",
+          description: "Birthday gift",
+          categories: [{ categoryId: category.id, amount: -1000 }],
+          updateRuleVendor: false,
+          updateRuleCategory: false,
+        },
+      },
+    });
+
+    expect(transaction.description).toBe("Birthday gift");
+  });
+
   it("rejects when override category amounts don't sum to the transaction amount", async () => {
     const category = await createCategory();
 
