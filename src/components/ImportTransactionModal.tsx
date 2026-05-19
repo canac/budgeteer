@@ -22,6 +22,7 @@ import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
+import { find } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatters";
 import "./TransactionModal.css";
@@ -91,7 +92,7 @@ export function ImportTransactionModal({
     } else {
       const newCategoryAmounts = value.map(
         (categoryId) =>
-          categoryAmounts.find((category) => category.categoryId === categoryId) ?? {
+          find(categoryAmounts, "categoryId", categoryId) ?? {
             categoryId,
             amount: 0,
           },
@@ -183,7 +184,7 @@ export function ImportTransactionModal({
               searchable
               classNames={{ dropdown: "TransactionModal-dropdown" }}
               renderOption={({ option, checked }) => {
-                const category = categories.find((category) => category.id === option.value);
+                const category = find(categories, "id", option.value);
                 return (
                   category && (
                     <>
@@ -214,9 +215,7 @@ export function ImportTransactionModal({
                 </Alert>
               )}
               {categoryAmounts.map((categoryAmount, index) => {
-                const category = categories.find(
-                  (category) => category.id === categoryAmount.categoryId,
-                );
+                const category = find(categories, "id", categoryAmount.categoryId);
                 return (
                   category && (
                     <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
