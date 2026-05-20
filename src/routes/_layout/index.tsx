@@ -1,5 +1,5 @@
 import { BarChart } from "@mantine/charts";
-import { Card, Container, Group, Stack, Text, Title } from "@mantine/core";
+import { Card, Container, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
 import { getOverview } from "~/functions/getOverview";
@@ -31,7 +31,7 @@ function OverviewPage() {
       <Stack gap="xl">
         <Title order={1}>{monthFormatter.format(parseISO(month))}</Title>
 
-        <Group grow align="stretch">
+        <SimpleGrid cols={{ base: 1, sm: 3 }}>
           <Card shadow="sm" padding="lg" radius="md" withBorder>
             <Stack gap="xs">
               <Text size="sm" c="dimmed" fw={500}>
@@ -64,7 +64,7 @@ function OverviewPage() {
               </Text>
             </Stack>
           </Card>
-        </Group>
+        </SimpleGrid>
 
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Stack gap="md">

@@ -1,42 +1,31 @@
-import { Select } from "@mantine/core";
-import { useRouter } from "@tanstack/react-router";
+import { ScrollArea } from "@mantine/core";
 import { parseISO } from "date-fns";
 import { monthFormatter } from "~/lib/formatters";
-import "./BudgetMonthSelector.css";
+import { MantineNavLink } from "./MantineNavLink";
 
 interface BudgetMonthSelectorProps {
   budgetMonths: string[];
   currentMonth: string | null;
+  onNavigate?: () => void;
 }
 
-export function BudgetMonthSelector({ budgetMonths, currentMonth }: BudgetMonthSelectorProps) {
-  const router = useRouter();
-
-  const options = budgetMonths.map((month) => ({
-    value: month,
-    label: monthFormatter.format(parseISO(month)),
-  }));
-
-  const handleChange = async (value: string | null) => {
-    if (value) {
-      await router.navigate({ to: "/budget/$month", params: { month: value } });
-    }
-  };
-
+export function BudgetMonthSelector({
+  budgetMonths,
+  currentMonth,
+  onNavigate,
+}: BudgetMonthSelectorProps) {
   return (
-    <Select
-      className="BudgetMonthSelector"
-      data={options}
-      value={currentMonth}
-      onChange={handleChange}
-      placeholder="Select Month"
-      variant="subtle"
-      color="white"
-      size="lg"
-      classNames={{
-        section: "section",
-        input: "input",
-      }}
-    />
+    <ScrollArea.Autosize mah={220} type="scroll">
+      {budgetMonths.map((month) => (
+        <MantineNavLink
+          key={month}
+          to="/budget/$month"
+          params={{ month }}
+          label={monthFormatter.format(parseISO(month))}
+          active={month === currentMonth}
+          onClick={onNavigate}
+        />
+      ))}
+    </ScrollArea.Autosize>
   );
 }

@@ -117,7 +117,7 @@ function CategoryHistoryPage() {
           </Group>
         </Stack>
 
-        <SimpleGrid cols={5} spacing="lg" type="container">
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 5 }} spacing="lg">
           <Card padding="lg" radius="md" withBorder>
             <Stack gap="xs">
               <Text size="sm" c="gray.6">

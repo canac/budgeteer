@@ -1,0 +1,25 @@
+.NavDrawer {
+  .mantine-CloseButton-root:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .mantine-NavLink-root {
+    color: white;
+    border: 1px solid transparent;
+    border-radius: var(--mantine-radius-sm);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.18);
+    }
+
+    &[data-active] {
+      background-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.6);
+      color: white;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.32);
+      }
+    }
+  }
+}
