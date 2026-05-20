@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import mantineChartsCss from "@mantine/charts/styles.css?url";
-import { mantineHtmlProps, MantineProvider } from "@mantine/core";
+import { createTheme, mantineHtmlProps, MantineProvider } from "@mantine/core";
 import mantineCss from "@mantine/core/styles.css?url";
 import { Notifications } from "@mantine/notifications";
 import mantineNotificationsCss from "@mantine/notifications/styles.css?url";
@@ -25,6 +25,43 @@ export const Route = createRootRoute({
   component: RootComponent,
 });
 
+const theme = createTheme({
+  components: {
+    Card: {
+      defaultProps: {
+        padding: "lg",
+        radius: "md",
+        withBorder: true,
+      },
+    },
+    Modal: {
+      defaultProps: {
+        size: "md",
+        centered: true,
+        closeOnClickOutside: false,
+      },
+    },
+    NavLink: {
+      defaultProps: {
+        childrenOffset: "md",
+      },
+    },
+    NumberInput: {
+      defaultProps: {
+        leftSection: "$",
+        min: 0,
+        decimalScale: 2,
+        fixedDecimalScale: true,
+      },
+    },
+    Table: {
+      defaultProps: {
+        striped: true,
+      },
+    },
+  },
+});
+
 function RootComponent() {
   return (
     <html lang="en" {...mantineHtmlProps}>
@@ -32,7 +69,7 @@ function RootComponent() {
         <HeadContent />
       </head>
       <body>
-        <MantineProvider>
+        <MantineProvider theme={theme}>
           <Notifications />
           <Outlet />
         </MantineProvider>

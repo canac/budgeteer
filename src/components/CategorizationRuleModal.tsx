@@ -51,13 +51,7 @@ export function CategorizationRuleModal({
   });
 
   return (
-    <Modal
-      {...modalProps}
-      title={<Text fw="bold">Edit Rule</Text>}
-      size="md"
-      centered
-      closeOnClickOutside={false}
-    >
+    <Modal {...modalProps} title={<Text fw="bold">Edit Rule</Text>}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <TextInput label="Teller Vendor" value={editingRule.tellerVendor} disabled />

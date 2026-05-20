@@ -148,13 +148,7 @@ export function ImportTransactionModal({
   const singleCategory = selectedCategoryIds.length === 1;
 
   return (
-    <Modal
-      {...modalProps}
-      title={<Text fw="bold">Import Transaction</Text>}
-      size="md"
-      centered
-      closeOnClickOutside={false}
-    >
+    <Modal {...modalProps} title={<Text fw="bold">Import Transaction</Text>}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <TextInput label="Teller Vendor" value={transaction.vendor} disabled />
@@ -223,12 +217,8 @@ export function ImportTransactionModal({
                     <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
                       <NumberInput
                         placeholder={`${category.name} amount`}
-                        leftSection="$"
                         key={form.key(`categoryAmounts.${index}.amount`)}
                         {...form.getInputProps(`categoryAmounts.${index}.amount`)}
-                        min={0}
-                        decimalScale={2}
-                        fixedDecimalScale
                         style={{ flex: 1 }}
                       />
                       <ActionIcon

@@ -118,7 +118,7 @@ function CategoryHistoryPage() {
         </Stack>
 
         <SimpleGrid cols={{ base: 1, sm: 2, md: 5 }} spacing="lg">
-          <Card padding="lg" radius="md" withBorder>
+          <Card>
             <Stack gap="xs">
               <Text size="sm" c="gray.6">
                 Total Budgeted
@@ -129,7 +129,7 @@ function CategoryHistoryPage() {
             </Stack>
           </Card>
 
-          <Card padding="lg" radius="md" withBorder>
+          <Card>
             <Stack gap="xs">
               <Text size="sm" c="gray.6">
                 Total Spent
@@ -140,7 +140,7 @@ function CategoryHistoryPage() {
             </Stack>
           </Card>
 
-          <Card padding="lg" radius="md" withBorder>
+          <Card>
             <Stack gap="xs">
               <Text size="sm" c="gray.6">
                 Percentage Used
@@ -151,7 +151,7 @@ function CategoryHistoryPage() {
             </Stack>
           </Card>
 
-          <Card padding="lg" radius="md" withBorder>
+          <Card>
             <Stack gap="xs">
               <Text size="sm" c="gray.6">
                 Spent per Month
@@ -162,7 +162,7 @@ function CategoryHistoryPage() {
             </Stack>
           </Card>
 
-          <Card padding="lg" radius="md" withBorder>
+          <Card>
             <Stack gap="xs">
               <Text size="sm" c="gray.6">
                 Transactions per Month
@@ -174,7 +174,7 @@ function CategoryHistoryPage() {
           </Card>
         </SimpleGrid>
 
-        <Card padding="lg" radius="md" withBorder>
+        <Card>
           <Stack gap="md">
             <Title order={3}>Monthly Breakdown</Title>
             <CategoryHistoryChart monthlyData={categoryHistory.monthlyBreakdown} />

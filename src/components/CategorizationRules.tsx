@@ -41,7 +41,7 @@ export function CategorizationRules({ rules }: CategorizationRulesProps) {
 
   return (
     <>
-      <Table striped>
+      <Table>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Teller Vendor</Table.Th>

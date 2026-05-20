@@ -61,7 +61,7 @@ export function TransactionTable({
           onSave={onUpdate}
         />
       )}
-      <Table className="TransactionTable" striped>
+      <Table className="TransactionTable">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Date</Table.Th>

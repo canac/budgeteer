@@ -32,7 +32,7 @@ function OverviewPage() {
         <Title order={1}>{monthFormatter.format(parseISO(month))}</Title>
 
         <SimpleGrid cols={{ base: 1, sm: 3 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm">
             <Stack gap="xs">
               <Text size="sm" c="dimmed" fw={500}>
                 Total Spent
@@ -43,7 +43,7 @@ function OverviewPage() {
             </Stack>
           </Card>
 
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm">
             <Stack gap="xs">
               <Text size="sm" c="dimmed" fw={500}>
                 Total Budgeted
@@ -54,7 +54,7 @@ function OverviewPage() {
             </Stack>
           </Card>
 
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm">
             <Stack gap="xs">
               <Text size="sm" c="dimmed" fw={500}>
                 Remaining
@@ -66,7 +66,7 @@ function OverviewPage() {
           </Card>
         </SimpleGrid>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card shadow="sm">
           <Stack gap="md">
             <Title order={3}>Spending by Category</Title>
             <BarChart

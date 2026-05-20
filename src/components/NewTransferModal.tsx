@@ -84,24 +84,14 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
   });
 
   return (
-    <Modal
-      {...modalProps}
-      title={<Text fw="bold">New Transfer</Text>}
-      size="md"
-      centered
-      closeOnClickOutside={false}
-    >
+    <Modal {...modalProps} title={<Text fw="bold">New Transfer</Text>}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <NumberInput
             label="Amount"
-            leftSection="$"
             key={form.key("amount")}
             {...form.getInputProps("amount")}
             required
-            min={0}
-            decimalScale={2}
-            fixedDecimalScale
           />
           <Select
             label="Source"

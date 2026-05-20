@@ -27,13 +27,7 @@ export function DeleteTransactionModal({
   };
 
   return (
-    <Modal
-      {...modalProps}
-      title={<Text fw="bold">Delete Transaction</Text>}
-      size="md"
-      centered
-      closeOnClickOutside={false}
-    >
+    <Modal {...modalProps} title={<Text fw="bold">Delete Transaction</Text>}>
       <Stack gap="md">
         <Text>
           Are you sure you want to delete the transaction "{transaction.vendor}" from{" "}

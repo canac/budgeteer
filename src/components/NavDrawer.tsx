@@ -51,7 +51,6 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
         key={`months-${currentMonth ?? "none"}`}
         label="Months"
         defaultOpened={currentMonth !== null}
-        childrenOffset="md"
         fw="bold"
       >
         <BudgetMonthSelector
@@ -64,7 +63,6 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
         key={`categories-${category ?? "none"}`}
         label="Categories"
         defaultOpened={category !== undefined}
-        childrenOffset="md"
         fw="bold"
       >
         <CategorySelector

@@ -223,9 +223,6 @@ export function TransactionModal({
     <Modal
       {...modalProps}
       title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
-      size="md"
-      centered
-      closeOnClickOutside={false}
     >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
@@ -237,14 +234,10 @@ export function TransactionModal({
           />
           <NumberInput
             label="Amount"
-            leftSection="$"
             key={form.key("amount")}
             {...form.getInputProps("amount")}
             required
             disabled={external}
-            min={0}
-            decimalScale={2}
-            fixedDecimalScale
           />
           <Autocomplete
             label="Vendor"
@@ -307,12 +300,8 @@ export function TransactionModal({
                     <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
                       <NumberInput
                         placeholder={`${category.name} amount`}
-                        leftSection="$"
                         key={form.key(`categoryAmounts.${index}.amount`)}
                         {...form.getInputProps(`categoryAmounts.${index}.amount`)}
-                        min={0}
-                        decimalScale={2}
-                        fixedDecimalScale
                         style={{ flex: 1 }}
                       />
                       <ActionIcon

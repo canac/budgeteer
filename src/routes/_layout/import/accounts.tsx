@@ -154,7 +154,7 @@ function AccountsPage() {
       {accounts.length === 0 ? (
         <Text c="dimmed">No accounts enrolled yet.</Text>
       ) : (
-        <Table striped>
+        <Table>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Institution</Table.Th>

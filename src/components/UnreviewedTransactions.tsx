@@ -39,7 +39,7 @@ export function UnreviewedTransactions({
 
   return (
     <>
-      <Table className="UnreviewedTransactions" striped>
+      <Table className="UnreviewedTransactions">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Date</Table.Th>

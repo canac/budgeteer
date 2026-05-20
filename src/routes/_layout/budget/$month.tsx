@@ -74,7 +74,7 @@ function BudgetPage() {
     <>
       <Outlet />
       <Stack className="BudgetPage" align="center">
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card shadow="sm">
           <Stack gap="xs">
             <Group justify="space-between">
               <Title order={2}>Income</Title>
@@ -87,7 +87,7 @@ function BudgetPage() {
           </Stack>
         </Card>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card shadow="sm">
           <Stack gap="xs">
             <Group justify="space-between">
               <Title order={2}>Categories</Title>
@@ -153,7 +153,7 @@ function BudgetPage() {
         </Card>
 
         {fixedCategories.length > 0 && (
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card shadow="sm">
             <Stack gap="xs">
               <Title order={2}>Fixed Categories</Title>
               {fixedCategories.map((budgetCategory) => (

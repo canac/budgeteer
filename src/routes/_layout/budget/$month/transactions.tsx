@@ -103,7 +103,7 @@ function TransactionsPage() {
         }
       >
         <Stack gap="md">
-          <Table striped>
+          <Table>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Date</Table.Th>
