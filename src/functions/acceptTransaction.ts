@@ -73,12 +73,12 @@ export const acceptTransaction = createServerFn({ method: "POST" })
               create: {
                 tellerVendor: tellerTransaction.vendor,
                 vendor: override.vendor,
-                categoryId: override.updateRuleCategory ? override.categories[0].categoryId : null,
+                categoryId: override.updateRuleCategory ? override.categories[0]?.categoryId : null,
               },
               update: {
                 ...(override.updateRuleVendor ? { vendor: override.vendor } : {}),
                 ...(override.updateRuleCategory
-                  ? { categoryId: override.categories[0].categoryId }
+                  ? { categoryId: override.categories[0]?.categoryId }
                   : {}),
               },
             })

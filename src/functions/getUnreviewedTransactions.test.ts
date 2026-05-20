@@ -27,7 +27,7 @@ describe("getUnreviewedTransactions", () => {
 
     expect(result.total).toBe(2);
     expect(pluck(result.transactions, "vendor")).toEqual(["B", "A"]);
-    expect(result.transactions[0].account.id).toBe(accountId);
+    expect(result.transactions[0]!.account.id).toBe(accountId);
   });
 
   it("paginates", async () => {

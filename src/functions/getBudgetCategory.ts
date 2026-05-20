@@ -36,7 +36,8 @@ export const getBudgetCategory = createServerFn()
         },
       },
     });
-    if (!category) {
+    const budgetCategory = category?.budgetCategories[0];
+    if (!budgetCategory) {
       throw notFound();
     }
 
@@ -60,7 +61,7 @@ export const getBudgetCategory = createServerFn()
 
     return {
       category,
-      budgetCategory: category.budgetCategories[0],
+      budgetCategory,
       currentBalance: await calculateCategoryBalance({ month, category }),
       startingBalance: await calculateCategoryStartingBalance({ month, category }),
       transactionTotal: transactionCategories.reduce(

@@ -64,6 +64,10 @@ export const getCategoryHistory = createServerFn()
         budget: true,
       },
     });
+    const startBudgetCategory = budgetCategories[0];
+    if (!startBudgetCategory) {
+      throw notFound();
+    }
 
     const totalBudgeted = budgetCategories.reduce(
       (sum, budgetCategory) => sum + budgetCategory.budgetedAmount,
@@ -92,7 +96,7 @@ export const getCategoryHistory = createServerFn()
 
     return {
       category,
-      startMonth: budgetCategories[0].budget.month,
+      startMonth: startBudgetCategory.budget.month,
       endMonth: toISODateString(endMonth),
       transactions: transactionCategories.map(({ amount, transaction }) => ({
         ...transaction,

@@ -7,6 +7,7 @@
     "lib": ["DOM", "DOM.Iterable", "ES2024"],
     "isolatedModules": true,
     "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "allowJs": true,
     "allowImportingTsExtensions": true,

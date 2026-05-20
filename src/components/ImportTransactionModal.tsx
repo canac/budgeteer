@@ -83,11 +83,11 @@ export function ImportTransactionModal({
 
   form.watch("selectedCategoryIds", ({ value, previousValue }) => {
     if (value.length === 1) {
-      form.setFieldValue("categoryAmounts", [{ categoryId: value[0], amount: totalDollars }]);
+      form.setFieldValue("categoryAmounts", [{ categoryId: value[0]!, amount: totalDollars }]);
     } else if (value.length === 2 && previousValue.length === 1) {
       form.setFieldValue("categoryAmounts", [
-        { categoryId: value[0], amount: 0 },
-        { categoryId: value[1], amount: 0 },
+        { categoryId: value[0]!, amount: 0 },
+        { categoryId: value[1]!, amount: 0 },
       ]);
     } else {
       const newCategoryAmounts = value.map(
@@ -109,14 +109,16 @@ export function ImportTransactionModal({
     categoryAmounts.reduce((sum, category) => sum + dollarsToPennies(category.amount), 0);
 
   const assignRemainingAmount = (index: number) => {
-    form.setFieldValue(
-      `categoryAmounts.${index}.amount`,
-      categoryAmounts[index].amount + penniesToDollars(remainingAmount),
-    );
+    if (categoryAmounts[index]) {
+      form.setFieldValue(
+        `categoryAmounts.${index}.amount`,
+        categoryAmounts[index].amount + penniesToDollars(remainingAmount),
+      );
+    }
   };
 
   const removeCategory = (index: number) => {
-    const categoryId = categoryAmounts[index].categoryId;
+    const categoryId = categoryAmounts[index]?.categoryId;
     form.setFieldValue(
       "selectedCategoryIds",
       selectedCategoryIds.filter((id) => id !== categoryId),

@@ -134,11 +134,11 @@ export function TransactionModal({
 
   form.watch("selectedCategoryIds", ({ value, previousValue }) => {
     if (value.length === 1) {
-      form.setFieldValue("categoryAmounts", [{ categoryId: value[0], amount }]);
+      form.setFieldValue("categoryAmounts", [{ categoryId: value[0]!, amount }]);
     } else if (value.length === 2 && previousValue.length === 1) {
       form.setFieldValue("categoryAmounts", [
-        { categoryId: value[0], amount: 0 },
-        { categoryId: value[1], amount: 0 },
+        { categoryId: value[0]!, amount: 0 },
+        { categoryId: value[1]!, amount: 0 },
       ]);
     } else {
       const newCategoryAmounts = value.map(
@@ -155,7 +155,7 @@ export function TransactionModal({
   form.watch("amount", ({ value }) => {
     if (selectedCategoryIds.length === 1 && value > 0) {
       form.setFieldValue("categoryAmounts", [
-        { categoryId: selectedCategoryIds[0], amount: value },
+        { categoryId: selectedCategoryIds[0]!, amount: value },
       ]);
     }
   });
@@ -165,14 +165,16 @@ export function TransactionModal({
     categoryAmounts.reduce((sum, category) => sum + dollarsToPennies(category.amount), 0);
 
   const assignRemainingAmount = (index: number) => {
-    form.setFieldValue(
-      `categoryAmounts.${index}.amount`,
-      categoryAmounts[index].amount + remainingAmount,
-    );
+    if (categoryAmounts[index]) {
+      form.setFieldValue(
+        `categoryAmounts.${index}.amount`,
+        categoryAmounts[index].amount + remainingAmount,
+      );
+    }
   };
 
   const removeCategory = (index: number) => {
-    const categoryId = categoryAmounts[index].categoryId;
+    const categoryId = categoryAmounts[index]?.categoryId;
     form.setFieldValue(
       "selectedCategoryIds",
       selectedCategoryIds.filter((id) => id !== categoryId),
