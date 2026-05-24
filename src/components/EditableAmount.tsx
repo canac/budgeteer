@@ -44,7 +44,6 @@ export function EditableAmount({
             ref={(input) => input?.focus()}
             inputMode="decimal"
             pattern="-?[0-9]*(\.[0-9]{0,2})?"
-            min={0}
             aria-label="Edit amount"
             value={value}
             onChange={(event) => setValue(event.target.value)}
