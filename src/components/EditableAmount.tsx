@@ -25,8 +25,8 @@ export function EditableAmount({
     setEditing(true);
   };
 
-  const handleSave = () => {
-    saveAmount(dollarsToPennies(Number(value))).catch(() => {});
+  const handleSave = async () => {
+    await saveAmount(dollarsToPennies(Number(value)));
     setEditing(false);
   };
 
@@ -34,9 +34,9 @@ export function EditableAmount({
     <span className="EditableAmount">
       {editing && editable ? (
         <form
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
-            handleSave();
+            await handleSave();
           }}
         >
           <input

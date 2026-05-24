@@ -15,8 +15,8 @@ export function EditableName({ name, saveName }: EditableNameProps) {
     setEditing(true);
   };
 
-  const handleSave = () => {
-    saveName(value).catch(() => {});
+  const handleSave = async () => {
+    await saveName(value);
     setEditing(false);
   };
 
@@ -24,9 +24,9 @@ export function EditableName({ name, saveName }: EditableNameProps) {
     <span className="EditableName">
       {editing ? (
         <form
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
-            handleSave();
+            await handleSave();
           }}
         >
           <input
