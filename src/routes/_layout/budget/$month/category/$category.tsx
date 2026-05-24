@@ -6,6 +6,7 @@ import {
   Progress,
   Select,
   Stack,
+  Table,
   Text,
   Title,
   Tooltip,
@@ -14,7 +15,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
-import { parseISO } from "date-fns";
+import { parseISO, subMonths } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
@@ -28,7 +29,12 @@ import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
 import { useSyncedState } from "~/hooks/useSyncedState";
-import { formatCurrency, monthFormatter } from "~/lib/formatters";
+import {
+  formatCurrency,
+  monthFormatter,
+  monthOnlyFormatter,
+  shortDateFormatter,
+} from "~/lib/formatters";
 import "./CategoryDetailsPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/category/$category")({
@@ -112,6 +118,33 @@ function CategoryDetailsPage() {
     "balance",
     budgetCategory.currentBalance >= 0 ? "positive" : "negative",
   ]);
+
+  const previousMonthBalance = budgetCategory.startingBalance - budgetedAmount;
+  const monthDate = parseISO(month);
+  const transactionRows = (
+    <>
+      <Table.Tr className="starting-balance">
+        <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
+        <Table.Td>Budgeted this month</Table.Td>
+        <Table.Td />
+        <Table.Td ta="right" c={budgetedAmount < 0 ? "red" : "green"}>
+          {formatCurrency(budgetedAmount)}
+        </Table.Td>
+        <Table.Td />
+      </Table.Tr>
+      {budgetCategory.category.type === "ACCUMULATING" && (
+        <Table.Tr>
+          <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
+          <Table.Td>{monthOnlyFormatter.format(subMonths(monthDate, 1))} balance</Table.Td>
+          <Table.Td />
+          <Table.Td ta="right" c={previousMonthBalance < 0 ? "red" : "green"}>
+            {formatCurrency(previousMonthBalance)}
+          </Table.Td>
+          <Table.Td />
+        </Table.Tr>
+      )}
+    </>
+  );
 
   return (
     <Drawer
@@ -205,8 +238,7 @@ function CategoryDetailsPage() {
           </Title>
           <TransactionTable
             transactions={budgetCategory.transactions}
-            startingBalance={budgetCategory.startingBalance}
-            startingBalanceMonth={month}
+            extraRows={transactionRows}
             onUpdate={handleUpdate}
           />
         </div>

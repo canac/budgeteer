@@ -16,6 +16,10 @@ export const monthFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
+export const monthOnlyFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+});
+
 export const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",

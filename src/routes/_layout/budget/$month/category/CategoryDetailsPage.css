@@ -18,4 +18,8 @@
   .spent {
     font-weight: normal;
   }
+
+  .TransactionTable tr.starting-balance {
+    border-top: 2px solid;
+  }
 }
