@@ -37,18 +37,49 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
       return;
     }
 
-    await prisma.transaction.create({
-      data: {
+    const adjustmentDate = toISODateString(startOfMonth(month));
+    const existingAdjustment = await prisma.transaction.findFirst({
+      where: {
         type: "BALANCE_ADJUSTMENT",
-        amount: adjustmentAmount,
-        date: toISODateString(startOfMonth(month)),
-        vendor: "Balance Adjustment",
-        transactionCategories: {
-          create: {
-            amount: adjustmentAmount,
-            categoryId,
-          },
-        },
+        date: adjustmentDate,
+        transactionCategories: { some: { categoryId } },
       },
     });
+
+    if (existingAdjustment) {
+      const newTotal = existingAdjustment.amount + adjustmentAmount;
+      if (newTotal === 0) {
+        await prisma.transaction.delete({
+          where: { id: existingAdjustment.id },
+        });
+      } else {
+        await prisma.transaction.update({
+          where: { id: existingAdjustment.id },
+          data: {
+            amount: newTotal,
+            transactionCategories: {
+              updateMany: {
+                where: {},
+                data: { amount: newTotal },
+              },
+            },
+          },
+        });
+      }
+    } else {
+      await prisma.transaction.create({
+        data: {
+          type: "BALANCE_ADJUSTMENT",
+          amount: adjustmentAmount,
+          date: adjustmentDate,
+          vendor: "Balance Adjustment",
+          transactionCategories: {
+            create: {
+              amount: adjustmentAmount,
+              categoryId,
+            },
+          },
+        },
+      });
+    }
   });
