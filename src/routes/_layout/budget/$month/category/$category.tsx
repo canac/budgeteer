@@ -54,6 +54,9 @@ export const Route = createFileRoute("/_layout/budget/$month/category/$category"
   },
 });
 
+/** Get the `positive` or `negative` className for an amount */
+const amountSignClassname = (amount: number): string => (amount >= 0 ? "positive" : "negative");
+
 function CategoryDetailsPage() {
   const { budgetCategory } = Route.useLoaderData();
   const { month, category } = Route.useParams();
@@ -114,10 +117,6 @@ function CategoryDetailsPage() {
   const { budgetedAmount } = budgetCategory.budgetCategory;
   const percentageSpent =
     (budgetedAmount === 0 ? 1 : -budgetCategory.transactionTotal / budgetedAmount) * 100;
-  const balanceClassName = clsx([
-    "balance",
-    budgetCategory.currentBalance >= 0 ? "positive" : "negative",
-  ]);
 
   const previousMonthBalance = budgetCategory.startingBalance - budgetedAmount;
   const monthDate = parseISO(month);
@@ -127,8 +126,12 @@ function CategoryDetailsPage() {
         <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
         <Table.Td>Budgeted this month</Table.Td>
         <Table.Td />
-        <Table.Td ta="right" c={budgetedAmount < 0 ? "red" : "green"}>
-          {formatCurrency(budgetedAmount)}
+        <Table.Td ta="right">
+          <EditableAmount
+            className={amountSignClassname(budgetedAmount)}
+            amount={budgetedAmount}
+            saveAmount={handleSaveBudgetedAmount}
+          />
         </Table.Td>
         <Table.Td />
       </Table.Tr>
@@ -137,7 +140,7 @@ function CategoryDetailsPage() {
           <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
           <Table.Td>{monthOnlyFormatter.format(subMonths(monthDate, 1))} balance</Table.Td>
           <Table.Td />
-          <Table.Td ta="right" c={previousMonthBalance < 0 ? "red" : "green"}>
+          <Table.Td ta="right" className={amountSignClassname(previousMonthBalance)}>
             {formatCurrency(previousMonthBalance)}
           </Table.Td>
           <Table.Td />
@@ -177,7 +180,7 @@ function CategoryDetailsPage() {
           <div>
             <Title order={3}>Current Balance</Title>
             <EditableAmount
-              className={balanceClassName}
+              className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
               editable={categoryType === "SAVINGS" || categoryType === "ACCUMULATING"}
               amount={budgetCategory.currentBalance}
               saveAmount={handleSaveBalance}
@@ -203,11 +206,9 @@ function CategoryDetailsPage() {
                 {formatCurrency(-budgetCategory.transactionTotal)}
               </Text>{" "}
               of{" "}
-              <EditableAmount
-                className="spent"
-                amount={budgetCategory.budgetCategory.budgetedAmount}
-                saveAmount={handleSaveBudgetedAmount}
-              />
+              <Text span fw="bold">
+                {formatCurrency(budgetCategory.budgetCategory.budgetedAmount)}
+              </Text>
             </Text>
           </Group>
           <Progress value={percentageSpent} color="green" flex={1} />

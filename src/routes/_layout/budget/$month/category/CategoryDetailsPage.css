@@ -4,19 +4,16 @@
     margin-bottom: var(--mantine-spacing-xs);
   }
 
-  .balance {
-    font-size: var(--mantine-font-size-xl);
-
-    &.positive {
-      color: var(--mantine-color-green-text);
-    }
-    &.negative {
-      color: var(--mantine-color-red-text);
-    }
+  .positive {
+    color: var(--mantine-color-green-text);
+  }
+  .negative {
+    color: var(--mantine-color-red-text);
   }
 
-  .spent {
-    font-weight: normal;
+  .balance {
+    font-size: var(--mantine-font-size-xl);
+    font-weight: bold;
   }
 
   .TransactionTable tr.starting-balance {
