@@ -3,6 +3,7 @@ import {
   createCategory,
   createTellerAccount,
   createTellerTransaction,
+  transaction,
 } from "test/mocks.ts";
 import { beforeEach, describe, expect, it } from "vitest";
 import { find, pluck, range } from "~/lib/collections";
@@ -28,6 +29,24 @@ describe("getUnreviewedTransactions", () => {
     expect(result.total).toBe(2);
     expect(pluck(result.transactions, "vendor")).toEqual(["B", "A"]);
     expect(result.transactions[0]!.account.id).toBe(accountId);
+  });
+
+  it("returns only rejected transactions when rejected is true", async () => {
+    await Promise.all([
+      createTellerTransaction({ vendor: "Pending", account }),
+      createTellerTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createTellerTransaction({
+        vendor: "Accepted",
+        reviewed: true,
+        transaction: { create: transaction() },
+        account,
+      }),
+    ]);
+
+    const result = await getUnreviewedTransactions({
+      data: { page: 1, pageSize: 10, rejected: true },
+    });
+    expect(pluck(result.transactions, "vendor")).toEqual(["Rejected"]);
   });
 
   it("paginates", async () => {

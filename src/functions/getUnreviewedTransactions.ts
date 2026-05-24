@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { number, object } from "zod";
+import { boolean, number, object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
@@ -7,13 +7,14 @@ import { prisma } from "~/lib/prisma";
 const inputSchema = object({
   page: number().int().min(1).default(1),
   pageSize: number().int().min(1).max(200),
+  rejected: boolean().default(false),
 });
 
 export const getUnreviewedTransactions = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { page, pageSize } }) => {
-    const where = { reviewed: false };
+  .handler(async ({ data: { page, pageSize, rejected } }) => {
+    const where = rejected ? { reviewed: true, transaction: { is: null } } : { reviewed: false };
     const [transactions, total] = await Promise.all([
       prisma.tellerTransaction.findMany({
         where,

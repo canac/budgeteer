@@ -77,6 +77,7 @@ model Transaction {
   transactionCategories TransactionCategory[]
   transfer              Transfer?
   tellerId              String?               @unique
+  tellerTransaction     TellerTransaction?    @relation(fields: [tellerId], references: [id], onDelete: SetNull)
 }
 
 model TransactionCategory {
@@ -128,15 +129,16 @@ model TellerAccount {
 }
 
 model TellerTransaction {
-  id        String        @id // The teller ID
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  amount    Int
-  date      String
-  vendor    String
-  reviewed  Boolean       @default(false)
-  accountId String
-  account   TellerAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  id            String        @id // The teller ID
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  amount        Int
+  date          String
+  vendor        String
+  reviewed      Boolean       @default(false)
+  accountId     String
+  account     TellerAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  transaction Transaction?
 }
 
 model CategorizationRule {

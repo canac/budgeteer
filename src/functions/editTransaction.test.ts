@@ -1,4 +1,9 @@
-import { createBudget, createCategory, createTransaction as seedTransaction } from "test/mocks.ts";
+import {
+  createBudget,
+  createCategory,
+  createTransaction as seedTransaction,
+  tellerTransaction,
+} from "test/mocks.ts";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Transaction } from "~/prisma/client.ts";
 import { getPrisma } from "../../test/helpers.ts";
@@ -75,7 +80,7 @@ describe("editTransaction", () => {
     const imported = await seedTransaction({
       amount: -1000,
       date: "2025-01-15",
-      tellerId: "teller_tx_1",
+      tellerTransaction: { create: tellerTransaction() },
       transactionCategories: { create: { amount: -1000, categoryId } },
     });
 
@@ -109,7 +114,7 @@ describe("editTransaction", () => {
       amount: -1000,
       date: "2025-01-15",
       vendor: "Old",
-      tellerId: "teller_tx_1",
+      tellerTransaction: { create: tellerTransaction() },
       transactionCategories: { create: { amount: -1000, categoryId } },
     });
 

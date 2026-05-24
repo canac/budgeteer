@@ -1,6 +1,6 @@
 import { ActionIcon, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconCheck, IconEdit, IconX } from "@tabler/icons-react";
+import { IconArrowBackUp, IconCheck, IconEdit, IconX } from "@tabler/icons-react";
 import { parseISO } from "date-fns";
 import { useState } from "react";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
@@ -13,6 +13,7 @@ interface UnreviewedTransactionsProps {
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
   onEdit: (id: string) => void;
+  onRestore?: (id: string) => void;
 }
 
 export function UnreviewedTransactions({
@@ -20,6 +21,7 @@ export function UnreviewedTransactions({
   onAccept,
   onReject,
   onEdit,
+  onRestore,
 }: UnreviewedTransactionsProps) {
   const [modalOpen, { open, close }] = useDisclosure(false);
   const [importingTransaction, setImportingTransaction] = useState<
@@ -63,31 +65,44 @@ export function UnreviewedTransactions({
                 {formatCurrency(transaction.amount)}
               </Table.Td>
               <Table.Td ta="center">
-                <ActionIcon
-                  variant="subtle"
-                  color="green"
-                  aria-label="Accept"
-                  style={{ visibility: transaction.rule?.category ? undefined : "hidden" }}
-                  onClick={() => onAccept(transaction.id)}
-                >
-                  <IconCheck />
-                </ActionIcon>
-                <ActionIcon
-                  variant="subtle"
-                  color="blue"
-                  aria-label="Edit"
-                  onClick={() => openImport(transaction)}
-                >
-                  <IconEdit />
-                </ActionIcon>
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  aria-label="Reject"
-                  onClick={() => onReject(transaction.id)}
-                >
-                  <IconX />
-                </ActionIcon>
+                {transaction.reviewed ? (
+                  <ActionIcon
+                    variant="subtle"
+                    color="blue"
+                    aria-label="Restore"
+                    onClick={() => onRestore?.(transaction.id)}
+                  >
+                    <IconArrowBackUp />
+                  </ActionIcon>
+                ) : (
+                  <>
+                    <ActionIcon
+                      variant="subtle"
+                      color="green"
+                      aria-label="Accept"
+                      style={{ visibility: transaction.rule?.category ? undefined : "hidden" }}
+                      onClick={() => onAccept(transaction.id)}
+                    >
+                      <IconCheck />
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="subtle"
+                      color="blue"
+                      aria-label="Edit"
+                      onClick={() => openImport(transaction)}
+                    >
+                      <IconEdit />
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      aria-label="Reject"
+                      onClick={() => onReject(transaction.id)}
+                    >
+                      <IconX />
+                    </ActionIcon>
+                  </>
+                )}
               </Table.Td>
             </Table.Tr>
           ))}
