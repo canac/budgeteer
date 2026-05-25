@@ -74,6 +74,7 @@ function BudgetPage() {
     <>
       <Outlet />
       <Stack className="BudgetPage" align="center">
+        <Title order={1}>{monthFormatter.format(parseISO(budget.month))}</Title>
         <Card shadow="sm">
           <Stack gap="xs">
             <Group justify="space-between">
