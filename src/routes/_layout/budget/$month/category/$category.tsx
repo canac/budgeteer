@@ -26,6 +26,7 @@ import { TransactionTable } from "~/components/TransactionTable";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBalance } from "~/functions/setCategoryBalance";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
+import { setCategoryStartingBalance } from "~/functions/setCategoryStartingBalance";
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
 import { useSyncedState } from "~/hooks/useSyncedState";
@@ -110,6 +111,17 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
+  const handleSaveStartingBalance = async (newBalance: number) => {
+    await setCategoryStartingBalance({
+      data: {
+        categoryId: budgetCategory.category.id,
+        month,
+        targetBalance: newBalance,
+      },
+    });
+    await router.invalidate();
+  };
+
   const handleUpdate = async () => {
     await router.invalidate();
   };
@@ -140,8 +152,12 @@ function CategoryDetailsPage() {
           <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
           <Table.Td>{monthOnlyFormatter.format(subMonths(monthDate, 1))} balance</Table.Td>
           <Table.Td />
-          <Table.Td ta="right" className={amountSignClassname(previousMonthBalance)}>
-            {formatCurrency(previousMonthBalance)}
+          <Table.Td ta="right">
+            <EditableAmount
+              className={amountSignClassname(previousMonthBalance)}
+              amount={previousMonthBalance}
+              saveAmount={handleSaveStartingBalance}
+            />
           </Table.Td>
           <Table.Td />
         </Table.Tr>

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { subMonths } from "date-fns";
 import { number, object, string } from "zod";
 import { applyBalanceAdjustment } from "~/lib/applyBalanceAdjustment";
 import { requireAuth } from "~/lib/authMiddleware";
@@ -13,7 +14,7 @@ const inputSchema = object({
   targetBalance: number().int(),
 });
 
-export const setCategoryBalance = createServerFn({ method: "POST" })
+export const setCategoryStartingBalance = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, month, targetBalance } }) => {
@@ -25,6 +26,6 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
         OR: [{ deletedMonth: null }, { deletedMonth: { gt: monthString } }],
       },
     });
-    const currentBalance = await calculateCategoryBalance({ month, category });
+    const currentBalance = await calculateCategoryBalance({ month: subMonths(month, 1), category });
     await applyBalanceAdjustment({ categoryId, month, amount: targetBalance - currentBalance });
   });
