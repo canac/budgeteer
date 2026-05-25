@@ -52,12 +52,13 @@ export const getOverview = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
     const budget = await getCurrentBudget();
+    const filteredBudgetCategories = budget.budgetCategories.filter(
+      (budgetCategory) =>
+        budgetCategory.category.type === "ACCUMULATING" ||
+        budgetCategory.category.type === "NON_ACCUMULATING",
+    );
     const budgetCategories = await calculateBalances(
-      budget.budgetCategories.filter(
-        (budgetCategory) =>
-          budgetCategory.category.type === "ACCUMULATING" ||
-          budgetCategory.category.type === "NON_ACCUMULATING",
-      ),
+      filteredBudgetCategories,
       parseISO(budget.month),
     );
 
@@ -65,8 +66,8 @@ export const getOverview = createServerFn()
       (sum, budgetCategory) => sum + budgetCategory.spent,
       0,
     );
-    const totalBudgeted = budgetCategories.reduce(
-      (sum, budgetCategory) => sum + budgetCategory.budgeted,
+    const totalBudgeted = filteredBudgetCategories.reduce(
+      (sum, budgetCategory) => sum + budgetCategory.budgetedAmount,
       0,
     );
 
