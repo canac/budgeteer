@@ -87,7 +87,7 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
 
     return {
       ...budgetCategory,
-      spent: -monthTransactionTotal,
+      spent: monthTransactionTotal === 0 ? 0 : -monthTransactionTotal,
       budgeted,
       balance: budgeted + transactionTotal,
     } satisfies BC & BalanceFields;
