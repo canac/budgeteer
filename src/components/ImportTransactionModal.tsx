@@ -214,9 +214,9 @@ export function ImportTransactionModal({
                 const category = find(categories, "id", categoryAmount.categoryId);
                 return (
                   category && (
-                    <Group key={categoryAmount.categoryId} gap="xs" align="flex-start">
+                    <Group key={categoryAmount.categoryId} gap="xs" align="center">
                       <NumberInput
-                        placeholder={`${category.name} amount`}
+                        label={category.name}
                         key={form.key(`categoryAmounts.${index}.amount`)}
                         {...form.getInputProps(`categoryAmounts.${index}.amount`)}
                         style={{ flex: 1 }}
