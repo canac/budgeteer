@@ -4,6 +4,10 @@
     margin-bottom: var(--mantine-spacing-xs);
   }
 
+  .EditableName {
+    font-weight: bold;
+  }
+
   .positive {
     color: var(--mantine-color-green-text);
   }

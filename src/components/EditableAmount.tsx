@@ -45,8 +45,15 @@ export function EditableAmount({
             inputMode="decimal"
             pattern="-?[0-9]*(\.[0-9]{0,2})?"
             aria-label="Edit amount"
+            data-mantine-stop-propagation="true"
             value={value}
             onChange={(event) => setValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                setEditing(false);
+              }
+            }}
             onBlur={handleSave}
           />
         </form>

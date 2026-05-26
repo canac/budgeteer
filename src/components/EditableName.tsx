@@ -34,8 +34,15 @@ export function EditableName({ name, saveName }: EditableNameProps) {
             ref={(input) => input?.focus()}
             type="text"
             aria-label="Edit name"
+            data-mantine-stop-propagation="true"
             value={value}
             onChange={(event) => setValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                setEditing(false);
+              }
+            }}
             onBlur={handleSave}
           />
         </form>
