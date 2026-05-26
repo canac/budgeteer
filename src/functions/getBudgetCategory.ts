@@ -22,7 +22,6 @@ export const getBudgetCategory = createServerFn()
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
-        type: { not: "FIXED" },
         OR: [{ deletedMonth: null }, { deletedMonth: { gt: monthString } }],
       },
       include: {

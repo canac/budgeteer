@@ -16,7 +16,6 @@ datasource db {
 }
 
 enum CategoryType {
-  FIXED
   SAVINGS
   ACCUMULATING
   NON_ACCUMULATING

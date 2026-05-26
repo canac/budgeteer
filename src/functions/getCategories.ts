@@ -4,12 +4,11 @@ import { prisma } from "~/lib/prisma";
 
 export const getCategories = createServerFn()
   .middleware([requireAuth])
-  .handler(() => {
-    return prisma.category.findMany({
+  .handler(() =>
+    prisma.category.findMany({
       where: {
-        type: { not: "FIXED" },
         deletedMonth: null,
       },
       orderBy: { name: "asc" },
-    });
-  });
+    }),
+  );

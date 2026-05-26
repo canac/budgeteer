@@ -1,7 +1,6 @@
 import { createBudget, createCategory, createTransaction } from "test/mocks.ts";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Budget } from "~/prisma/client.ts";
-import { CategoryType } from "~/prisma/enums.ts";
 import { getPrisma } from "../../test/helpers.ts";
 import { getBudgetCategory } from "./getBudgetCategory.ts";
 
@@ -54,14 +53,6 @@ describe("getBudgetCategory", () => {
     expect(result.transactions).toEqual([]);
     expect(result.transactionTotal).toBe(0);
     expect(result.deletable).toEqual({ valid: true });
-  });
-
-  it("throws notFound for FIXED categories", async () => {
-    const fixed = await createCategory({ createdMonth: "2025-01", type: CategoryType.FIXED });
-
-    await expect(() =>
-      getBudgetCategory({ data: { month: "2025-01", categoryId: fixed.id } }),
-    ).rejects.toMatchObject({ isNotFound: true });
   });
 
   it("throws notFound when the category was deleted on or before the queried month", async () => {

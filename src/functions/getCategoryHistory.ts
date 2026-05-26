@@ -19,10 +19,7 @@ export const getCategoryHistory = createServerFn()
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, startMonth, endMonth, includeTransfers } }) => {
     const category = await prisma.category.findUnique({
-      where: {
-        id: categoryId,
-        type: { not: "FIXED" },
-      },
+      where: { id: categoryId },
     });
     if (!category) {
       throw notFound();

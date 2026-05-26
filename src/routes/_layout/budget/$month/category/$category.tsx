@@ -36,6 +36,7 @@ import {
   monthOnlyFormatter,
   shortDateFormatter,
 } from "~/lib/formatters";
+import { categoryType as categoryTypeSchema } from "~/lib/zod";
 import "./CategoryDetailsPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/category/$category")({
@@ -78,11 +79,7 @@ function CategoryDetailsPage() {
   };
 
   const handleChangeType = async (value: string | null) => {
-    if (!value) {
-      return;
-    }
-
-    const newType = value as "SAVINGS" | "ACCUMULATING" | "NON_ACCUMULATING";
+    const newType = categoryTypeSchema().parse(value);
     setCategoryType(newType);
     await updateCategory({
       data: { categoryId: budgetCategory.category.id, type: newType },
@@ -197,7 +194,7 @@ function CategoryDetailsPage() {
             <Title order={3}>Current Balance</Title>
             <EditableAmount
               className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
-              editable={categoryType === "SAVINGS" || categoryType === "ACCUMULATING"}
+              editable={categoryType !== "NON_ACCUMULATING"}
               amount={budgetCategory.currentBalance}
               saveAmount={handleSaveBalance}
             />

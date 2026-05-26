@@ -53,9 +53,7 @@ export const getOverview = createServerFn()
   .handler(async () => {
     const budget = await getCurrentBudget();
     const filteredBudgetCategories = budget.budgetCategories.filter(
-      (budgetCategory) =>
-        budgetCategory.category.type === "ACCUMULATING" ||
-        budgetCategory.category.type === "NON_ACCUMULATING",
+      (budgetCategory) => budgetCategory.category.type !== "SAVINGS",
     );
     const budgetCategories = await calculateBalances(
       filteredBudgetCategories,

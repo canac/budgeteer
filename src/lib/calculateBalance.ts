@@ -6,7 +6,7 @@ import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 
 function isFund(categoryType: CategoryType): boolean {
-  return categoryType === "SAVINGS" || categoryType === "ACCUMULATING";
+  return categoryType !== "NON_ACCUMULATING";
 }
 
 type BudgetCategoryWithCategory = Pick<BudgetCategory, "categoryId"> & {
