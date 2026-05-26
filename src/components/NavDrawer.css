@@ -4,7 +4,8 @@
   }
 
   .mantine-NavLink-root {
-    color: white;
+    --nl-color: white;
+    --nl-hover: rgba(255, 255, 255, 0.32);
     border: 1px solid transparent;
     border-radius: var(--mantine-radius-sm);
 
@@ -12,14 +13,10 @@
       background-color: rgba(255, 255, 255, 0.18);
     }
 
-    &[data-active] {
-      background-color: rgba(255, 255, 255, 0.25);
+    &[data-active],
+    &[aria-current="page"] {
+      --nl-bg: rgba(255, 255, 255, 0.25);
       border-color: rgba(255, 255, 255, 0.6);
-      color: white;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.32);
-      }
     }
   }
 }
