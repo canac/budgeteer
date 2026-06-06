@@ -69,6 +69,8 @@ function CategoryHistoryPage() {
   };
 
   const { startMonth, endMonth, totalBudgeted, totalSpent } = categoryHistory;
+  const startMonthFormatted = monthFormatter.format(parseISO(startMonth));
+  const endMonthFormatted = monthFormatter.format(parseISO(endMonth));
   const totalTransactions = categoryHistory.transactions.length;
   const percentageUsed = (totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted) * 100;
 
@@ -80,8 +82,9 @@ function CategoryHistoryPage() {
             {categoryHistory.category.name}
           </Title>
           <Text size="lg" c="gray.6">
-            {monthFormatter.format(parseISO(startMonth))} -{" "}
-            {monthFormatter.format(parseISO(endMonth))}
+            {startMonth === endMonth
+              ? startMonthFormatted
+              : `${startMonthFormatted} - ${endMonthFormatted}`}
           </Text>
         </div>
 
@@ -108,7 +111,7 @@ function CategoryHistoryPage() {
               }
             />
             <Switch
-              label="Include Transfers"
+              label="Include transfers"
               checked={transfers}
               onChange={(event) =>
                 navigate({ search: (prev) => ({ ...prev, transfers: event.target.checked }) })
