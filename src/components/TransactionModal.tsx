@@ -168,7 +168,7 @@ export function TransactionModal({
     if (categoryAmounts[index]) {
       form.setFieldValue(
         `categoryAmounts.${index}.amount`,
-        categoryAmounts[index].amount + remainingAmount,
+        categoryAmounts[index].amount + penniesToDollars(remainingAmount),
       );
     }
   };
