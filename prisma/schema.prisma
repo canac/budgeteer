@@ -42,6 +42,7 @@ model Category {
   updatedAt             DateTime              @updatedAt
   name                  String
   type                  CategoryType          @default(NON_ACCUMULATING)
+  sortOrder             Float
   createdMonth          String
   deletedMonth          String?
   transactionCategories TransactionCategory[]
@@ -128,14 +129,14 @@ model TellerAccount {
 }
 
 model TellerTransaction {
-  id            String        @id // The teller ID
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  amount        Int
-  date          String
-  vendor        String
-  reviewed      Boolean       @default(false)
-  accountId     String
+  id          String        @id // The teller ID
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  amount      Int
+  date        String
+  vendor      String
+  reviewed    Boolean       @default(false)
+  accountId   String
   account     TellerAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
   transaction Transaction?
 }

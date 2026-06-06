@@ -9,6 +9,6 @@ export const getCategories = createServerFn()
       where: {
         deletedMonth: null,
       },
-      orderBy: { name: "asc" },
+      orderBy: { sortOrder: "asc" },
     }),
   );

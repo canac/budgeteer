@@ -19,11 +19,15 @@ export const createCategory = createServerFn({ method: "POST" })
     const budget = await prisma.budget.findFirstOrThrow({
       where: { month },
     });
+    const lastCategory = await prisma.category.findFirst({
+      orderBy: { sortOrder: "desc" },
+    });
     const category = await prisma.category.create({
       data: {
         name,
         type,
         createdMonth: month,
+        sortOrder: (lastCategory?.sortOrder ?? 0) + 1,
       },
     });
     await prisma.budgetCategory.create({

@@ -9,7 +9,7 @@ export const getCategoriesWithBalances = createServerFn()
     const [categories, budgets, transactions] = await Promise.all([
       prisma.category.findMany({
         where: { deletedMonth: null },
-        orderBy: { name: "asc" },
+        orderBy: { sortOrder: "asc" },
       }),
       prisma.budgetCategory.groupBy({
         by: ["categoryId"],

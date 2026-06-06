@@ -1,15 +1,48 @@
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { ActionIcon, Button, ButtonGroup, Card, Group, Stack, Text, Title } from "@mantine/core";
-import { IconChevronLeft, IconChevronRight, IconPlus } from "@tabler/icons-react";
-import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
+import {
+  IconArrowsUpDown,
+  IconCheck,
+  IconChevronLeft,
+  IconChevronRight,
+  IconGripVertical,
+  IconPlus,
+} from "@tabler/icons-react";
+import {
+  createFileRoute,
+  Outlet,
+  type RegisteredRouter,
+  type RouteById,
+  useRouter,
+} from "@tanstack/react-router";
+import clsx from "clsx";
 import { addMonths, parseISO, subMonths } from "date-fns";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineLink } from "~/components/MantineLink";
 import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
+import { reorderCategory } from "~/functions/reorderCategory";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
+import { useSyncedState } from "~/hooks/useSyncedState";
+import { pluck } from "~/lib/collections";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
 import "./BudgetPage.css";
@@ -29,10 +62,70 @@ export const Route = createFileRoute("/_layout/budget/$month")({
   },
 });
 
+type BudgetCategory = RouteById<
+  RegisteredRouter["routeTree"],
+  "/_layout/budget/$month"
+>["types"]["loaderData"]["budgetCategories"][number];
+
+interface CategoryItemProps {
+  budgetCategory: BudgetCategory;
+  viewMode: "budgeted" | "spent" | "balance";
+  reordering: boolean;
+}
+
+function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProps) {
+  const { budget } = Route.useLoaderData();
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: budgetCategory.categoryId,
+  });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      className={clsx("CategoryItem", { dragging: isDragging })}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+    >
+      {reordering && (
+        <div className="drag-handle" {...listeners}>
+          <IconGripVertical size={18} stroke={1.5} />
+        </div>
+      )}
+      <MantineLink
+        to="/budget/$month/category/$category"
+        params={{
+          month: budget.month,
+          category: budgetCategory.categoryId.toString(),
+        }}
+        underline="never"
+        c="inherit"
+      >
+        <Text>{budgetCategory.name}</Text>
+        <Text>
+          {formatCurrency(
+            viewMode === "budgeted"
+              ? budgetCategory.budgetedAmount
+              : viewMode === "spent"
+                ? budgetCategory.spent
+                : budgetCategory.balance,
+          )}
+        </Text>
+      </MantineLink>
+    </div>
+  );
+}
+
 function BudgetPage() {
   const router = useRouter();
   const { budget, totalBudgetedAmount, budgetCategories, budgetMonths } = Route.useLoaderData();
   const [viewMode, setViewMode] = useState<"budgeted" | "spent" | "balance">("budgeted");
+  const [reordering, setReordering] = useState(false);
   const leftToBudget = budget.income - totalBudgetedAmount;
 
   const previousMonth =
@@ -43,6 +136,37 @@ function BudgetPage() {
     budget.month === toISOMonthString(new Date())
       ? undefined
       : toISOMonthString(addMonths(parseISO(budget.month), 1));
+
+  const [categories, setCategories] = useSyncedState(budgetCategories);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor),
+  );
+  const accessibilityId = useId();
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = categories.findIndex((category) => category.categoryId === active.id);
+    const newIndex = categories.findIndex((category) => category.categoryId === over.id);
+    setCategories(arrayMove(categories, oldIndex, newIndex));
+
+    if (typeof active.id === "string" && typeof over.id === "string") {
+      await reorderCategory({
+        data: {
+          month: budget.month,
+          categoryId: active.id,
+          targetId: over.id,
+          direction: newIndex < oldIndex ? "before" : "after",
+        },
+      });
+      await router.invalidate();
+    }
+  };
 
   const handleSaveIncome = async (newIncome: number) => {
     await setBudgetIncome({
@@ -136,32 +260,27 @@ function BudgetPage() {
                 </Button>
               </ButtonGroup>
             </Group>
-            {budgetCategories.map((budgetCategory) => (
-              <MantineLink
-                key={budgetCategory.id}
-                to="/budget/$month/category/$category"
-                params={{
-                  month: budget.month,
-                  category: budgetCategory.categoryId.toString(),
-                }}
-                underline="never"
-                c="inherit"
+            <DndContext
+              id={accessibilityId}
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={pluck(categories, "categoryId")}
+                strategy={verticalListSortingStrategy}
               >
-                <Group justify="space-between">
-                  <Text>{budgetCategory.name}</Text>
-                  <Text>
-                    {formatCurrency(
-                      viewMode === "budgeted"
-                        ? budgetCategory.budgetedAmount
-                        : viewMode === "spent"
-                          ? budgetCategory.spent
-                          : budgetCategory.balance,
-                    )}
-                  </Text>
-                </Group>
-              </MantineLink>
-            ))}
-            <Group justify="center">
+                {categories.map((budgetCategory) => (
+                  <CategoryItem
+                    key={budgetCategory.id}
+                    budgetCategory={budgetCategory}
+                    viewMode={viewMode}
+                    reordering={reordering}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+            <Group justify="space-evenly">
               <Button
                 variant="subtle"
                 leftSection={<IconPlus />}
@@ -169,6 +288,25 @@ function BudgetPage() {
               >
                 Add Category
               </Button>
+
+              {reordering ? (
+                <Button
+                  variant="subtle"
+                  color="green"
+                  leftSection={<IconCheck />}
+                  onClick={() => setReordering(false)}
+                >
+                  Done Reordering
+                </Button>
+              ) : (
+                <Button
+                  variant="subtle"
+                  leftSection={<IconArrowsUpDown />}
+                  onClick={() => setReordering(true)}
+                >
+                  Reorder
+                </Button>
+              )}
             </Group>
           </Stack>
         </Card>

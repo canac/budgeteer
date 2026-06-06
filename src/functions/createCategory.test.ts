@@ -28,6 +28,7 @@ describe("createCategory", () => {
         type: CategoryType.NON_ACCUMULATING,
         createdMonth: "2025-01",
         deletedMonth: null,
+        sortOrder: 1,
       });
 
       const { budgetCategories } = await prisma.category.findFirstOrThrow({
@@ -56,6 +57,7 @@ describe("createCategory", () => {
         type: CategoryType.ACCUMULATING,
         createdMonth: "2025-01",
         deletedMonth: null,
+        sortOrder: 1,
       });
 
       const { budgetCategories } = await prisma.category.findFirstOrThrow({
@@ -67,6 +69,25 @@ describe("createCategory", () => {
         categoryId: category.id,
         budgetedAmount: 500,
       });
+    });
+
+    it("increments sort order", async () => {
+      await prisma.category.createMany({
+        data: [1, 2, 3].map((sortOrder) => ({
+          createdMonth: "2025-01",
+          name: "Groceries",
+          sortOrder,
+        })),
+      });
+
+      const category = await createCategory({
+        data: {
+          month: "2025-01",
+          name: "Groceries",
+        },
+      });
+
+      expect(category.sortOrder).toBe(4);
     });
 
     it("fails when budget does not exist", async () => {

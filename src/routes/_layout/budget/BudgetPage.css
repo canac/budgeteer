@@ -13,4 +13,35 @@
       font-weight: normal;
     }
   }
+
+  .CategoryItem {
+    display: flex;
+    flex-direction: row;
+    border-radius: var(--mantine-radius-sm);
+
+    &:has(.drag-handle:hover) {
+      background-color: var(--mantine-color-gray-0);
+    }
+
+    &.dragging {
+      opacity: 0.5;
+    }
+
+    .drag-handle {
+      display: flex;
+      align-items: center;
+      cursor: grab;
+      color: var(--mantine-color-gray-5);
+
+      &:active {
+        cursor: grabbing;
+      }
+    }
+
+    a {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
 }

@@ -10,6 +10,7 @@ const emergencyFund = await prisma.category.create({
   data: {
     name: "Emergency Fund",
     type: "SAVINGS",
+    sortOrder: 1,
     createdMonth: "2025-07",
   },
 });
@@ -18,6 +19,7 @@ const vacationFund = await prisma.category.create({
   data: {
     name: "Vacation Fund",
     type: "ACCUMULATING",
+    sortOrder: 2,
     createdMonth: "2025-07",
   },
 });
@@ -25,6 +27,7 @@ const vacationFund = await prisma.category.create({
 const groceriesCategory = await prisma.category.create({
   data: {
     name: "Groceries",
+    sortOrder: 3,
     createdMonth: "2025-07",
   },
 });
@@ -32,6 +35,7 @@ const groceriesCategory = await prisma.category.create({
 const utilitiesCategory = await prisma.category.create({
   data: {
     name: "Utilities",
+    sortOrder: 4,
     createdMonth: "2025-07",
   },
 });
@@ -39,6 +43,7 @@ const utilitiesCategory = await prisma.category.create({
 const entertainmentCategory = await prisma.category.create({
   data: {
     name: "Entertainment",
+    sortOrder: 5,
     createdMonth: "2025-07",
   },
 });

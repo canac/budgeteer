@@ -50,6 +50,7 @@ export const budget = (fields?: Partial<BudgetCreateInput>): BudgetCreateInput =
 
 export const category = (fields?: Partial<CategoryCreateInput>): CategoryCreateInput => ({
   name: faker.commerce.department(),
+  sortOrder: faker.number.int({ min: 1, max: 100 }),
   createdMonth: randomMonth(),
   ...fields,
 });

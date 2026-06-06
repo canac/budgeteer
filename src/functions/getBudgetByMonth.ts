@@ -28,7 +28,7 @@ async function getBudget(requestedMonth: Date) {
     },
     include: {
       budgetCategories: {
-        orderBy: { id: "asc" },
+        orderBy: { category: { sortOrder: "asc" } },
         include: { category: true },
       },
     },
@@ -82,7 +82,7 @@ async function getBudget(requestedMonth: Date) {
     },
     include: {
       budgetCategories: {
-        orderBy: { id: "asc" },
+        orderBy: { category: { sortOrder: "asc" } },
         include: { category: true },
       },
     },
