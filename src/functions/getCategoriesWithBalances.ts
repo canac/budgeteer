@@ -1,32 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
+import { calculateBalances } from "~/lib/calculateBalance";
 import { find } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
 
 export const getCategoriesWithBalances = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
-    const [categories, budgets, transactions] = await Promise.all([
-      prisma.category.findMany({
-        where: { deletedMonth: null },
-        orderBy: { sortOrder: "asc" },
-      }),
-      prisma.budgetCategory.groupBy({
-        by: ["categoryId"],
-        _sum: { budgetedAmount: true },
-      }),
-      prisma.transactionCategory.groupBy({
-        by: ["categoryId"],
-        _sum: { amount: true },
-      }),
-    ]);
-
-    return categories.map((category) => {
-      const totalBudgeted = find(budgets, "categoryId", category.id)?._sum.budgetedAmount ?? 0;
-      const totalSpent = find(transactions, "categoryId", category.id)?._sum.amount ?? 0;
-      return {
-        ...category,
-        balance: totalBudgeted + totalSpent,
-      };
+    const categories = await prisma.category.findMany({
+      where: { deletedMonth: null },
+      orderBy: { sortOrder: "asc" },
     });
+
+    const balances = await calculateBalances(
+      categories.map((category) => ({ categoryId: category.id, category })),
+      new Date(),
+    );
+
+    return categories.map((category) => ({
+      ...category,
+      balance: find(balances, "categoryId", category.id)?.balance ?? 0,
+    }));
   });

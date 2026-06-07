@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import {
+  BudgetCategoryCreateInput,
   BudgetCreateInput,
   CategorizationRuleCreateInput,
   CategoryCreateInput,
@@ -9,6 +10,8 @@ import {
   TransactionCreateInput,
 } from "src/prisma/models";
 import { getPrisma } from "./helpers";
+
+type WithRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 
 const randomMonth = () => faker.date.recent({ days: 365 }).toISOString().slice(0, 7);
 const randomDate = () => faker.date.recent({ days: 365 }).toISOString().slice(0, 10);
@@ -55,6 +58,13 @@ export const category = (fields?: Partial<CategoryCreateInput>): CategoryCreateI
   ...fields,
 });
 
+export const budgetCategory = (
+  fields: WithRequired<BudgetCategoryCreateInput, "category" | "budget">,
+): BudgetCategoryCreateInput => ({
+  budgetedAmount: faker.number.int({ min: 0, max: 100000 }),
+  ...fields,
+});
+
 export const transaction = (fields?: Partial<TransactionCreateInput>): TransactionCreateInput => ({
   amount: -faker.number.int({ min: 100, max: 50000 }),
   date: randomDate(),
@@ -70,23 +80,26 @@ export const categorizationRule = (
   ...fields,
 });
 
-export const createTellerEnrollment = (fields?: Partial<TellerEnrollmentCreateInput>) =>
-  getPrisma().tellerEnrollment.create({ data: tellerEnrollment(fields) });
+export const createTellerEnrollment = (...args: Parameters<typeof tellerEnrollment>) =>
+  getPrisma().tellerEnrollment.create({ data: tellerEnrollment(...args) });
 
-export const createTellerAccount = (fields?: Partial<TellerAccountCreateInput>) =>
-  getPrisma().tellerAccount.create({ data: tellerAccount(fields) });
+export const createTellerAccount = (...args: Parameters<typeof tellerAccount>) =>
+  getPrisma().tellerAccount.create({ data: tellerAccount(...args) });
 
-export const createTellerTransaction = (fields?: Partial<TellerTransactionCreateInput>) =>
-  getPrisma().tellerTransaction.create({ data: tellerTransaction(fields) });
+export const createTellerTransaction = (...args: Parameters<typeof tellerTransaction>) =>
+  getPrisma().tellerTransaction.create({ data: tellerTransaction(...args) });
 
-export const createBudget = (fields?: Partial<BudgetCreateInput>) =>
-  getPrisma().budget.create({ data: budget(fields) });
+export const createBudget = (...args: Parameters<typeof budget>) =>
+  getPrisma().budget.create({ data: budget(...args) });
 
-export const createCategory = (fields?: Partial<CategoryCreateInput>) =>
-  getPrisma().category.create({ data: category(fields) });
+export const createCategory = (...args: Parameters<typeof category>) =>
+  getPrisma().category.create({ data: category(...args) });
 
-export const createTransaction = (fields?: Partial<TransactionCreateInput>) =>
-  getPrisma().transaction.create({ data: transaction(fields) });
+export const createTransaction = (...args: Parameters<typeof transaction>) =>
+  getPrisma().transaction.create({ data: transaction(...args) });
 
-export const createCategorizationRule = (fields?: Partial<CategorizationRuleCreateInput>) =>
-  getPrisma().categorizationRule.create({ data: categorizationRule(fields) });
+export const createCategorizationRule = (...args: Parameters<typeof categorizationRule>) =>
+  getPrisma().categorizationRule.create({ data: categorizationRule(...args) });
+
+export const createBudgetCategory = (...args: Parameters<typeof budgetCategory>) =>
+  getPrisma().budgetCategory.create({ data: budgetCategory(...args) });
