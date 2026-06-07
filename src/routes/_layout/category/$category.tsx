@@ -72,6 +72,7 @@ function CategoryHistoryPage() {
   const startMonthFormatted = monthFormatter.format(parseISO(startMonth));
   const endMonthFormatted = monthFormatter.format(parseISO(endMonth));
   const totalTransactions = categoryHistory.transactions.length;
+  const monthCount = categoryHistory.monthlyBreakdown.length;
   const percentageUsed = (totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted) * 100;
 
   return (
@@ -160,7 +161,7 @@ function CategoryHistoryPage() {
                 Spent per Month
               </Text>
               <Text size="2.25rem" fw="bold">
-                {formatCurrency(totalSpent / months)}
+                {formatCurrency(totalSpent / monthCount)}
               </Text>
             </Stack>
           </Card>
@@ -171,7 +172,7 @@ function CategoryHistoryPage() {
                 Transactions per Month
               </Text>
               <Text size="2.25rem" fw="bold">
-                {(totalTransactions / months).toFixed(1)}
+                {(totalTransactions / monthCount).toFixed(1)}
               </Text>
             </Stack>
           </Card>
