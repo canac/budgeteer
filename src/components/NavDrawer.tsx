@@ -1,5 +1,11 @@
 import { Badge, Drawer, NavLink } from "@mantine/core";
-import { IconFileImport, IconLayoutDashboard, IconLogout } from "@tabler/icons-react";
+import {
+  IconCalendarMonth,
+  IconCategory,
+  IconChartBar,
+  IconFileImport,
+  IconLogout,
+} from "@tabler/icons-react";
 import { getRouteApi, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { logout as logoutServerFn } from "~/functions/logout";
@@ -50,12 +56,13 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
       <MantineNavLink
         to="/"
         label="Overview"
-        leftSection={<IconLayoutDashboard size={18} />}
+        leftSection={<IconChartBar size={18} />}
         onClick={onClose}
       />
       <NavLink
         key={`months-${currentMonth ?? "none"}`}
         label="Months"
+        leftSection={<IconCalendarMonth size={18} />}
         defaultOpened={currentMonth !== null}
         fw="bold"
       >
@@ -68,6 +75,7 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
       <NavLink
         key={`categories-${category ?? "none"}`}
         label="Categories"
+        leftSection={<IconCategory size={18} />}
         defaultOpened={category !== undefined}
         fw="bold"
       >
