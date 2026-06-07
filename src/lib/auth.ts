@@ -31,7 +31,7 @@ export async function authenticateWithPassword(password: string): Promise<boolea
   setCookie("auth", jwt, {
     httpOnly: true,
     maxAge: 60 * 60 * 24 * 30, // 30 days
-    sameSite: "strict",
+    sameSite: "lax",
     secure: true,
   });
 
