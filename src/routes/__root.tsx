@@ -46,12 +46,53 @@ const theme = createTheme({
         childrenOffset: "md",
       },
     },
+    Input: {
+      defaultProps: {
+        size: "md",
+      },
+    },
+    TextInput: {
+      defaultProps: {
+        size: "md",
+      },
+    },
     NumberInput: {
       defaultProps: {
+        size: "md",
         leftSection: "$",
         min: 0,
         decimalScale: 2,
         fixedDecimalScale: true,
+      },
+    },
+    PasswordInput: {
+      defaultProps: {
+        size: "md",
+      },
+    },
+    Checkbox: {
+      defaultProps: {
+        size: "md",
+      },
+    },
+    Switch: {
+      defaultProps: {
+        size: "md",
+      },
+    },
+    Select: {
+      defaultProps: {
+        size: "md",
+      },
+    },
+    MultiSelect: {
+      defaultProps: {
+        size: "md",
+      },
+    },
+    Autocomplete: {
+      defaultProps: {
+        size: "md",
       },
     },
     Table: {
