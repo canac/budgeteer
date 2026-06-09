@@ -5,6 +5,7 @@ import {
   IconChartBar,
   IconFileImport,
   IconLogout,
+  IconSearch,
 } from "@tabler/icons-react";
 import { getRouteApi, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -57,6 +58,12 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
         to="/"
         label="Overview"
         leftSection={<IconChartBar size={18} />}
+        onClick={onClose}
+      />
+      <MantineNavLink
+        to="/search"
+        label="Search"
+        leftSection={<IconSearch size={18} />}
         onClick={onClose}
       />
       <NavLink
