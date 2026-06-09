@@ -1,7 +1,13 @@
-import { ActionIcon, AppShell, Box, Burger, Container, Group } from "@mantine/core";
+import { ActionIcon, AppShell, Box, Burger, Container, Group, Loader } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconArrowsExchange, IconList, IconPlus } from "@tabler/icons-react";
-import { createFileRoute, Outlet, useParams, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  useParams,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 import { DynamicNewTransferModal } from "~/components/DynamicNewTransferModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
@@ -33,6 +39,9 @@ function LayoutRoute() {
     from: "/_layout/budget/$month",
     shouldThrow: false,
     select: (params) => params.month,
+  });
+  const loading = useRouterState({
+    select: (state) => state.isLoading || state.status === "pending",
   });
 
   const handleUpdate = async () => {
@@ -67,6 +76,7 @@ function LayoutRoute() {
               <MantineLink to="/" c="white" underline="never" fz="xl" fw="bold">
                 Budgeteer
               </MantineLink>
+              {loading && <Loader size="sm" color="white" />}
               <Box flex={1} />
               <Group gap="xs">
                 {month && (
