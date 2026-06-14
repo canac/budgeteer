@@ -13,8 +13,14 @@ export const Route = createFileRoute("/_layout/")({
 });
 
 function OverviewPage() {
-  const { month, totalSpent, totalBudgeted, monthProgressionPercentage, categories } =
-    Route.useLoaderData();
+  const {
+    month,
+    totalSpent,
+    totalBudgeted,
+    monthProgressionPercentage,
+    categories,
+    leftoverBalance,
+  } = Route.useLoaderData();
 
   const chartData = [
     ...categories.map(({ category, spent, budgeted }) => ({
@@ -36,7 +42,7 @@ function OverviewPage() {
           </MantineLink>
         </Title>
 
-        <SimpleGrid cols={{ base: 1, sm: 3 }}>
+        <SimpleGrid cols={{ base: 1, sm: 4 }}>
           <Card shadow="sm">
             <Stack gap="xs">
               <Text size="sm" c="dimmed" fw={500}>
@@ -66,6 +72,17 @@ function OverviewPage() {
               </Text>
               <Text size="xl" fw={700} c={totalSpent > totalBudgeted ? "red" : "green"}>
                 {formatCurrency(totalBudgeted - totalSpent)}
+              </Text>
+            </Stack>
+          </Card>
+
+          <Card shadow="sm">
+            <Stack gap="xs">
+              <Text size="sm" c="dimmed" fw={500}>
+                Leftover
+              </Text>
+              <Text size="xl" fw={700} c={leftoverBalance < 0 ? "red" : "green"}>
+                {formatCurrency(leftoverBalance)}
               </Text>
             </Stack>
           </Card>

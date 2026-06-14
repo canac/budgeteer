@@ -3,7 +3,7 @@ import { getDaysInMonth, parseISO } from "date-fns";
 import type { BudgetInclude } from "~/prisma/models";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
-import { toISOMonthString } from "~/lib/iso";
+import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 
 /**
@@ -74,6 +74,27 @@ export const getOverview = createServerFn()
     const dayOfMonth = now.getDate();
     const monthProgressionPercentage = dayOfMonth / totalDaysInMonth;
 
+    // Virtual leftover category capturing all non-accumulating categories from previous months
+    const currentMonthStart = toISODateString(parseISO(budget.month));
+    const [leftoverBudgeted, leftoverTransactions] = await Promise.all([
+      prisma.budgetCategory.aggregate({
+        _sum: { budgetedAmount: true },
+        where: {
+          category: { type: "NON_ACCUMULATING" },
+          budget: { month: { lt: budget.month } },
+        },
+      }),
+      prisma.transactionCategory.aggregate({
+        _sum: { amount: true },
+        where: {
+          category: { type: "NON_ACCUMULATING" },
+          transaction: { date: { lt: currentMonthStart } },
+        },
+      }),
+    ]);
+    const leftoverBalance =
+      (leftoverBudgeted._sum.budgetedAmount ?? 0) + (leftoverTransactions._sum.amount ?? 0);
+
     return {
       month: budget.month,
       totalSpent,
@@ -81,5 +102,6 @@ export const getOverview = createServerFn()
       monthProgressionPercentage,
       categories: budgetCategories,
       income: budget.income,
+      leftoverBalance,
     };
   });
