@@ -2,6 +2,7 @@ import { BarChart } from "@mantine/charts";
 import { Card, Container, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
+import { MantineLink } from "~/components/MantineLink";
 import { getOverview } from "~/functions/getOverview";
 import { formatCurrency, monthFormatter, percentageFormatter } from "~/lib/formatters";
 
@@ -29,7 +30,11 @@ function OverviewPage() {
   return (
     <Container size="lg" py="xl">
       <Stack gap="xl">
-        <Title order={1}>{monthFormatter.format(parseISO(month))}</Title>
+        <Title order={1}>
+          <MantineLink to="/budget/$month" params={{ month }} c="inherit" inherit>
+            {monthFormatter.format(parseISO(month))}
+          </MantineLink>
+        </Title>
 
         <SimpleGrid cols={{ base: 1, sm: 3 }}>
           <Card shadow="sm">
