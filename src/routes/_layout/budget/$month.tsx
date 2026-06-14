@@ -223,12 +223,18 @@ function BudgetPage() {
           <Stack gap="xs">
             <Group justify="space-between">
               <Title order={2}>Income</Title>
-              <EditableAmount amount={budget.income} saveAmount={handleSaveIncome} />
+              <EditableAmount
+                className={leftToBudget === 0 ? "positive" : undefined}
+                amount={budget.income}
+                saveAmount={handleSaveIncome}
+              />
             </Group>
-            <Group justify="space-between">
-              <Text>Left to budget</Text>
-              <Text c={leftToBudget >= 0 ? "green" : "red"}>{formatCurrency(leftToBudget)}</Text>
-            </Group>
+            {leftToBudget !== 0 && (
+              <Group justify="space-between">
+                <Text>Left to budget</Text>
+                <Text c={leftToBudget >= 0 ? "green" : "red"}>{formatCurrency(leftToBudget)}</Text>
+              </Group>
+            )}
           </Stack>
         </Card>
 
