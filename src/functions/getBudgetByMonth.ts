@@ -104,10 +104,14 @@ export const getBudgetByMonth = createServerFn()
     );
 
     const budgetCategories = await calculateBalances(budget.budgetCategories, month);
+    const leftoverRemaining = budgetCategories
+      .filter((budgetCategory) => !budgetCategory.category.accumulating)
+      .reduce((sum, budgetCategory) => sum + budgetCategory.balance, 0);
     return {
       budget,
       month: toISOMonthString(month),
       totalBudgetedAmount,
+      leftoverRemaining,
       budgetCategories: budgetCategories.map((budgetCategory) => ({
         ...budgetCategory,
         name: budgetCategory.category.name,

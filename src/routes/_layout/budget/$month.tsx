@@ -123,7 +123,8 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
 
 function BudgetPage() {
   const router = useRouter();
-  const { budget, totalBudgetedAmount, budgetCategories, budgetMonths } = Route.useLoaderData();
+  const { budget, totalBudgetedAmount, budgetCategories, budgetMonths, leftoverRemaining } =
+    Route.useLoaderData();
   const [viewMode, setViewMode] = useState<"budgeted" | "spent" | "balance">("budgeted");
   const [reordering, setReordering] = useState(false);
   const leftToBudget = budget.income - totalBudgetedAmount;
@@ -235,6 +236,10 @@ function BudgetPage() {
                 <Text c={leftToBudget >= 0 ? "green" : "red"}>{formatCurrency(leftToBudget)}</Text>
               </Group>
             )}
+            <Group justify="space-between">
+              <Text>Leftover</Text>
+              <Text>{formatCurrency(leftoverRemaining)}</Text>
+            </Group>
           </Stack>
         </Card>
 
