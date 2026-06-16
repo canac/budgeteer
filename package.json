@@ -14,7 +14,7 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "node --env-file=.env seed.ts",
     "fmt": "oxfmt --write .",
     "lint": "oxlint",
