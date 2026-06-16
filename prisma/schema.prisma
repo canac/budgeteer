@@ -15,12 +15,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum CategoryType {
-  SAVINGS
-  ACCUMULATING
-  NON_ACCUMULATING
-}
-
 enum TransactionType {
   TRANSACTION
   TRANSFER
@@ -41,7 +35,8 @@ model Category {
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
   name                  String
-  type                  CategoryType          @default(NON_ACCUMULATING)
+  accumulating          Boolean               @default(false)
+  flexible              Boolean               @default(true)
   sortOrder             Float
   createdMonth          String
   deletedMonth          String?

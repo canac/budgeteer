@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Budget } from "~/prisma/client.ts";
-import { CategoryType } from "~/prisma/enums";
 import { getPrisma } from "../../test/helpers.ts";
 import { createCategory } from "./createCategory.ts";
 
@@ -25,7 +24,8 @@ describe("createCategory", () => {
 
       expect(category).toMatchObject({
         name: "Groceries",
-        type: CategoryType.NON_ACCUMULATING,
+        accumulating: false,
+        flexible: true,
         createdMonth: "2025-01",
         deletedMonth: null,
         sortOrder: 1,
@@ -47,14 +47,16 @@ describe("createCategory", () => {
         data: {
           month: "2025-01",
           name: "Groceries",
-          type: CategoryType.ACCUMULATING,
+          accumulating: true,
+          flexible: true,
           budgetedAmount: 500,
         },
       });
 
       expect(category).toMatchObject({
         name: "Groceries",
-        type: CategoryType.ACCUMULATING,
+        accumulating: true,
+        flexible: true,
         createdMonth: "2025-01",
         deletedMonth: null,
         sortOrder: 1,

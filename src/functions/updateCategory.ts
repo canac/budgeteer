@@ -1,13 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
-import { object, string } from "zod";
+import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
-import { categoryType } from "~/lib/zod";
 
 const inputSchema = object({
   categoryId: string(),
   name: string().min(1).optional(),
-  type: categoryType().optional(),
+  accumulating: boolean().optional(),
+  flexible: boolean().optional(),
 });
 
 export const updateCategory = createServerFn({ method: "POST" })

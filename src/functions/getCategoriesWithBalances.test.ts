@@ -28,7 +28,7 @@ describe("getCategoriesWithBalances", () => {
   });
 
   it("reports only the current month for non-accumulating categories", async () => {
-    const { id } = await createCategory({ type: "NON_ACCUMULATING", createdMonth: lastMonth });
+    const { id } = await createCategory({ accumulating: false, createdMonth: lastMonth });
     await Promise.all([
       createBudgetCategory({
         budgetedAmount: 3000,
@@ -57,7 +57,7 @@ describe("getCategoriesWithBalances", () => {
   });
 
   it("accumulates through the current month for fund categories", async () => {
-    const { id } = await createCategory({ type: "ACCUMULATING", createdMonth: lastMonth });
+    const { id } = await createCategory({ accumulating: true, createdMonth: lastMonth });
     await Promise.all([
       createBudgetCategory({
         budgetedAmount: 3000,

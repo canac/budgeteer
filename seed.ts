@@ -9,7 +9,8 @@ await prisma.budget.deleteMany();
 const emergencyFund = await prisma.category.create({
   data: {
     name: "Emergency Fund",
-    type: "SAVINGS",
+    accumulating: true,
+    flexible: false,
     sortOrder: 1,
     createdMonth: "2025-07",
   },
@@ -18,7 +19,8 @@ const emergencyFund = await prisma.category.create({
 const vacationFund = await prisma.category.create({
   data: {
     name: "Vacation Fund",
-    type: "ACCUMULATING",
+    accumulating: true,
+    flexible: true,
     sortOrder: 2,
     createdMonth: "2025-07",
   },

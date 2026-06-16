@@ -13,7 +13,7 @@ describe("setCategoryBalance", () => {
   beforeEach(async () => {
     const [budget, category]: [Budget, Category] = await Promise.all([
       createBudget({ month }),
-      createCategory({ createdMonth: month, type: "ACCUMULATING" }),
+      createCategory({ createdMonth: month, accumulating: true }),
     ]);
     categoryId = category.id;
     await Promise.all([
@@ -90,7 +90,7 @@ describe("setCategoryBalance", () => {
   it("throws when category is non-accumulating", async () => {
     const nonAccumulating = await createCategory({
       createdMonth: month,
-      type: "NON_ACCUMULATING",
+      accumulating: false,
     });
 
     await expect(

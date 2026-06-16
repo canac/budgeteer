@@ -1,21 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
-import { number, object, string, enum as zodEnum } from "zod";
+import { boolean, number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
 import { monthString } from "~/lib/zod";
-import { CategoryType } from "~/prisma/enums";
 
 const inputSchema = object({
   month: monthString(),
   name: string().min(1),
   budgetedAmount: number().min(0).default(0),
-  type: zodEnum(Object.values(CategoryType)).optional(),
+  accumulating: boolean().optional(),
+  flexible: boolean().optional(),
 });
 
 export const createCategory = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { month, name, budgetedAmount, type } }) => {
+  .handler(async ({ data: { month, name, budgetedAmount, accumulating, flexible } }) => {
     const budget = await prisma.budget.findFirstOrThrow({
       where: { month },
     });
@@ -25,7 +25,8 @@ export const createCategory = createServerFn({ method: "POST" })
     const category = await prisma.category.create({
       data: {
         name,
-        type,
+        accumulating,
+        flexible,
         createdMonth: month,
         sortOrder: (lastCategory?.sortOrder ?? 0) + 1,
       },

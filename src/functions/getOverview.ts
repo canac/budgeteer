@@ -53,7 +53,7 @@ export const getOverview = createServerFn()
   .handler(async () => {
     const budget = await getCurrentBudget();
     const filteredBudgetCategories = budget.budgetCategories.filter(
-      (budgetCategory) => budgetCategory.category.type !== "SAVINGS",
+      (budgetCategory) => budgetCategory.category.flexible,
     );
     const budgetCategories = await calculateBalances(
       filteredBudgetCategories,
@@ -80,14 +80,14 @@ export const getOverview = createServerFn()
       prisma.budgetCategory.aggregate({
         _sum: { budgetedAmount: true },
         where: {
-          category: { type: "NON_ACCUMULATING" },
+          category: { accumulating: false },
           budget: { month: { lt: budget.month } },
         },
       }),
       prisma.transactionCategory.aggregate({
         _sum: { amount: true },
         where: {
-          category: { type: "NON_ACCUMULATING" },
+          category: { accumulating: false },
           transaction: { date: { lt: currentMonthStart } },
         },
       }),

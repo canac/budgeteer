@@ -22,7 +22,7 @@ export const setCategoryStartingBalance = createServerFn({ method: "POST" })
     const category = await prisma.category.findUniqueOrThrow({
       where: {
         id: categoryId,
-        type: { not: "NON_ACCUMULATING" },
+        accumulating: true,
         OR: [{ deletedMonth: null }, { deletedMonth: { gt: monthString } }],
       },
     });

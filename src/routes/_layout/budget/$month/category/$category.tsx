@@ -4,8 +4,8 @@ import {
   Drawer,
   Group,
   Progress,
-  Select,
   Stack,
+  Switch,
   Table,
   Text,
   Title,
@@ -36,7 +36,6 @@ import {
   monthOnlyFormatter,
   shortDateFormatter,
 } from "~/lib/formatters";
-import { categoryType as categoryTypeSchema } from "~/lib/zod";
 import "./CategoryDetailsPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/category/$category")({
@@ -69,7 +68,8 @@ function CategoryDetailsPage() {
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
 
-  const [categoryType, setCategoryType] = useSyncedState(budgetCategory.category.type);
+  const [accumulating, setAccumulating] = useSyncedState(budgetCategory.category.accumulating);
+  const [flexible, setFlexible] = useSyncedState(budgetCategory.category.flexible);
 
   const handleSaveCategoryName = async (newName: string) => {
     await updateCategory({
@@ -78,11 +78,18 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
-  const handleChangeType = async (value: string | null) => {
-    const newType = categoryTypeSchema().parse(value);
-    setCategoryType(newType);
+  const handleChangeAccumulating = async (newAccumulating: boolean) => {
+    setAccumulating(newAccumulating);
     await updateCategory({
-      data: { categoryId: budgetCategory.category.id, type: newType },
+      data: { categoryId: budgetCategory.category.id, accumulating: newAccumulating },
+    });
+    await router.invalidate();
+  };
+
+  const handleChangeFlexible = async (newFlexible: boolean) => {
+    setFlexible(newFlexible);
+    await updateCategory({
+      data: { categoryId: budgetCategory.category.id, flexible: newFlexible },
     });
     await router.invalidate();
   };
@@ -144,7 +151,7 @@ function CategoryDetailsPage() {
         </Table.Td>
         <Table.Td />
       </Table.Tr>
-      {budgetCategory.category.type === "ACCUMULATING" && (
+      {budgetCategory.category.accumulating && (
         <Table.Tr>
           <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
           <Table.Td>{monthOnlyFormatter.format(subMonths(monthDate, 1))} balance</Table.Td>
@@ -194,21 +201,23 @@ function CategoryDetailsPage() {
             <Title order={3}>Current Balance</Title>
             <EditableAmount
               className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
-              editable={categoryType !== "NON_ACCUMULATING"}
+              editable={accumulating}
               amount={budgetCategory.currentBalance}
               saveAmount={handleSaveBalance}
             />
           </div>
-          <Select
-            label={<Title order={3}>Type</Title>}
-            value={categoryType}
-            onChange={handleChangeType}
-            data={[
-              { value: "SAVINGS", label: "Savings" },
-              { value: "ACCUMULATING", label: "Accumulating" },
-              { value: "NON_ACCUMULATING", label: "Non-Accumulating" },
-            ]}
-          />
+          <Stack gap="xs">
+            <Switch
+              label="Accumulating"
+              checked={accumulating}
+              onChange={(event) => handleChangeAccumulating(event.currentTarget.checked)}
+            />
+            <Switch
+              label="Flexible"
+              checked={flexible}
+              onChange={(event) => handleChangeFlexible(event.currentTarget.checked)}
+            />
+          </Stack>
         </Group>
 
         <div>
