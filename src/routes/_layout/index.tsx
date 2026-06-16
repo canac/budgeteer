@@ -90,7 +90,7 @@ function OverviewPage() {
 
         <Card shadow="sm">
           <Stack gap="md">
-            <Title order={3}>Spending by Category</Title>
+            <Title order={3}>Spending by category</Title>
             <BarChart
               h={Math.max(300, chartData.length * 40)}
               data={chartData}

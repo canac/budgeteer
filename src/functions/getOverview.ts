@@ -13,7 +13,7 @@ export const getCurrentBudget = createServerOnlyFn(async () => {
   const month = toISOMonthString(new Date());
   const include = {
     budgetCategories: {
-      orderBy: { category: { name: "asc" } },
+      orderBy: { category: { sortOrder: "asc" } },
       include: { category: true },
     },
   } satisfies BudgetInclude;
