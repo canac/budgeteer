@@ -1,5 +1,4 @@
-import { faker } from "@faker-js/faker";
-import {
+import type {
   BudgetCategoryCreateInput,
   BudgetCreateInput,
   CategorizationRuleCreateInput,
@@ -9,6 +8,7 @@ import {
   TellerTransactionCreateInput,
   TransactionCreateInput,
 } from "src/prisma/models";
+import { faker } from "@faker-js/faker";
 import { getPrisma } from "./helpers";
 
 type WithRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;

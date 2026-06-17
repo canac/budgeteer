@@ -23,21 +23,19 @@ export function getPrisma(): PrismaClient {
 }
 
 export function setupSchema(): Promise<void> {
-  if (!setupPromise) {
-    setupPromise = (async () => {
-      const ddl = await readFile(process.env.TEST_DDL_PATH!, "utf8");
-      const client = new Client({ connectionString: process.env.DATABASE_URL });
-      await client.connect();
-      try {
-        await client.query(`DROP SCHEMA IF EXISTS "${workerSchema}" CASCADE`);
-        await client.query(`CREATE SCHEMA "${workerSchema}"`);
-        await client.query(`SET search_path TO "${workerSchema}"`);
-        await client.query(ddl);
-      } finally {
-        await client.end();
-      }
-    })();
-  }
+  setupPromise ??= (async () => {
+    const ddl = await readFile(process.env.TEST_DDL_PATH!, "utf8");
+    const client = new Client({ connectionString: process.env.DATABASE_URL });
+    await client.connect();
+    try {
+      await client.query(`DROP SCHEMA IF EXISTS "${workerSchema}" CASCADE`);
+      await client.query(`CREATE SCHEMA "${workerSchema}"`);
+      await client.query(`SET search_path TO "${workerSchema}"`);
+      await client.query(ddl);
+    } finally {
+      await client.end();
+    }
+  })();
   return setupPromise;
 }
 

@@ -230,7 +230,7 @@ describe("syncAccount", () => {
 
     const reloaded = await prisma.tellerAccount.findUniqueOrThrow({ where: { id: account.id } });
     expect(reloaded.lastSyncedAt).not.toBeNull();
-    const ts = reloaded.lastSyncedAt!.getTime();
+    const ts = reloaded.lastSyncedAt?.getTime();
     expect(ts).toBeGreaterThanOrEqual(before);
     expect(ts).toBeLessThanOrEqual(after);
   });

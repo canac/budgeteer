@@ -19,7 +19,7 @@ export const searchTransactions = createServerFn()
     const transactions = await prisma.transaction.findMany({
       where: {
         type: { not: "BALANCE_ADJUSTMENT" },
-        ...((fromDate || toDate) && { date: { gte: fromDate, lte: toDate } }),
+        ...((!!fromDate || !!toDate) && { date: { gte: fromDate, lte: toDate } }),
         ...(vendor && { vendor: { equals: vendor } }),
         ...(categoryId && { transactionCategories: { some: { categoryId } } }),
       },

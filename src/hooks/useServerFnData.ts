@@ -11,7 +11,7 @@ export function useServerFnData<T>(
     const abortController = new AbortController();
     loadData({ signal: abortController.signal })
       .then((result) => setData(result))
-      .catch((error) => {
+      .catch((error: unknown) => {
         if (!abortController.signal.aborted) {
           throw error;
         }

@@ -104,7 +104,7 @@ export function TransactionModal({
       ? {
           amount: penniesToDollars(Math.abs(editingTransaction.amount)),
           vendor: editingTransaction.vendor,
-          description: editingTransaction.description || "",
+          description: editingTransaction.description ?? "",
           date: editingTransaction.date,
           isIncome: editingTransaction.amount > 0,
           selectedCategoryIds: pluck(editingTransaction.transactionCategories, "id"),

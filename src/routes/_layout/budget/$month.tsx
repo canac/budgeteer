@@ -101,7 +101,7 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
         to="/budget/$month/category/$category"
         params={{
           month: budget.month,
-          category: budgetCategory.categoryId.toString(),
+          category: budgetCategory.categoryId,
         }}
         underline="never"
         c="inherit"

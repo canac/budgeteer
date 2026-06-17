@@ -1,4 +1,5 @@
-import z, { array, literal, object, string, union } from "zod";
+import type z from "zod";
+import { array, literal, object, string, union } from "zod";
 
 export const tellerAccountSchema = object({
   id: string(),

@@ -47,13 +47,8 @@ function SearchPage() {
   const update = (patch: Partial<typeof search>) =>
     navigate({
       search: (prev) => {
-        const next = { ...prev, ...patch };
-        for (const key of Object.keys(next) as (keyof typeof next)[]) {
-          if (!next[key]) {
-            delete next[key];
-          }
-        }
-        return next;
+        const merged = { ...prev, ...patch };
+        return Object.fromEntries(Object.entries(merged).filter(([, value]) => value));
       },
     });
 

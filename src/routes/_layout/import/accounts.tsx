@@ -17,7 +17,7 @@ interface TellerEnrollmentResult {
 }
 
 interface TellerConnectInstance {
-  open(): void;
+  open: () => void;
 }
 
 interface TellerConnectSetupOptions {
@@ -32,7 +32,7 @@ interface TellerConnectSetupOptions {
 declare global {
   interface Window {
     TellerConnect?: {
-      setup(options: TellerConnectSetupOptions): TellerConnectInstance;
+      setup: (options: TellerConnectSetupOptions) => TellerConnectInstance;
     };
   }
 }
@@ -80,10 +80,10 @@ function AccountsPage() {
   useEffect(() => {
     loadTellerScript().then(
       () => setReady(true),
-      (err: Error) =>
+      (err: unknown) =>
         notifications.show({
           title: "Teller Connect failed to load",
-          message: err.message,
+          message: err instanceof Error ? err.message : String(err),
           color: "red",
         }),
     );

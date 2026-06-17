@@ -25,9 +25,7 @@ function createAgent(): Agent {
 
 let dispatcher: Dispatcher | null = null;
 function getDispatcher(): Dispatcher {
-  if (!dispatcher) {
-    dispatcher = createAgent();
-  }
+  dispatcher ??= createAgent();
   return dispatcher;
 }
 
@@ -36,7 +34,7 @@ export function setDispatcher(newDispatcher: Dispatcher | null): void {
 }
 
 export class TellerClient {
-  #accessToken: string;
+  readonly #accessToken: string;
 
   constructor(accessToken: string) {
     this.#accessToken = accessToken;
@@ -67,6 +65,7 @@ export class TellerClient {
 
     const startDate = toISODateString(subDays(lastSync, 10));
     let fromId = null;
+    // oxlint-disable-next-line typescript/no-unnecessary-condition
     while (true) {
       const params = new URLSearchParams({
         count: String(BATCH_SIZE),

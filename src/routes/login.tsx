@@ -41,6 +41,7 @@ function LoginPage() {
         password: values.password,
       },
     });
+    // oxlint-disable-next-line typescript/no-unnecessary-condition
     if (!result?.success) {
       form.setFieldError("password", "Invalid password");
     }

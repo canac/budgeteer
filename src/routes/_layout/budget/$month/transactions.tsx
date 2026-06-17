@@ -42,7 +42,7 @@ function CategoryLink({ month, category }: CategoryLinkProps) {
       to="/budget/$month/category/$category"
       params={{
         month,
-        category: category.id.toString(),
+        category: category.id,
       }}
       fz="inherit"
     >
