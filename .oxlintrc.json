@@ -6,7 +6,8 @@
   },
   "rules": {
     "no-console": "error",
-    "object-shorthand": "error"
+    "object-shorthand": "error",
+    "react/react-compiler": "error"
   },
   "settings": {
     "vitest": {
