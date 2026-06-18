@@ -18,7 +18,7 @@
     "db:seed": "node --env-file=.env seed.ts",
     "fmt": "oxfmt --write .",
     "lint": "oxlint",
-    "lint:ts": "tsgo --noEmit",
+    "lint:ts": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -64,7 +64,7 @@
     "oxlint": "^1.70.0",
     "oxlint-tsgolint": "^0.23.0",
     "pg": "^8.20.0",
-    "typescript": "npm:@typescript/native-preview@beta",
+    "typescript": "7.0.1-rc",
     "vite": "^8.0.10",
     "vitest": "^4.1.4"
   },
