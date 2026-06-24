@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
-import { _default, coerce, object } from "zod/mini";
+import { _default, coerce, enum as enumType, object } from "zod/mini";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
 import { CategoryType } from "~/components/CategoryType";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
@@ -20,24 +20,36 @@ import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
 
+const ranges = ["current", "last1", "last3", "last6", "last12"] as const;
+type Range = (typeof ranges)[number];
+
 const searchSchema = object({
-  months: _default(coerce.number(), 6),
-  incomplete: _default(coerce.boolean(), true),
+  range: _default(enumType(ranges), "current"),
   transfers: _default(coerce.boolean(), false),
 });
+
+function getRangeMonths(range: Range) {
+  const currentDate = new Date();
+  if (range === "current") {
+    const month = toISOMonthString(currentDate);
+    return { startMonth: month, endMonth: month };
+  }
+  const count = Number(range.slice(4));
+  return {
+    startMonth: toISOMonthString(subMonths(currentDate, count)),
+    endMonth: toISOMonthString(subMonths(currentDate, 1)),
+  };
+}
 
 export const Route = createFileRoute("/_layout/category/$category")({
   component: CategoryHistoryPage,
   validateSearch: searchSchema,
-  loaderDeps: ({ search: { months, incomplete, transfers } }) => ({
-    months,
-    incomplete,
+  loaderDeps: ({ search: { range, transfers } }) => ({
+    range,
     transfers,
   }),
-  loader: ({ params: { category }, deps: { months, incomplete, transfers } }) => {
-    const currentDate = new Date();
-    const startMonth = toISOMonthString(subMonths(currentDate, months));
-    const endMonth = toISOMonthString(incomplete ? currentDate : subMonths(currentDate, 1));
+  loader: ({ params: { category }, deps: { range, transfers } }) => {
+    const { startMonth, endMonth } = getRangeMonths(range);
     return getCategoryHistory({
       data: {
         categoryId: category,
@@ -52,17 +64,17 @@ export const Route = createFileRoute("/_layout/category/$category")({
   }),
 });
 
-const monthOptions = [
-  { value: 1, label: "1 Month" },
-  { value: 3, label: "3 Months" },
-  { value: 6, label: "6 Months" },
-  { value: 12, label: "12 Months" },
-  { value: 24, label: "24 Months" },
+const rangeOptions: Array<{ value: Range; label: string }> = [
+  { value: "current", label: "This month" },
+  { value: "last1", label: "Last month" },
+  { value: "last3", label: "Last 3 months" },
+  { value: "last6", label: "Last 6 months" },
+  { value: "last12", label: "Last 12 months" },
 ];
 
 function CategoryHistoryPage() {
   const categoryHistory = Route.useLoaderData();
-  const { months, incomplete, transfers } = Route.useSearch();
+  const { range, transfers } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
   const { startMonth, endMonth, totalBudgeted, totalSpent } = categoryHistory;
@@ -102,12 +114,12 @@ function CategoryHistoryPage() {
 
         <Stack gap="md">
           <Group gap="xs">
-            {monthOptions.map((option) => (
+            {rangeOptions.map((option) => (
               <Button
                 key={option.value}
-                variant={months === option.value ? "filled" : "outline"}
+                variant={range === option.value ? "filled" : "outline"}
                 size="sm"
-                onClick={() => navigate({ search: (prev) => ({ ...prev, months: option.value }) })}
+                onClick={() => navigate({ search: (prev) => ({ ...prev, range: option.value }) })}
               >
                 {option.label}
               </Button>
@@ -115,13 +127,6 @@ function CategoryHistoryPage() {
           </Group>
 
           <Group gap="xl">
-            <Switch
-              label="Include current month"
-              checked={incomplete}
-              onChange={(event) =>
-                navigate({ search: (prev) => ({ ...prev, incomplete: event.target.checked }) })
-              }
-            />
             <Switch
               label="Include transfers"
               checked={transfers}
