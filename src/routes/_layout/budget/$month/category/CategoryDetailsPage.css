@@ -1,15 +1,11 @@
 .CategoryDetailsPage {
-  h3 {
-    font-size: var(--mantine-font-size-sm);
-    margin-bottom: var(--mantine-spacing-xs);
-  }
-
   .EditableName {
+    font-size: var(--mantine-font-size-xl);
     font-weight: bold;
   }
 
   .balance {
-    font-size: var(--mantine-font-size-xl);
+    font-size: 2.25rem;
     font-weight: bold;
   }
 

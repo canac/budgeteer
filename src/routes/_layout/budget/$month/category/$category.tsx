@@ -5,7 +5,6 @@ import {
   Group,
   Progress,
   Stack,
-  Switch,
   Table,
   Text,
   Title,
@@ -18,6 +17,7 @@ import clsx from "clsx";
 import { parseISO, subMonths } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
+import { CategoryType } from "~/components/CategoryType";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
@@ -69,27 +69,10 @@ function CategoryDetailsPage() {
     useDisclosure(false);
 
   const [accumulating, setAccumulating] = useSyncedState(budgetCategory.category.accumulating);
-  const [flexible, setFlexible] = useSyncedState(budgetCategory.category.flexible);
 
   const handleSaveCategoryName = async (newName: string) => {
     await updateCategory({
       data: { categoryId: budgetCategory.category.id, name: newName },
-    });
-    await router.invalidate();
-  };
-
-  const handleChangeAccumulating = async (newAccumulating: boolean) => {
-    setAccumulating(newAccumulating);
-    await updateCategory({
-      data: { categoryId: budgetCategory.category.id, accumulating: newAccumulating },
-    });
-    await router.invalidate();
-  };
-
-  const handleChangeFlexible = async (newFlexible: boolean) => {
-    setFlexible(newFlexible);
-    await updateCategory({
-      data: { categoryId: budgetCategory.category.id, flexible: newFlexible },
     });
     await router.invalidate();
   };
@@ -196,9 +179,11 @@ function CategoryDetailsPage() {
       size="xl"
     >
       <Stack gap="lg">
-        <Group>
+        <Group justify="space-between" align="flex-start">
           <div>
-            <Title order={3}>Current Balance</Title>
+            <Text size="xs" fw="bold" c="dimmed" tt="uppercase">
+              Current Balance
+            </Text>
             <EditableAmount
               className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
               editable={accumulating}
@@ -206,24 +191,18 @@ function CategoryDetailsPage() {
               saveAmount={handleSaveBalance}
             />
           </div>
-          <Stack gap="xs">
-            <Switch
-              label="Accumulating"
-              checked={accumulating}
-              onChange={(event) => handleChangeAccumulating(event.currentTarget.checked)}
-            />
-            <Switch
-              label="Flexible"
-              checked={flexible}
-              onChange={(event) => handleChangeFlexible(event.currentTarget.checked)}
-            />
-          </Stack>
+          <CategoryType
+            categoryId={budgetCategory.category.id}
+            accumulating={budgetCategory.category.accumulating}
+            flexible={budgetCategory.category.flexible}
+            onChange={(values) => setAccumulating(values.accumulating)}
+          />
         </Group>
 
         <div>
-          <Group justify="space-between">
-            <Title order={3}>Spent</Title>
-            <Text component="div" size="sm">
+          <Group justify="space-between" mb="xs">
+            <Text size="sm">Spent</Text>
+            <Text size="sm">
               <Text span fw="bold">
                 {formatCurrency(-budgetCategory.transactionTotal)}
               </Text>{" "}

@@ -13,6 +13,7 @@ import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { parseISO, subMonths } from "date-fns";
 import { _default, coerce, object } from "zod/mini";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
+import { CategoryType } from "~/components/CategoryType";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
@@ -78,16 +79,23 @@ function CategoryHistoryPage() {
   return (
     <Container size="xl">
       <Stack gap="xl">
-        <div>
-          <Title order={1} size="2.5rem" fw="bold">
-            {categoryHistory.category.name}
-          </Title>
-          <Text size="lg" c="gray.6">
-            {startMonth === endMonth
-              ? startMonthFormatted
-              : `${startMonthFormatted} - ${endMonthFormatted}`}
-          </Text>
-        </div>
+        <Group justify="space-between" align="flex-start">
+          <div>
+            <Title order={1} size="2.5rem" fw="bold">
+              {categoryHistory.category.name}
+            </Title>
+            <Text size="lg" c="gray.6">
+              {startMonth === endMonth
+                ? startMonthFormatted
+                : `${startMonthFormatted} - ${endMonthFormatted}`}
+            </Text>
+          </div>
+          <CategoryType
+            categoryId={categoryHistory.category.id}
+            accumulating={categoryHistory.category.accumulating}
+            flexible={categoryHistory.category.flexible}
+          />
+        </Group>
 
         <Stack gap="md">
           <Group gap="xs">

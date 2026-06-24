@@ -1,0 +1,5 @@
+.CategoryType.mantine-Fieldset-root {
+  .mantine-Text-root {
+    padding-inline: calc(var(--mantine-spacing-xs) / 2);
+  }
+}
