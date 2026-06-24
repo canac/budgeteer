@@ -1,5 +1,5 @@
 import { Button, Container, Group, Select, Stack, Text, TextInput, Title } from "@mantine/core";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { object, optional, string } from "zod/mini";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategories } from "~/functions/getCategories";
@@ -42,7 +42,6 @@ function SearchPage() {
   const { categories, vendors, transactions } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const router = useRouter();
 
   const update = (patch: Partial<typeof search>) =>
     navigate({
@@ -53,10 +52,6 @@ function SearchPage() {
     });
 
   const clear = () => navigate({ search: {} });
-
-  const handleUpdate = async () => {
-    await router.invalidate();
-  };
 
   const filtered = hasFilter(search);
 
@@ -124,7 +119,7 @@ function SearchPage() {
           (transactions.length === 0 ? (
             <Text c="dimmed">No transactions found</Text>
           ) : (
-            <TransactionTable transactions={transactions} onUpdate={handleUpdate} />
+            <TransactionTable transactions={transactions} showCategories />
           ))}
       </Stack>
     </Container>

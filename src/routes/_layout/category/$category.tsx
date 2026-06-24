@@ -9,7 +9,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
 import { _default, coerce, object } from "zod/mini";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
@@ -62,12 +62,7 @@ const monthOptions = [
 function CategoryHistoryPage() {
   const categoryHistory = Route.useLoaderData();
   const { months, incomplete, transfers } = Route.useSearch();
-  const router = useRouter();
   const navigate = useNavigate({ from: Route.fullPath });
-
-  const handleUpdate = async () => {
-    await router.invalidate();
-  };
 
   const { startMonth, endMonth, totalBudgeted, totalSpent } = categoryHistory;
   const startMonthFormatted = monthFormatter.format(parseISO(startMonth));
@@ -197,7 +192,7 @@ function CategoryHistoryPage() {
           <Title order={3} mb="md">
             Transaction History
           </Title>
-          <TransactionTable transactions={categoryHistory.transactions} onUpdate={handleUpdate} />
+          <TransactionTable transactions={categoryHistory.transactions} />
         </div>
       </Stack>
     </Container>

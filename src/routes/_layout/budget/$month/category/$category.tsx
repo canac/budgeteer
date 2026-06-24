@@ -109,10 +109,6 @@ function CategoryDetailsPage() {
     await router.invalidate();
   };
 
-  const handleUpdate = async () => {
-    await router.invalidate();
-  };
-
   const { budgetedAmount } = budgetCategory.budgetCategory;
   const percentageSpent =
     (budgetedAmount === 0 ? 1 : -budgetCategory.transactionTotal / budgetedAmount) * 100;
@@ -241,7 +237,6 @@ function CategoryDetailsPage() {
           <TransactionTable
             transactions={budgetCategory.transactions}
             extraRows={transactionRows}
-            onUpdate={handleUpdate}
           />
         </div>
       </Stack>
