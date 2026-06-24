@@ -1,5 +1,5 @@
 import { ActionIcon, AppShell, Box, Burger, Container, Group, Loader } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMounted } from "@mantine/hooks";
 import { IconArrowsExchange, IconList, IconPlus } from "@tabler/icons-react";
 import {
   createFileRoute,
@@ -43,6 +43,7 @@ function LayoutRoute() {
   const loading = useRouterState({
     select: (state) => state.isLoading || state.status === "pending",
   });
+  const mounted = useMounted();
 
   const handleUpdate = async () => {
     await router.invalidate();
@@ -76,7 +77,7 @@ function LayoutRoute() {
               <MantineLink to="/" c="white" underline="never" fz="xl" fw="bold">
                 Budgeteer
               </MantineLink>
-              {loading && <Loader size="sm" color="white" />}
+              {mounted && loading && <Loader size="sm" color="white" />}
               <Box flex={1} />
               <Group gap="xs">
                 {month && (
