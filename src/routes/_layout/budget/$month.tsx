@@ -33,6 +33,7 @@ import {
 import clsx from "clsx";
 import { addMonths, parseISO, subMonths } from "date-fns";
 import { useId, useState } from "react";
+import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineLink } from "~/components/MantineLink";
@@ -106,7 +107,13 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
         underline="never"
         c="inherit"
       >
-        <Text>{budgetCategory.name}</Text>
+        <Group gap="xs">
+          <Text>{budgetCategory.name}</Text>
+          <CategoryTypeIcons
+            accumulating={budgetCategory.category.accumulating}
+            flexible={budgetCategory.category.flexible}
+          />
+        </Group>
         <Text>
           {formatCurrency(
             viewMode === "budgeted"

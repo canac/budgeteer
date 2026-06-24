@@ -14,6 +14,7 @@ import { parseISO, subMonths } from "date-fns";
 import { _default, coerce, object } from "zod/mini";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
 import { CategoryType } from "~/components/CategoryType";
+import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
@@ -76,9 +77,16 @@ function CategoryHistoryPage() {
       <Stack gap="xl">
         <Group justify="space-between" align="flex-start">
           <div>
-            <Title order={1} size="2.5rem" fw="bold">
-              {categoryHistory.category.name}
-            </Title>
+            <Group gap="sm" align="center">
+              <Title order={1} size="2.5rem" fw="bold">
+                {categoryHistory.category.name}
+              </Title>
+              <CategoryTypeIcons
+                accumulating={categoryHistory.category.accumulating}
+                flexible={categoryHistory.category.flexible}
+                size={28}
+              />
+            </Group>
             <Text size="lg" c="gray.6">
               {startMonth === endMonth
                 ? startMonthFormatted

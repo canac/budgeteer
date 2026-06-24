@@ -1,4 +1,5 @@
 import { Fieldset, Group, Switch, Text } from "@mantine/core";
+import { IconPigMoney, IconWallet } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { updateCategory } from "~/functions/updateCategory";
 import { useSyncedState } from "~/hooks/useSyncedState";
@@ -47,12 +48,22 @@ export function CategoryType({
     >
       <Group gap="lg">
         <Switch
-          label="Accumulating"
+          label={
+            <Group gap={6}>
+              <IconPigMoney size={16} stroke={1.5} />
+              Accumulating
+            </Group>
+          }
           checked={accumulating}
           onChange={(event) => handleChangeAccumulating(event.currentTarget.checked)}
         />
         <Switch
-          label="Flexible"
+          label={
+            <Group gap={6}>
+              <IconWallet size={16} stroke={1.5} />
+              Flexible
+            </Group>
+          }
           checked={flexible}
           onChange={(event) => handleChangeFlexible(event.currentTarget.checked)}
         />

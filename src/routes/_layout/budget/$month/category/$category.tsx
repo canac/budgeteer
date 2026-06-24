@@ -18,6 +18,7 @@ import { parseISO, subMonths } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { CategoryType } from "~/components/CategoryType";
+import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
@@ -69,6 +70,7 @@ function CategoryDetailsPage() {
     useDisclosure(false);
 
   const [accumulating, setAccumulating] = useSyncedState(budgetCategory.category.accumulating);
+  const [flexible, setFlexible] = useSyncedState(budgetCategory.category.flexible);
 
   const handleSaveCategoryName = async (newName: string) => {
     await updateCategory({
@@ -155,6 +157,7 @@ function CategoryDetailsPage() {
       title={
         <Group>
           <EditableName name={budgetCategory.category.name} saveName={handleSaveCategoryName} />
+          <CategoryTypeIcons accumulating={accumulating} flexible={flexible} size={20} />
           <Tooltip
             label={!budgetCategory.deletable.valid && budgetCategory.deletable.message}
             disabled={budgetCategory.deletable.valid}
@@ -191,7 +194,10 @@ function CategoryDetailsPage() {
             categoryId={budgetCategory.category.id}
             accumulating={budgetCategory.category.accumulating}
             flexible={budgetCategory.category.flexible}
-            onChange={(values) => setAccumulating(values.accumulating)}
+            onChange={(values) => {
+              setAccumulating(values.accumulating);
+              setFlexible(values.flexible);
+            }}
           />
         </Group>
 
