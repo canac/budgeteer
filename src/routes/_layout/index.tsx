@@ -1,8 +1,9 @@
 import { BarChart } from "@mantine/charts";
-import { Card, Container, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Card, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
 import { MantineLink } from "~/components/MantineLink";
+import { PageContainer } from "~/components/PageContainer";
 import { getOverview } from "~/functions/getOverview";
 import { formatCurrency, monthFormatter, percentageFormatter } from "~/lib/formatters";
 
@@ -34,7 +35,7 @@ function OverviewPage() {
   ];
 
   return (
-    <Container size="lg" py="xl">
+    <PageContainer>
       <Stack gap="xl">
         <Title order={1}>
           <MantineLink to="/budget/$month" params={{ month }} c="inherit" inherit>
@@ -112,6 +113,6 @@ function OverviewPage() {
           </Stack>
         </Card>
       </Stack>
-    </Container>
+    </PageContainer>
   );
 }

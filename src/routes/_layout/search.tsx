@@ -1,6 +1,7 @@
-import { Button, Container, Group, Select, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Button, Group, Select, Stack, Text, TextInput, Title } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { object, optional, string } from "zod/mini";
+import { PageContainer } from "~/components/PageContainer";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategories } from "~/functions/getCategories";
 import { getVendors } from "~/functions/getVendors";
@@ -56,7 +57,7 @@ function SearchPage() {
   const filtered = hasFilter(search);
 
   return (
-    <Container size="lg" py="xl">
+    <PageContainer>
       <Stack gap="xl">
         <Title order={1}>Search</Title>
 
@@ -122,6 +123,6 @@ function SearchPage() {
             <TransactionTable transactions={transactions} showCategories />
           ))}
       </Stack>
-    </Container>
+    </PageContainer>
   );
 }

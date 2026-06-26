@@ -1,20 +1,11 @@
-import {
-  Button,
-  Card,
-  Container,
-  Group,
-  SimpleGrid,
-  Stack,
-  Switch,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Button, Card, Group, SimpleGrid, Stack, Switch, Text, Title } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
 import { _default, coerce, enum as enumType, object } from "zod/mini";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
 import { CategoryType } from "~/components/CategoryType";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
+import { PageContainer } from "~/components/PageContainer";
 import { TransactionTable } from "~/components/TransactionTable";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
@@ -85,7 +76,7 @@ function CategoryHistoryPage() {
   const percentageUsed = (totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted) * 100;
 
   return (
-    <Container size="xl">
+    <PageContainer size="xl">
       <Stack gap="xl">
         <Group justify="space-between" align="flex-start">
           <div>
@@ -208,6 +199,6 @@ function CategoryHistoryPage() {
           <TransactionTable transactions={categoryHistory.transactions} />
         </div>
       </Stack>
-    </Container>
+    </PageContainer>
   );
 }

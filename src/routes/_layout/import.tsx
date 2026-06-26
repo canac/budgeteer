@@ -1,5 +1,6 @@
-import { Container, Stack, Tabs, Text, Title } from "@mantine/core";
+import { Stack, Tabs, Text, Title } from "@mantine/core";
 import { createFileRoute, Outlet, useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { PageContainer } from "~/components/PageContainer";
 
 export const Route = createFileRoute("/_layout/import")({
   component: ImportLayout,
@@ -26,7 +27,7 @@ function ImportLayout() {
   };
 
   return (
-    <Container size="lg" py="xl">
+    <PageContainer>
       <Stack gap="lg">
         <Stack gap="xs">
           <Title order={1}>Import</Title>
@@ -41,6 +42,6 @@ function ImportLayout() {
         </Tabs>
         <Outlet />
       </Stack>
-    </Container>
+    </PageContainer>
   );
 }
