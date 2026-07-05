@@ -1,7 +1,7 @@
 .BudgetPage {
   .mantine-Card-root {
     width: 100%;
-    max-width: 28rem;
+    max-width: 36rem;
 
     h2 {
       font-size: var(--mantine-font-size-lg);
