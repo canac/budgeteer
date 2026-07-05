@@ -4,6 +4,7 @@ import { IconBuildingBank } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
+import { extractErrorMessage } from "src/lib/error";
 import { createTellerEnrollment as createTellerEnrollmentFn } from "~/functions/createTellerEnrollment";
 import { getTellerAccounts } from "~/functions/getTellerAccounts";
 import { setTellerAccountEnabled as setTellerAccountEnabledFn } from "~/functions/setTellerAccountEnabled";
@@ -80,10 +81,10 @@ function AccountsPage() {
   useEffect(() => {
     loadTellerScript().then(
       () => setReady(true),
-      (err: unknown) =>
+      (error: unknown) =>
         notifications.show({
           title: "Teller Connect failed to load",
-          message: err instanceof Error ? err.message : String(err),
+          message: extractErrorMessage(error),
           color: "red",
         }),
     );
@@ -113,10 +114,10 @@ function AccountsPage() {
             color: "green",
           });
           await router.invalidate();
-        } catch (err) {
+        } catch (error) {
           notifications.show({
             title: "Failed to save enrollment",
-            message: err instanceof Error ? err.message : String(err),
+            message: extractErrorMessage(error),
             color: "red",
           });
         }

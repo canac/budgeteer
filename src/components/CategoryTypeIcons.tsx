@@ -1,13 +1,16 @@
 import { Group, Tooltip } from "@mantine/core";
 import { IconPigMoney, IconWallet } from "@tabler/icons-react";
+import type { Category } from "~/prisma/client";
 
 interface CategoryTypeIconsProps {
-  accumulating: boolean;
-  flexible: boolean;
+  category: Pick<Category, "accumulating" | "flexible">;
   size?: number;
 }
 
-export function CategoryTypeIcons({ accumulating, flexible, size = 16 }: CategoryTypeIconsProps) {
+export function CategoryTypeIcons({
+  category: { accumulating, flexible },
+  size = 16,
+}: CategoryTypeIconsProps) {
   if (!accumulating && !flexible) {
     return null;
   }

@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ActionIcon, Button, ButtonGroup, Card, Group, Stack, Text, Title } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
   IconArrowsUpDown,
   IconCheck,
@@ -34,10 +35,10 @@ import clsx from "clsx";
 import { addMonths, parseISO, subMonths } from "date-fns";
 import { useId, useState } from "react";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
+import { DynamicCategoryModal } from "~/components/DynamicCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineLink } from "~/components/MantineLink";
-import { createCategory } from "~/functions/createCategory";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { reorderCategory } from "~/functions/reorderCategory";
@@ -109,10 +110,7 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
       >
         <Group gap="xs">
           <Text>{budgetCategory.name}</Text>
-          <CategoryTypeIcons
-            accumulating={budgetCategory.category.accumulating}
-            flexible={budgetCategory.category.flexible}
-          />
+          <CategoryTypeIcons category={budgetCategory.category} />
         </Group>
         <Text>
           {formatCurrency(
@@ -183,12 +181,8 @@ function BudgetPage() {
     await router.invalidate();
   };
 
-  const handleCreateCategory = async () => {
-    await createCategory({
-      data: { month: budget.month, name: "New Category" },
-    });
-    await router.invalidate();
-  };
+  const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] =
+    useDisclosure(false);
 
   return (
     <>
@@ -299,11 +293,7 @@ function BudgetPage() {
               </SortableContext>
             </DndContext>
             <Group justify="space-evenly">
-              <Button
-                variant="subtle"
-                leftSection={<IconPlus />}
-                onClick={() => handleCreateCategory()}
-              >
+              <Button variant="subtle" leftSection={<IconPlus />} onClick={() => openCreateModal()}>
                 Add Category
               </Button>
 
@@ -329,6 +319,13 @@ function BudgetPage() {
           </Stack>
         </Card>
       </Stack>
+      {createModalOpen && (
+        <DynamicCategoryModal
+          onClose={closeCreateModal}
+          onSave={() => router.invalidate()}
+          month={budget.month}
+        />
+      )}
     </>
   );
 }

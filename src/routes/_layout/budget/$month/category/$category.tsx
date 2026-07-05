@@ -1,35 +1,21 @@
-import {
-  ActionIcon,
-  Divider,
-  Drawer,
-  Group,
-  Progress,
-  Stack,
-  Text,
-  Title,
-  Tooltip,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconHistory, IconTrash } from "@tabler/icons-react";
+import { Divider, Drawer, Group, Progress, Stack, Text, Title } from "@mantine/core";
+import { IconHistory } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { parseISO, subMonths } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
-import { CategoryType } from "~/components/CategoryType";
+import { CategoryHeaderActions } from "~/components/CategoryHeaderActions";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
-import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
-import { EditableName } from "~/components/EditableName";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
+import { MantineLink } from "~/components/MantineLink";
 import { TransactionList, TransactionRow } from "~/components/TransactionList";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBalance } from "~/functions/setCategoryBalance";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryStartingBalance } from "~/functions/setCategoryStartingBalance";
-import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
-import { useSyncedState } from "~/hooks/useSyncedState";
 import { formatCurrency, monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 import "./CategoryDetailsPage.css";
 
@@ -60,18 +46,6 @@ function CategoryDetailsPage() {
   const { close, modalProps } = useOpened({
     onClose: () => router.navigate({ to: "/budget/$month", params: { month } }),
   });
-  const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
-    useDisclosure(false);
-
-  const [accumulating, setAccumulating] = useSyncedState(budgetCategory.category.accumulating);
-  const [flexible, setFlexible] = useSyncedState(budgetCategory.category.flexible);
-
-  const handleSaveCategoryName = async (newName: string) => {
-    await updateCategory({
-      data: { categoryId: budgetCategory.category.id, name: newName },
-    });
-    await router.invalidate();
-  };
 
   const handleSaveBudgetedAmount = async (newAmount: number) => {
     await setCategoryBudgetedAmount({
@@ -145,50 +119,42 @@ function CategoryDetailsPage() {
       {...modalProps}
       title={
         <Group>
-          <EditableName name={budgetCategory.category.name} saveName={handleSaveCategoryName} />
-          <CategoryTypeIcons accumulating={accumulating} flexible={flexible} size={20} />
-          <Tooltip
-            label={!budgetCategory.deletable.valid && budgetCategory.deletable.message}
-            disabled={budgetCategory.deletable.valid}
+          <MantineLink
+            fw="bold"
+            fz="2rem"
+            c="inherit"
+            underline="never"
+            to="/category/$category"
+            params={{ category }}
           >
-            <ActionIcon
-              color="red"
-              onClick={() => openDeleteModal()}
-              disabled={!budgetCategory.deletable.valid}
-              title="Delete category"
-              size="md"
-            >
-              <IconTrash />
-            </ActionIcon>
-          </Tooltip>
+            {budgetCategory.category.name}
+          </MantineLink>
+          <CategoryTypeIcons category={budgetCategory.category} size={20} />
+          <CategoryHeaderActions
+            category={budgetCategory.category}
+            deletable={budgetCategory.deletable}
+            month={month}
+            size="md"
+            onSave={() => router.invalidate()}
+            onDelete={close}
+          />
         </Group>
       }
       position="right"
       size="xl"
     >
       <Stack gap="lg">
-        <Group justify="space-between" align="flex-start">
-          <div>
-            <Text size="xs" fw="bold" c="dimmed" tt="uppercase">
-              Current Balance
-            </Text>
-            <EditableAmount
-              className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
-              editable={accumulating}
-              amount={budgetCategory.currentBalance}
-              saveAmount={handleSaveBalance}
-            />
-          </div>
-          <CategoryType
-            categoryId={budgetCategory.category.id}
-            accumulating={budgetCategory.category.accumulating}
-            flexible={budgetCategory.category.flexible}
-            onChange={(values) => {
-              setAccumulating(values.accumulating);
-              setFlexible(values.flexible);
-            }}
+        <div>
+          <Text size="xs" fw="bold" c="dimmed" tt="uppercase">
+            Current Balance
+          </Text>
+          <EditableAmount
+            className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
+            editable={budgetCategory.category.accumulating}
+            amount={budgetCategory.currentBalance}
+            saveAmount={handleSaveBalance}
           />
-        </Group>
+        </div>
 
         <div>
           <Group justify="space-between" mb="xs">
@@ -232,14 +198,6 @@ function CategoryDetailsPage() {
           <TransactionList transactions={budgetCategory.transactions} extraRows={transactionRows} />
         </div>
       </Stack>
-      {deleteModalOpen && budgetCategory.deletable.valid && (
-        <DynamicDeleteCategoryModal
-          onClose={() => closeDeleteModal()}
-          category={budgetCategory.category}
-          month={month}
-          onDelete={close}
-        />
-      )}
     </Drawer>
   );
 }

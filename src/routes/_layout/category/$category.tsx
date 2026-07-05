@@ -1,9 +1,9 @@
 import { Button, Card, Group, SimpleGrid, Stack, Switch, Text, Title } from "@mantine/core";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
 import { _default, coerce, enum as enumType, object } from "zod/mini";
+import { CategoryHeaderActions } from "~/components/CategoryHeaderActions";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
-import { CategoryType } from "~/components/CategoryType";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { PageContainer } from "~/components/PageContainer";
 import { TransactionList } from "~/components/TransactionList";
@@ -67,6 +67,8 @@ function CategoryHistoryPage() {
   const categoryHistory = Route.useLoaderData();
   const { range, transfers } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
+  const router = useRouter();
+  const currentMonth = toISOMonthString(new Date());
 
   const { startMonth, endMonth, totalBudgeted, totalSpent } = categoryHistory;
   const startMonthFormatted = monthFormatter.format(parseISO(startMonth));
@@ -84,10 +86,14 @@ function CategoryHistoryPage() {
               <Title order={1} size="2.5rem" fw="bold">
                 {categoryHistory.category.name}
               </Title>
-              <CategoryTypeIcons
-                accumulating={categoryHistory.category.accumulating}
-                flexible={categoryHistory.category.flexible}
-                size={28}
+              <CategoryTypeIcons category={categoryHistory.category} size={28} />
+              <CategoryHeaderActions
+                category={categoryHistory.category}
+                deletable={categoryHistory.deletable}
+                month={currentMonth}
+                size="lg"
+                onSave={() => router.invalidate()}
+                onDelete={() => navigate({ to: "/budget/$month", params: { month: currentMonth } })}
               />
             </Group>
             <Text size="lg" c="gray.6">
@@ -96,11 +102,6 @@ function CategoryHistoryPage() {
                 : `${startMonthFormatted} - ${endMonthFormatted}`}
             </Text>
           </div>
-          <CategoryType
-            categoryId={categoryHistory.category.id}
-            accumulating={categoryHistory.category.accumulating}
-            flexible={categoryHistory.category.flexible}
-          />
         </Group>
 
         <Stack gap="md">

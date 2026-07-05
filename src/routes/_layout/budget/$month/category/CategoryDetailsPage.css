@@ -1,9 +1,4 @@
 .CategoryDetailsPage {
-  .EditableName {
-    font-size: var(--mantine-font-size-xl);
-    font-weight: bold;
-  }
-
   .balance {
     font-size: 2.25rem;
     font-weight: bold;

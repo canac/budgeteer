@@ -16,6 +16,7 @@ import {
 import { schemaResolver, useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+import { extractErrorMessage } from "src/lib/error";
 import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
@@ -207,10 +208,8 @@ export function TransactionModal({
           data: transaction,
         });
       }
-    } catch (err) {
-      if (err instanceof Error) {
-        setErrorMessage(err.message);
-      }
+    } catch (error) {
+      setErrorMessage(extractErrorMessage(error));
       return;
     }
 
