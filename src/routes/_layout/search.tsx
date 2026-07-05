@@ -61,7 +61,7 @@ function SearchPage() {
       <Stack gap="xl">
         <Title order={1}>Search</Title>
 
-        <div>
+        <Stack>
           <Group align="flex-end" gap="md">
             <TextInput
               type="date"
@@ -108,13 +108,11 @@ function SearchPage() {
                 ? `${transactions.length} transaction${transactions.length === 1 ? "" : "s"}`
                 : "Set a filter to search"}
             </Text>
-            {filtered && (
-              <Button variant="subtle" onClick={clear}>
-                Clear filters
-              </Button>
-            )}
+            <Button variant="subtle" onClick={clear} display={filtered ? "visible" : "none"}>
+              Clear filters
+            </Button>
           </Group>
-        </div>
+        </Stack>
 
         {filtered &&
           (transactions.length === 0 ? (
