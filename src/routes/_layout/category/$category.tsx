@@ -6,7 +6,7 @@ import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
 import { CategoryType } from "~/components/CategoryType";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { PageContainer } from "~/components/PageContainer";
-import { TransactionTable } from "~/components/TransactionTable";
+import { TransactionList } from "~/components/TransactionList";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
@@ -196,7 +196,7 @@ function CategoryHistoryPage() {
           <Title order={3} mb="md">
             Transaction History
           </Title>
-          <TransactionTable transactions={categoryHistory.transactions} />
+          <TransactionList transactions={categoryHistory.transactions} />
         </div>
       </Stack>
     </PageContainer>

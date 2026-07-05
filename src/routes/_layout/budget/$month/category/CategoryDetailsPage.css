@@ -9,7 +9,7 @@
     font-weight: bold;
   }
 
-  .TransactionTable tr.starting-balance {
+  .TransactionList .starting-balance {
     border-top: 2px solid;
   }
 }

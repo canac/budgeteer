@@ -1,0 +1,64 @@
+.TransactionList {
+  display: flex;
+  flex-direction: column;
+
+  .transaction-row {
+    display: grid;
+    align-items: center;
+    column-gap: var(--mantine-spacing-md);
+    row-gap: 2px;
+    padding: var(--mantine-spacing-sm) 0;
+    border-bottom: 1px solid var(--mantine-color-default-border);
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      "vendor amount menu"
+      "bottom bottom bottom";
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .cell-vendor {
+    grid-area: vendor;
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-xs);
+  }
+
+  .mantine-ThemeIcon-root.transaction-type {
+    --ti-bg: var(--mantine-color-blue-filled);
+    --ti-size: var(--ti-size-sm);
+    border-radius: 100%;
+  }
+
+  .cell-amount {
+    grid-area: amount;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cell-menu {
+    grid-area: menu;
+  }
+
+  .cell-bottom {
+    grid-area: bottom;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--mantine-spacing-xs);
+    min-width: 0;
+  }
+
+  .bottom-meta {
+    margin-right: auto;
+    min-width: 0;
+  }
+
+  .category-badge {
+    cursor: pointer;
+  }
+}

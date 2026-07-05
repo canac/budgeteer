@@ -2,7 +2,7 @@ import { Button, Group, Select, Stack, Text, TextInput, Title } from "@mantine/c
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { object, optional, string } from "zod/mini";
 import { PageContainer } from "~/components/PageContainer";
-import { TransactionTable } from "~/components/TransactionTable";
+import { TransactionList } from "~/components/TransactionList";
 import { getCategories } from "~/functions/getCategories";
 import { getVendors } from "~/functions/getVendors";
 import { searchTransactions } from "~/functions/searchTransactions";
@@ -120,7 +120,7 @@ function SearchPage() {
           (transactions.length === 0 ? (
             <Text c="dimmed">No transactions found</Text>
           ) : (
-            <TransactionTable transactions={transactions} showCategories />
+            <TransactionList transactions={transactions} showCategories />
           ))}
       </Stack>
     </PageContainer>

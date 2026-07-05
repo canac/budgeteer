@@ -2,7 +2,7 @@ import { Drawer, Group, Stack } from "@mantine/core";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
-import { TransactionTable } from "~/components/TransactionTable";
+import { TransactionList } from "~/components/TransactionList";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
 import { useOpened } from "~/hooks/useOpened";
 import { monthFormatter } from "~/lib/formatters";
@@ -44,7 +44,7 @@ function TransactionsPage() {
       }
     >
       <Stack gap="md">
-        <TransactionTable transactions={transactions} showCategories month={month} />
+        <TransactionList transactions={transactions} showCategories month={month} />
       </Stack>
     </Drawer>
   );

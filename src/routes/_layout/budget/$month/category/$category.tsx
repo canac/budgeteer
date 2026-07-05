@@ -5,7 +5,6 @@ import {
   Group,
   Progress,
   Stack,
-  Table,
   Text,
   Title,
   Tooltip,
@@ -23,7 +22,7 @@ import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryMo
 import { EditableAmount } from "~/components/EditableAmount";
 import { EditableName } from "~/components/EditableName";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
-import { TransactionTable } from "~/components/TransactionTable";
+import { TransactionList, TransactionRow } from "~/components/TransactionList";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBalance } from "~/functions/setCategoryBalance";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
@@ -31,12 +30,7 @@ import { setCategoryStartingBalance } from "~/functions/setCategoryStartingBalan
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
 import { useSyncedState } from "~/hooks/useSyncedState";
-import {
-  formatCurrency,
-  monthFormatter,
-  monthOnlyFormatter,
-  shortDateFormatter,
-} from "~/lib/formatters";
+import { formatCurrency, monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 import "./CategoryDetailsPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/category/$category")({
@@ -119,33 +113,28 @@ function CategoryDetailsPage() {
   const monthDate = parseISO(month);
   const transactionRows = (
     <>
-      <Table.Tr className="starting-balance">
-        <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
-        <Table.Td>Budgeted this month</Table.Td>
-        <Table.Td />
-        <Table.Td ta="right">
+      <TransactionRow
+        className="starting-balance"
+        title="Budgeted this month"
+        amount={
           <EditableAmount
             className={amountSignClassname(budgetedAmount)}
             amount={budgetedAmount}
             saveAmount={handleSaveBudgetedAmount}
           />
-        </Table.Td>
-        <Table.Td />
-      </Table.Tr>
+        }
+      />
       {budgetCategory.category.accumulating && (
-        <Table.Tr>
-          <Table.Td>{shortDateFormatter.format(monthDate)}</Table.Td>
-          <Table.Td>{monthOnlyFormatter.format(subMonths(monthDate, 1))} balance</Table.Td>
-          <Table.Td />
-          <Table.Td ta="right">
+        <TransactionRow
+          title={`${monthOnlyFormatter.format(subMonths(monthDate, 1))} balance`}
+          amount={
             <EditableAmount
               className={amountSignClassname(previousMonthBalance)}
               amount={previousMonthBalance}
               saveAmount={handleSaveStartingBalance}
             />
-          </Table.Td>
-          <Table.Td />
-        </Table.Tr>
+          }
+        />
       )}
     </>
   );
@@ -240,10 +229,7 @@ function CategoryDetailsPage() {
               </MantineActionIconLink>
             </Group>
           </Title>
-          <TransactionTable
-            transactions={budgetCategory.transactions}
-            extraRows={transactionRows}
-          />
+          <TransactionList transactions={budgetCategory.transactions} extraRows={transactionRows} />
         </div>
       </Stack>
       {deleteModalOpen && budgetCategory.deletable.valid && (
