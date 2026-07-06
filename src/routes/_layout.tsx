@@ -1,6 +1,6 @@
 import { ActionIcon, AppShell, Box, Burger, Container, Group, Loader } from "@mantine/core";
 import { useDisclosure, useMounted } from "@mantine/hooks";
-import { IconArrowsExchange, IconList, IconPlus } from "@tabler/icons-react";
+import { IconArrowsExchange, IconPlus } from "@tabler/icons-react";
 import {
   createFileRoute,
   Outlet,
@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-router";
 import { DynamicNewTransferModal } from "~/components/DynamicNewTransferModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
-import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineLink } from "~/components/MantineLink";
 import { NavDrawer } from "~/components/NavDrawer";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
@@ -80,17 +79,6 @@ function LayoutRoute() {
               {mounted && loading && <Loader size="sm" color="white" />}
               <Box flex={1} />
               <Group gap="xs">
-                {month && (
-                  <MantineActionIconLink
-                    variant="subtle"
-                    c="white"
-                    size="xl"
-                    to="/budget/$month/transactions"
-                    params={{ month }}
-                  >
-                    <IconList />
-                  </MantineActionIconLink>
-                )}
                 <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransfer}>
                   <IconArrowsExchange />
                 </ActionIcon>

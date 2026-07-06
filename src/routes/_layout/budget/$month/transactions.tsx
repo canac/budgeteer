@@ -1,11 +1,10 @@
-import { Drawer, Group, Stack } from "@mantine/core";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { Card, Group, Stack, Text, Title } from "@mantine/core";
+import { createFileRoute } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { TransactionList } from "~/components/TransactionList";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
-import { useOpened } from "~/hooks/useOpened";
-import { monthFormatter } from "~/lib/formatters";
+import { monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 
 export const Route = createFileRoute("/_layout/budget/$month/transactions")({
   component: TransactionsPage,
@@ -22,30 +21,23 @@ export const Route = createFileRoute("/_layout/budget/$month/transactions")({
 });
 
 function TransactionsPage() {
-  const router = useRouter();
   const { transactions } = Route.useLoaderData();
   const { month } = Route.useParams();
-  const { modalProps } = useOpened({
-    onClose: async () => {
-      await router.navigate({ to: "/budget/$month", params: { month } });
-    },
-  });
 
   return (
-    <Drawer
-      {...modalProps}
-      position="right"
-      size="xl"
-      title={
-        <Group align="center" gap="xs" fw="bold">
-          Transactions
-          <AddTransactionButton />
+    <Card shadow="sm">
+      <Stack gap="xs">
+        <Group justify="space-between">
+          <Group gap="xs">
+            <Title order={2}>Transactions</Title>
+            <AddTransactionButton />
+          </Group>
+          <Text c="dimmed">
+            {transactions.length} in {monthOnlyFormatter.format(parseISO(month))}
+          </Text>
         </Group>
-      }
-    >
-      <Stack gap="md">
         <TransactionList transactions={transactions} showCategories month={month} />
       </Stack>
-    </Drawer>
+    </Card>
   );
 }

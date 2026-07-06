@@ -65,7 +65,7 @@ interface CategoryBadgeProps {
 function CategoryBadge({ month, category, color = "gray" }: CategoryBadgeProps) {
   const link = month
     ? linkOptions({
-        to: "/budget/$month/category/$category",
+        to: "/budget/$month/categories/$category",
         params: { month, category: category.id },
       })
     : linkOptions({

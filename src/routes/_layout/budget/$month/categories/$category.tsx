@@ -19,7 +19,7 @@ import { useOpened } from "~/hooks/useOpened";
 import { formatCurrency, monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 import "./CategoryDetailsPage.css";
 
-export const Route = createFileRoute("/_layout/budget/$month/category/$category")({
+export const Route = createFileRoute("/_layout/budget/$month/categories/$category")({
   component: CategoryDetailsPage,
   loader: async ({ params: { month, category } }) => {
     const budgetCategory = await getBudgetCategory({
@@ -44,7 +44,7 @@ function CategoryDetailsPage() {
   const { month, category } = Route.useParams();
   const router = useRouter();
   const { close, modalProps } = useOpened({
-    onClose: () => router.navigate({ to: "/budget/$month", params: { month } }),
+    onClose: () => router.navigate({ to: "/budget/$month/categories", params: { month } }),
   });
 
   const handleSaveBudgetedAmount = async (newAmount: number) => {

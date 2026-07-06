@@ -1,56 +1,18 @@
-import {
-  closestCenter,
-  DndContext,
-  type DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { ActionIcon, Button, ButtonGroup, Card, Group, Stack, Text, Title } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import {
-  IconArrowsUpDown,
-  IconCheck,
-  IconChevronLeft,
-  IconChevronRight,
-  IconGripVertical,
-  IconPlus,
-} from "@tabler/icons-react";
-import {
-  createFileRoute,
-  Outlet,
-  type RegisteredRouter,
-  type RouteById,
-  useRouter,
-} from "@tanstack/react-router";
-import clsx from "clsx";
+import { ActionIcon, Card, Group, SegmentedControl, Stack, Text, Title } from "@mantine/core";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/react-router";
 import { addMonths, parseISO, subMonths } from "date-fns";
-import { useId, useState } from "react";
-import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
-import { DynamicCategoryModal } from "~/components/DynamicCategoryModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
-import { MantineLink } from "~/components/MantineLink";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
-import { reorderCategory } from "~/functions/reorderCategory";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
-import { useSyncedState } from "~/hooks/useSyncedState";
-import { pluck } from "~/lib/collections";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
 import "./BudgetPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month")({
-  component: BudgetPage,
+  component: BudgetLayout,
   loader: async ({ params: { month } }) => {
     const [budget, budgetMonths] = await Promise.all([
       getBudgetByMonth({ data: { month } }),
@@ -64,74 +26,11 @@ export const Route = createFileRoute("/_layout/budget/$month")({
   },
 });
 
-type BudgetCategory = RouteById<
-  RegisteredRouter["routeTree"],
-  "/_layout/budget/$month"
->["types"]["loaderData"]["budgetCategories"][number];
-
-interface CategoryItemProps {
-  budgetCategory: BudgetCategory;
-  viewMode: "budgeted" | "spent" | "balance";
-  reordering: boolean;
-}
-
-function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProps) {
-  const { budget } = Route.useLoaderData();
-
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: budgetCategory.categoryId,
-  });
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      className={clsx("CategoryItem", { dragging: isDragging })}
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-    >
-      {reordering && (
-        <div className="drag-handle" {...listeners}>
-          <IconGripVertical size={18} stroke={1.5} />
-        </div>
-      )}
-      <MantineLink
-        to="/budget/$month/category/$category"
-        params={{
-          month: budget.month,
-          category: budgetCategory.categoryId,
-        }}
-        underline="never"
-        c="inherit"
-      >
-        <Group gap="xs">
-          <Text>{budgetCategory.name}</Text>
-          <CategoryTypeIcons category={budgetCategory.category} />
-        </Group>
-        <Text>
-          {formatCurrency(
-            viewMode === "budgeted"
-              ? budgetCategory.budgetedAmount
-              : viewMode === "spent"
-                ? budgetCategory.spent
-                : budgetCategory.balance,
-          )}
-        </Text>
-      </MantineLink>
-    </div>
-  );
-}
-
-function BudgetPage() {
+function BudgetLayout() {
   const router = useRouter();
-  const { budget, totalBudgetedAmount, budgetCategories, budgetMonths, leftoverRemaining } =
-    Route.useLoaderData();
-  const [viewMode, setViewMode] = useState<"budgeted" | "spent" | "balance">("budgeted");
-  const [reordering, setReordering] = useState(false);
+  const { budget, totalBudgetedAmount, budgetMonths, leftoverRemaining } = Route.useLoaderData();
+  const matchRoute = useMatchRoute();
+  const onTransactions = !!matchRoute({ to: "/budget/$month/transactions" });
   const leftToBudget = budget.income - totalBudgetedAmount;
 
   const previousMonth =
@@ -143,36 +42,7 @@ function BudgetPage() {
       ? undefined
       : toISOMonthString(addMonths(parseISO(budget.month), 1));
 
-  const [categories, setCategories] = useSyncedState(budgetCategories);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor),
-  );
-  const accessibilityId = useId();
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) {
-      return;
-    }
-
-    const oldIndex = categories.findIndex((category) => category.categoryId === active.id);
-    const newIndex = categories.findIndex((category) => category.categoryId === over.id);
-    setCategories(arrayMove(categories, oldIndex, newIndex));
-
-    if (typeof active.id === "string" && typeof over.id === "string") {
-      await reorderCategory({
-        data: {
-          month: budget.month,
-          categoryId: active.id,
-          targetId: over.id,
-          direction: newIndex < oldIndex ? "before" : "after",
-        },
-      });
-      await router.invalidate();
-    }
-  };
+  const tabLink = onTransactions ? "/budget/$month/transactions" : "/budget/$month/categories";
 
   const handleSaveIncome = async (newIncome: number) => {
     await setBudgetIncome({
@@ -181,151 +51,83 @@ function BudgetPage() {
     await router.invalidate();
   };
 
-  const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] =
-    useDisclosure(false);
-
   return (
-    <>
+    <Stack className="BudgetPage" align="center">
+      <Group gap="xs">
+        {previousMonth ? (
+          <MantineActionIconLink
+            to={tabLink}
+            params={{ month: previousMonth }}
+            variant="subtle"
+            color="gray"
+            aria-label="Previous month"
+          >
+            <IconChevronLeft />
+          </MantineActionIconLink>
+        ) : (
+          <ActionIcon variant="subtle" color="gray" disabled aria-label="Previous month">
+            <IconChevronLeft />
+          </ActionIcon>
+        )}
+        <Title order={1}>{monthFormatter.format(parseISO(budget.month))}</Title>
+        {nextMonth ? (
+          <MantineActionIconLink
+            to={tabLink}
+            params={{ month: nextMonth }}
+            variant="subtle"
+            color="gray"
+            aria-label="Next month"
+          >
+            <IconChevronRight />
+          </MantineActionIconLink>
+        ) : (
+          <ActionIcon variant="subtle" color="gray" disabled aria-label="Next month">
+            <IconChevronRight />
+          </ActionIcon>
+        )}
+      </Group>
+      <SegmentedControl
+        w="100%"
+        maw="36rem"
+        fullWidth
+        value={onTransactions ? "transactions" : "categories"}
+        onChange={(value) =>
+          router.navigate({
+            to:
+              value === "transactions"
+                ? "/budget/$month/transactions"
+                : "/budget/$month/categories",
+            params: { month: budget.month },
+          })
+        }
+        data={[
+          { label: "Categories", value: "categories" },
+          { label: "Transactions", value: "transactions" },
+        ]}
+      />
+      <Card shadow="sm">
+        <Stack gap="xs">
+          <Group justify="space-between">
+            <Title order={2}>Income</Title>
+            <EditableAmount
+              className={leftToBudget === 0 ? "positive" : undefined}
+              amount={budget.income}
+              saveAmount={handleSaveIncome}
+            />
+          </Group>
+          {leftToBudget !== 0 && (
+            <Group justify="space-between">
+              <Text>Left to budget</Text>
+              <Text c={leftToBudget >= 0 ? "green" : "red"}>{formatCurrency(leftToBudget)}</Text>
+            </Group>
+          )}
+          <Group justify="space-between">
+            <Text>Leftover</Text>
+            <Text>{formatCurrency(leftoverRemaining)}</Text>
+          </Group>
+        </Stack>
+      </Card>
       <Outlet />
-      <Stack className="BudgetPage" align="center">
-        <Group gap="xs">
-          {previousMonth ? (
-            <MantineActionIconLink
-              to="/budget/$month"
-              params={{ month: previousMonth }}
-              variant="subtle"
-              color="gray"
-              aria-label="Previous month"
-            >
-              <IconChevronLeft />
-            </MantineActionIconLink>
-          ) : (
-            <ActionIcon variant="subtle" color="gray" disabled aria-label="Previous month">
-              <IconChevronLeft />
-            </ActionIcon>
-          )}
-          <Title order={1}>{monthFormatter.format(parseISO(budget.month))}</Title>
-          {nextMonth ? (
-            <MantineActionIconLink
-              to="/budget/$month"
-              params={{ month: nextMonth }}
-              variant="subtle"
-              color="gray"
-              aria-label="Next month"
-            >
-              <IconChevronRight />
-            </MantineActionIconLink>
-          ) : (
-            <ActionIcon variant="subtle" color="gray" disabled aria-label="Next month">
-              <IconChevronRight />
-            </ActionIcon>
-          )}
-        </Group>
-        <Card shadow="sm">
-          <Stack gap="xs">
-            <Group justify="space-between">
-              <Title order={2}>Income</Title>
-              <EditableAmount
-                className={leftToBudget === 0 ? "positive" : undefined}
-                amount={budget.income}
-                saveAmount={handleSaveIncome}
-              />
-            </Group>
-            {leftToBudget !== 0 && (
-              <Group justify="space-between">
-                <Text>Left to budget</Text>
-                <Text c={leftToBudget >= 0 ? "green" : "red"}>{formatCurrency(leftToBudget)}</Text>
-              </Group>
-            )}
-            <Group justify="space-between">
-              <Text>Leftover</Text>
-              <Text>{formatCurrency(leftoverRemaining)}</Text>
-            </Group>
-          </Stack>
-        </Card>
-
-        <Card shadow="sm">
-          <Stack gap="xs">
-            <Group justify="space-between">
-              <Title order={2}>Categories</Title>
-              <ButtonGroup>
-                <Button
-                  variant={viewMode === "budgeted" ? "filled" : "outline"}
-                  size="xs"
-                  onClick={() => setViewMode("budgeted")}
-                >
-                  Budgeted
-                </Button>
-                <Button
-                  variant={viewMode === "spent" ? "filled" : "outline"}
-                  size="xs"
-                  onClick={() => setViewMode("spent")}
-                >
-                  Spent
-                </Button>
-                <Button
-                  variant={viewMode === "balance" ? "filled" : "outline"}
-                  size="xs"
-                  onClick={() => setViewMode("balance")}
-                >
-                  Balance
-                </Button>
-              </ButtonGroup>
-            </Group>
-            <DndContext
-              id={accessibilityId}
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={pluck(categories, "categoryId")}
-                strategy={verticalListSortingStrategy}
-              >
-                {categories.map((budgetCategory) => (
-                  <CategoryItem
-                    key={budgetCategory.id}
-                    budgetCategory={budgetCategory}
-                    viewMode={viewMode}
-                    reordering={reordering}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-            <Group justify="space-evenly">
-              <Button variant="subtle" leftSection={<IconPlus />} onClick={() => openCreateModal()}>
-                Add Category
-              </Button>
-
-              {reordering ? (
-                <Button
-                  variant="subtle"
-                  color="green"
-                  leftSection={<IconCheck />}
-                  onClick={() => setReordering(false)}
-                >
-                  Done Reordering
-                </Button>
-              ) : (
-                <Button
-                  variant="subtle"
-                  leftSection={<IconArrowsUpDown />}
-                  onClick={() => setReordering(true)}
-                >
-                  Reorder
-                </Button>
-              )}
-            </Group>
-          </Stack>
-        </Card>
-      </Stack>
-      {createModalOpen && (
-        <DynamicCategoryModal
-          onClose={closeCreateModal}
-          onSave={() => router.invalidate()}
-          month={budget.month}
-        />
-      )}
-    </>
+    </Stack>
   );
 }
