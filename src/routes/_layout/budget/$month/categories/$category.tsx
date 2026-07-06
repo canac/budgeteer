@@ -16,7 +16,12 @@ import { setCategoryBalance } from "~/functions/setCategoryBalance";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryStartingBalance } from "~/functions/setCategoryStartingBalance";
 import { useOpened } from "~/hooks/useOpened";
-import { formatCurrency, monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
+import {
+  amountSignClassname,
+  formatCurrency,
+  monthFormatter,
+  monthOnlyFormatter,
+} from "~/lib/formatters";
 import "./CategoryDetailsPage.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/categories/$category")({
@@ -35,9 +40,6 @@ export const Route = createFileRoute("/_layout/budget/$month/categories/$categor
     };
   },
 });
-
-/** Get the `positive` or `negative` className for an amount */
-const amountSignClassname = (amount: number): string => (amount >= 0 ? "positive" : "negative");
 
 function CategoryDetailsPage() {
   const { budgetCategory } = Route.useLoaderData();

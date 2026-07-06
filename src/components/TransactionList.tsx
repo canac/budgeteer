@@ -251,7 +251,7 @@ export function TransactionList({
                 ) : undefined
               }
               amount={
-                <Text fw="bold" c={income ? "green" : undefined}>
+                <Text className={income ? "positive" : undefined} fw="bold">
                   {formatCurrency(transaction.transfer?.amount ?? transaction.amount)}
                 </Text>
               }

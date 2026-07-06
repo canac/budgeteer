@@ -6,7 +6,12 @@ import { parseISO } from "date-fns";
 import { MantineLink } from "~/components/MantineLink";
 import { PageContainer } from "~/components/PageContainer";
 import { getOverview } from "~/functions/getOverview";
-import { formatCurrency, monthFormatter, percentageFormatter } from "~/lib/formatters";
+import {
+  amountSignClassname,
+  formatCurrency,
+  monthFormatter,
+  percentageFormatter,
+} from "~/lib/formatters";
 
 interface ChartDatum {
   category: string;
@@ -113,7 +118,7 @@ function OverviewPage() {
               <Text size="sm" c="dimmed" fw={500}>
                 Remaining
               </Text>
-              <Text size="xl" fw={700} c={totalSpent > totalBudgeted ? "red" : "green"}>
+              <Text className={amountSignClassname(totalBudgeted - totalSpent)} size="xl" fw={700}>
                 {formatCurrency(totalBudgeted - totalSpent)}
               </Text>
             </Stack>
@@ -124,7 +129,7 @@ function OverviewPage() {
               <Text size="sm" c="dimmed" fw={500}>
                 Leftover
               </Text>
-              <Text size="xl" fw={700} c={leftoverBalance < 0 ? "red" : "green"}>
+              <Text className={amountSignClassname(leftoverBalance)} size="xl" fw={700}>
                 {formatCurrency(leftoverBalance)}
               </Text>
             </Stack>

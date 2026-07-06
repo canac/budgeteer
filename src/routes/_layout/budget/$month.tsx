@@ -7,7 +7,7 @@ import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
-import { formatCurrency, monthFormatter } from "~/lib/formatters";
+import { amountSignClassname, formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
 import "./BudgetPage.css";
 
@@ -118,12 +118,16 @@ function BudgetLayout() {
           {leftToBudget !== 0 && (
             <Group justify="space-between">
               <Text>Left to budget</Text>
-              <Text c={leftToBudget >= 0 ? "green" : "red"}>{formatCurrency(leftToBudget)}</Text>
+              <Text className={amountSignClassname(leftToBudget)}>
+                {formatCurrency(leftToBudget)}
+              </Text>
             </Group>
           )}
           <Group justify="space-between">
             <Text>Leftover</Text>
-            <Text>{formatCurrency(leftoverRemaining)}</Text>
+            <Text className={amountSignClassname(leftoverRemaining)}>
+              {formatCurrency(leftoverRemaining)}
+            </Text>
           </Group>
         </Stack>
       </Card>

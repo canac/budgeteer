@@ -34,3 +34,7 @@ export const percentageFormatter = new Intl.NumberFormat("en-US", {
   style: "percent",
   currency: "USD",
 });
+
+/** Get the `positive` or `negative` className for an amount */
+export const amountSignClassname = (amount: number): string =>
+  amount >= 0 ? "positive" : "negative";

@@ -61,7 +61,7 @@ export function UnreviewedTransactions({
               </Table.Td>
               <Table.Td>{transaction.rule?.category?.name}</Table.Td>
               <Table.Td>{transaction.account.name}</Table.Td>
-              <Table.Td ta="right" c={transaction.amount < 0 ? undefined : "green"}>
+              <Table.Td className={transaction.amount >= 0 ? "positive" : undefined} ta="right">
                 {formatCurrency(transaction.amount)}
               </Table.Td>
               <Table.Td ta="center">
