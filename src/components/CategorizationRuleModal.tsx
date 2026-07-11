@@ -7,7 +7,7 @@ import { useServerFnData } from "~/hooks/useServerFnData";
 
 interface EditRule {
   id: string;
-  tellerVendor: string;
+  externalVendor: string;
   vendor: string;
   categoryId: string | null;
 }
@@ -54,7 +54,7 @@ export function CategorizationRuleModal({
     <Modal {...modalProps} title={<Text fw="bold">Edit Rule</Text>}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
-          <TextInput label="Teller Vendor" value={editingRule.tellerVendor} disabled />
+          <TextInput label="Bank Vendor" value={editingRule.externalVendor} disabled />
           <TextInput
             label="Vendor"
             description="Default vendor name of imported transactions"

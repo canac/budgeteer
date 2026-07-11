@@ -9,7 +9,7 @@ import { deleteCategorizationRule as deleteCategorizationRuleFn } from "~/functi
 
 interface Rule {
   id: string;
-  tellerVendor: string;
+  externalVendor: string;
   vendor: string;
   categoryId: string | null;
   category: { name: string } | null;
@@ -44,7 +44,7 @@ export function CategorizationRules({ rules }: CategorizationRulesProps) {
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Teller Vendor</Table.Th>
+            <Table.Th>Bank Vendor</Table.Th>
             <Table.Th>Vendor</Table.Th>
             <Table.Th>Category</Table.Th>
             <Table.Th ta="center">Actions</Table.Th>
@@ -53,7 +53,7 @@ export function CategorizationRules({ rules }: CategorizationRulesProps) {
         <Table.Tbody>
           {rules.map((rule) => (
             <Table.Tr key={rule.id}>
-              <Table.Td>{rule.tellerVendor}</Table.Td>
+              <Table.Td>{rule.externalVendor}</Table.Td>
               <Table.Td>{rule.vendor}</Table.Td>
               <Table.Td>{rule.category?.name}</Table.Td>
               <Table.Td>

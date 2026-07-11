@@ -3,9 +3,9 @@ import type {
   BudgetCreateInput,
   CategorizationRuleCreateInput,
   CategoryCreateInput,
-  TellerAccountCreateInput,
-  TellerEnrollmentCreateInput,
-  TellerTransactionCreateInput,
+  ExternalAccountCreateInput,
+  ExternalConnectionCreateInput,
+  ExternalTransactionCreateInput,
   TransactionCreateInput,
 } from "src/prisma/models";
 import { faker } from "@faker-js/faker";
@@ -16,32 +16,33 @@ type WithRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 const randomMonth = () => faker.date.recent({ days: 365 }).toISOString().slice(0, 7);
 const randomDate = () => faker.date.recent({ days: 365 }).toISOString().slice(0, 10);
 
-export const tellerEnrollment = (
-  fields?: Partial<TellerEnrollmentCreateInput>,
-): TellerEnrollmentCreateInput => ({
-  id: `enr_${faker.string.nanoid()}`,
-  accessToken: `tok_${faker.string.alphanumeric(32)}`,
+export const externalConnection = (
+  fields?: Partial<ExternalConnectionCreateInput>,
+): ExternalConnectionCreateInput => ({
+  id: `item_${faker.string.nanoid()}`,
+  accessToken: `access-sandbox-${faker.string.alphanumeric(32)}`,
+  institution: faker.company.name(),
   ...fields,
 });
 
-export const tellerAccount = (
-  fields?: Partial<TellerAccountCreateInput>,
-): TellerAccountCreateInput => ({
+export const externalAccount = (
+  fields?: Partial<ExternalAccountCreateInput>,
+): ExternalAccountCreateInput => ({
   id: `acc_${faker.string.nanoid()}`,
   name: faker.finance.accountName(),
   institution: faker.company.name(),
-  enrollment: { create: tellerEnrollment() },
+  connection: { create: externalConnection() },
   ...fields,
 });
 
-export const tellerTransaction = (
-  fields?: Partial<TellerTransactionCreateInput>,
-): TellerTransactionCreateInput => ({
+export const externalTransaction = (
+  fields?: Partial<ExternalTransactionCreateInput>,
+): ExternalTransactionCreateInput => ({
   id: `txn_${faker.string.nanoid()}`,
   amount: -faker.number.int({ min: 100, max: 50000 }),
   date: randomDate(),
   vendor: faker.company.name().toUpperCase(),
-  account: { create: tellerAccount() },
+  account: { create: externalAccount() },
   ...fields,
 });
 
@@ -75,19 +76,19 @@ export const transaction = (fields?: Partial<TransactionCreateInput>): Transacti
 export const categorizationRule = (
   fields?: Partial<CategorizationRuleCreateInput>,
 ): CategorizationRuleCreateInput => ({
-  tellerVendor: faker.company.name().toUpperCase(),
+  externalVendor: faker.company.name().toUpperCase(),
   vendor: faker.company.name(),
   ...fields,
 });
 
-export const createTellerEnrollment = (...args: Parameters<typeof tellerEnrollment>) =>
-  getPrisma().tellerEnrollment.create({ data: tellerEnrollment(...args) });
+export const createExternalConnection = (...args: Parameters<typeof externalConnection>) =>
+  getPrisma().externalConnection.create({ data: externalConnection(...args) });
 
-export const createTellerAccount = (...args: Parameters<typeof tellerAccount>) =>
-  getPrisma().tellerAccount.create({ data: tellerAccount(...args) });
+export const createExternalAccount = (...args: Parameters<typeof externalAccount>) =>
+  getPrisma().externalAccount.create({ data: externalAccount(...args) });
 
-export const createTellerTransaction = (...args: Parameters<typeof tellerTransaction>) =>
-  getPrisma().tellerTransaction.create({ data: tellerTransaction(...args) });
+export const createExternalTransaction = (...args: Parameters<typeof externalTransaction>) =>
+  getPrisma().externalTransaction.create({ data: externalTransaction(...args) });
 
 export const createBudget = (...args: Parameters<typeof budget>) =>
   getPrisma().budget.create({ data: budget(...args) });

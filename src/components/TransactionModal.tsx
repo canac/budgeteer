@@ -38,7 +38,7 @@ interface EditTransaction {
   vendor: string;
   description: string | null;
   date: string;
-  tellerId: string | null;
+  externalId: string | null;
   transactionCategories: Array<{
     id: string;
     amount: number;
@@ -97,7 +97,7 @@ export function TransactionModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isEditing = !!editingTransaction;
-  const external = !!editingTransaction?.tellerId;
+  const external = !!editingTransaction?.externalId;
 
   const form = useForm({
     validateInputOnBlur: true,

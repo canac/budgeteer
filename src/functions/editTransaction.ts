@@ -23,7 +23,7 @@ export const editTransaction = createServerFn({ method: "POST" })
     });
 
     if (
-      existing.tellerId &&
+      existing.externalId &&
       (existing.date !== attributes.date || existing.amount !== attributes.amount)
     ) {
       throw new Error("The date and amount of imported transactions are immutable");

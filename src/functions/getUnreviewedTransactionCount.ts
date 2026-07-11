@@ -4,4 +4,11 @@ import { prisma } from "~/lib/prisma";
 
 export const getUnreviewedTransactionCount = createServerFn()
   .middleware([requireAuth])
-  .handler(() => prisma.tellerTransaction.count({ where: { reviewed: false } }));
+  .handler(() =>
+    prisma.externalTransaction.count({
+      where: {
+        // Transactions awaiting review or accepted ones flagged as changed at the bank
+        OR: [{ reviewed: false }, { changedAt: { not: null }, transaction: { isNot: null } }],
+      },
+    }),
+  );

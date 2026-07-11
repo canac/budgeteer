@@ -71,8 +71,8 @@ model Transaction {
   description           String?
   transactionCategories TransactionCategory[]
   transfer              Transfer?
-  tellerId              String?               @unique
-  tellerTransaction     TellerTransaction?    @relation(fields: [tellerId], references: [id], onDelete: SetNull)
+  externalId            String?               @unique
+  externalTransaction   ExternalTransaction?  @relation(fields: [externalId], references: [id], onDelete: SetNull)
 }
 
 model TransactionCategory {
@@ -101,47 +101,51 @@ model Transfer {
   transaction           Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
 }
 
-model TellerEnrollment {
-  id          String          @id // The teller ID
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  accessToken String
-  accounts    TellerAccount[]
+model ExternalConnection {
+  id            String            @id // The Plaid item_id
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  accessToken   String
+  institution   String
+  cursor        String?
+  lastSyncedAt  DateTime?
+  loginRequired Boolean           @default(false)
+  accounts      ExternalAccount[]
 }
 
-model TellerAccount {
-  id           String              @id // The teller ID
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+model ExternalAccount {
+  id           String                @id // The Plaid account_id
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
   name         String
   institution  String
-  creditCard   Boolean             @default(false)
-  enabled      Boolean             @default(true)
-  lastSyncedAt DateTime?
-  enrollmentId String
-  enrollment   TellerEnrollment    @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  transactions TellerTransaction[]
+  creditCard   Boolean               @default(false)
+  enabled      Boolean               @default(true)
+  connectionId String
+  connection   ExternalConnection    @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  transactions ExternalTransaction[]
 }
 
-model TellerTransaction {
-  id          String        @id // The teller ID
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+model ExternalTransaction {
+  id          String          @id // The Plaid transaction_id
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   amount      Int
   date        String
   vendor      String
-  reviewed    Boolean       @default(false)
+  reviewed    Boolean         @default(false)
+  changedAt   DateTime?
   accountId   String
-  account     TellerAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account     ExternalAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
   transaction Transaction?
 }
 
 model CategorizationRule {
-  id           String    @id @default(uuid(7))
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  tellerVendor String    @unique
-  vendor       String
-  categoryId   String?
-  category     Category? @relation(fields: [categoryId], references: [id])
+  id             String    @id @default(uuid(7))
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  externalVendor String    @unique
+  vendor         String
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id])
 }

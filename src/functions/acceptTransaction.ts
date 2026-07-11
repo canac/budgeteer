@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { array, boolean, number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
-import { formatTellerVendor } from "~/lib/teller/formatVendor";
 
 const overrideSchema = object({
   vendor: string().min(1),
@@ -29,21 +28,23 @@ export const acceptTransaction = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, override } }) => {
-    const tellerTransaction = await prisma.tellerTransaction.findUniqueOrThrow({
+    const externalTransaction = await prisma.externalTransaction.findUniqueOrThrow({
       where: { id },
     });
     const rule = await prisma.categorizationRule.findUnique({
-      where: { tellerVendor: tellerTransaction.vendor },
+      where: { externalVendor: externalTransaction.vendor },
     });
 
-    const vendor = override?.vendor ?? rule?.vendor ?? formatTellerVendor(tellerTransaction.vendor);
+    const vendor = override?.vendor ?? rule?.vendor ?? externalTransaction.vendor;
     const categories =
       override?.categories ??
-      (rule?.categoryId ? [{ categoryId: rule.categoryId, amount: tellerTransaction.amount }] : []);
+      (rule?.categoryId
+        ? [{ categoryId: rule.categoryId, amount: externalTransaction.amount }]
+        : []);
 
     if (override) {
       const total = categories.reduce((sum, category) => sum + category.amount, 0);
-      if (total !== tellerTransaction.amount) {
+      if (total !== externalTransaction.amount) {
         throw new Error("Category amounts must sum to transaction amount");
       }
     }
@@ -53,25 +54,25 @@ export const acceptTransaction = createServerFn({ method: "POST" })
         tx.transaction.create({
           data: {
             type: "TRANSACTION",
-            amount: tellerTransaction.amount,
-            date: tellerTransaction.date,
+            amount: externalTransaction.amount,
+            date: externalTransaction.date,
             vendor,
             description: override?.description,
-            tellerId: tellerTransaction.id,
+            externalId: externalTransaction.id,
             transactionCategories: {
               create: categories.map(({ categoryId, amount }) => ({ categoryId, amount })),
             },
           },
         }),
-        tx.tellerTransaction.update({
+        tx.externalTransaction.update({
           where: { id },
           data: { reviewed: true },
         }),
         override?.updateRuleVendor || override?.updateRuleCategory
           ? tx.categorizationRule.upsert({
-              where: { tellerVendor: tellerTransaction.vendor },
+              where: { externalVendor: externalTransaction.vendor },
               create: {
-                tellerVendor: tellerTransaction.vendor,
+                externalVendor: externalTransaction.vendor,
                 vendor: override.vendor,
                 categoryId: override.updateRuleCategory ? override.categories[0]?.categoryId : null,
               },

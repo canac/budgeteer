@@ -12,6 +12,7 @@ The only allowed abbreviations are:
 
 - `i` for `index`
 - `tx` for `transaction`
+- `req`/`res` for `request`/`response`
 
 ## Tests
 

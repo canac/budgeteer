@@ -1,8 +1,8 @@
 import {
   createCategorizationRule,
   createCategory,
-  createTellerAccount,
-  createTellerTransaction,
+  createExternalAccount,
+  createExternalTransaction,
   transaction,
 } from "test/mocks.ts";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -13,15 +13,15 @@ describe("getUnreviewedTransactions", () => {
   let accountId: string;
   let account: { connect: { id: string } };
   beforeEach(async () => {
-    accountId = (await createTellerAccount()).id;
+    accountId = (await createExternalAccount()).id;
     account = { connect: { id: accountId } };
   });
 
   it("returns unreviewed transactions ordered by date desc with total", async () => {
     await Promise.all([
-      createTellerTransaction({ date: "2025-01-10", vendor: "A", account }),
-      createTellerTransaction({ date: "2025-01-20", vendor: "B", account }),
-      createTellerTransaction({ date: "2025-01-15", vendor: "C", reviewed: true, account }),
+      createExternalTransaction({ date: "2025-01-10", vendor: "A", account }),
+      createExternalTransaction({ date: "2025-01-20", vendor: "B", account }),
+      createExternalTransaction({ date: "2025-01-15", vendor: "C", reviewed: true, account }),
     ]);
 
     const result = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10 } });
@@ -31,11 +31,11 @@ describe("getUnreviewedTransactions", () => {
     expect(result.transactions[0]!.account.id).toBe(accountId);
   });
 
-  it("returns only rejected transactions when rejected is true", async () => {
+  it("returns only rejected transactions when view is rejected", async () => {
     await Promise.all([
-      createTellerTransaction({ vendor: "Pending", account }),
-      createTellerTransaction({ vendor: "Rejected", reviewed: true, account }),
-      createTellerTransaction({
+      createExternalTransaction({ vendor: "Pending", account }),
+      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({
         vendor: "Accepted",
         reviewed: true,
         transaction: { create: transaction() },
@@ -44,15 +44,40 @@ describe("getUnreviewedTransactions", () => {
     ]);
 
     const result = await getUnreviewedTransactions({
-      data: { page: 1, pageSize: 10, rejected: true },
+      data: { page: 1, pageSize: 10, view: "rejected" },
     });
     expect(pluck(result.transactions, "vendor")).toEqual(["Rejected"]);
+  });
+
+  it("returns only accepted transactions flagged as changed when view is changed", async () => {
+    await Promise.all([
+      createExternalTransaction({ vendor: "Pending", account }),
+      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({
+        vendor: "AcceptedUnchanged",
+        reviewed: true,
+        transaction: { create: transaction() },
+        account,
+      }),
+      createExternalTransaction({
+        vendor: "AcceptedChanged",
+        reviewed: true,
+        changedAt: new Date(),
+        transaction: { create: transaction() },
+        account,
+      }),
+    ]);
+
+    const result = await getUnreviewedTransactions({
+      data: { page: 1, pageSize: 10, view: "changed" },
+    });
+    expect(pluck(result.transactions, "vendor")).toEqual(["AcceptedChanged"]);
   });
 
   it("paginates", async () => {
     await Promise.all(
       range(5).map((index) =>
-        createTellerTransaction({ date: `2025-01-0${index + 1}`, vendor: `V${index}`, account }),
+        createExternalTransaction({ date: `2025-01-0${index + 1}`, vendor: `V${index}`, account }),
       ),
     );
 
@@ -72,12 +97,12 @@ describe("getUnreviewedTransactions", () => {
     const category = await createCategory({ name: "Shopping" });
     await Promise.all([
       createCategorizationRule({
-        tellerVendor: "AMAZON",
+        externalVendor: "AMAZON",
         vendor: "Amazon",
         category: { connect: { id: category.id } },
       }),
-      createTellerTransaction({ vendor: "AMAZON", account }),
-      createTellerTransaction({ vendor: "UNKNOWN", account }),
+      createExternalTransaction({ vendor: "AMAZON", account }),
+      createExternalTransaction({ vendor: "UNKNOWN", account }),
     ]);
 
     const { transactions } = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10 } });

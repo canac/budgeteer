@@ -11,7 +11,7 @@ export const rejectTransaction = createServerFn({ method: "POST" })
   .inputValidator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
-    await prisma.tellerTransaction.update({
+    await prisma.externalTransaction.update({
       where: { id },
       data: { reviewed: true },
     });

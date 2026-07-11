@@ -14,7 +14,6 @@ import {
 } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
 import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
-import { formatTellerVendor } from "src/lib/teller/formatVendor";
 import { array, boolean, minLength, number, object, string } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { acceptTransaction } from "~/functions/acceptTransaction";
@@ -62,7 +61,7 @@ export function ImportTransactionModal({
   const form = useForm({
     validateInputOnBlur: true,
     initialValues: {
-      vendor: transaction.rule?.vendor ?? formatTellerVendor(transaction.vendor),
+      vendor: transaction.rule?.vendor ?? transaction.vendor,
       description: "",
       selectedCategoryIds: transaction.rule?.category ? [transaction.rule.category.id] : [],
       categoryAmounts: transaction.rule?.category
@@ -151,7 +150,7 @@ export function ImportTransactionModal({
     <Modal {...modalProps} title={<Text fw="bold">Import Transaction</Text>}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
-          <TextInput label="Teller Vendor" value={transaction.vendor} disabled />
+          <TextInput label="Bank Vendor" value={transaction.vendor} disabled />
           <Stack gap="xs">
             <TextInput
               label="Vendor"

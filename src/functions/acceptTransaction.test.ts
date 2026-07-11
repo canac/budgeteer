@@ -1,15 +1,19 @@
-import { createCategorizationRule, createCategory, createTellerTransaction } from "test/mocks.ts";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { TellerTransaction } from "~/prisma/client.ts";
+import type { ExternalTransaction } from "~/prisma/client.ts";
 import { getPrisma } from "../../test/helpers.ts";
+import {
+  createCategorizationRule,
+  createCategory,
+  createExternalTransaction,
+} from "../../test/mocks.ts";
 import { acceptTransaction } from "./acceptTransaction.ts";
 
 describe("acceptTransaction", () => {
   const prisma = getPrisma();
 
-  let teller: TellerTransaction;
+  let external: ExternalTransaction;
   beforeEach(async () => {
-    teller = await createTellerTransaction({
+    external = await createExternalTransaction({
       amount: -1000,
       vendor: "AMZN MKTP",
       date: "2025-01-15",
@@ -20,7 +24,7 @@ describe("acceptTransaction", () => {
     await expect(() =>
       acceptTransaction({
         data: {
-          id: teller.id,
+          id: external.id,
           override: {
             vendor: "Amazon",
             categories: [],
@@ -35,12 +39,12 @@ describe("acceptTransaction", () => {
   it("uses an existing rule for vendor and category", async () => {
     const cat = await createCategory();
     await createCategorizationRule({
-      tellerVendor: teller.vendor,
+      externalVendor: external.vendor,
       vendor: "Amazon",
       category: { connect: { id: cat.id } },
     });
 
-    const transaction = await acceptTransaction({ data: { id: teller.id } });
+    const transaction = await acceptTransaction({ data: { id: external.id } });
 
     expect(transaction.vendor).toBe("Amazon");
     expect(
@@ -53,7 +57,7 @@ describe("acceptTransaction", () => {
 
     const transaction = await acceptTransaction({
       data: {
-        id: teller.id,
+        id: external.id,
         override: {
           vendor: "Amazon",
           categories: [
@@ -86,7 +90,7 @@ describe("acceptTransaction", () => {
 
     const transaction = await acceptTransaction({
       data: {
-        id: teller.id,
+        id: external.id,
         override: {
           vendor: "Amazon",
           description: "Birthday gift",
@@ -106,7 +110,7 @@ describe("acceptTransaction", () => {
     await expect(() =>
       acceptTransaction({
         data: {
-          id: teller.id,
+          id: external.id,
           override: {
             vendor: "Amazon",
             categories: [{ categoryId: category.id, amount: -500 }],
@@ -123,7 +127,7 @@ describe("acceptTransaction", () => {
 
     await acceptTransaction({
       data: {
-        id: teller.id,
+        id: external.id,
         override: {
           vendor: "Amazon",
           categories: [{ categoryId: category.id, amount: -1000 }],
@@ -134,7 +138,7 @@ describe("acceptTransaction", () => {
     });
 
     const rule = await prisma.categorizationRule.findUniqueOrThrow({
-      where: { tellerVendor: teller.vendor },
+      where: { externalVendor: external.vendor },
     });
     expect(rule).toMatchObject({ vendor: "Amazon", categoryId: category.id });
   });
@@ -142,14 +146,14 @@ describe("acceptTransaction", () => {
   it("updates only the rule fields requested when both flags differ", async () => {
     const [oldCategory, newCategory] = await Promise.all([createCategory(), createCategory()]);
     await createCategorizationRule({
-      tellerVendor: teller.vendor,
+      externalVendor: external.vendor,
       vendor: "OldVendor",
       category: { connect: { id: oldCategory.id } },
     });
 
     await acceptTransaction({
       data: {
-        id: teller.id,
+        id: external.id,
         override: {
           vendor: "NewVendor",
           categories: [{ categoryId: newCategory.id, amount: -1000 }],
@@ -160,7 +164,7 @@ describe("acceptTransaction", () => {
     });
 
     const rule = await prisma.categorizationRule.findUniqueOrThrow({
-      where: { tellerVendor: teller.vendor },
+      where: { externalVendor: external.vendor },
     });
     expect(rule).toMatchObject({ vendor: "NewVendor", categoryId: oldCategory.id });
   });
@@ -171,7 +175,7 @@ describe("acceptTransaction", () => {
     await expect(() =>
       acceptTransaction({
         data: {
-          id: teller.id,
+          id: external.id,
           override: {
             vendor: "Amazon",
             categories: [

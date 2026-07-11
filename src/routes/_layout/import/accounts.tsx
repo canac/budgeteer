@@ -1,154 +1,151 @@
-import { Button, Group, Stack, Switch, Table, Text } from "@mantine/core";
+import { Alert, Button, Group, Stack, Switch, Table, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconBuildingBank } from "@tabler/icons-react";
+import { IconAlertTriangle, IconBuildingBank } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { usePlaidLink, type PlaidLinkOnExit, type PlaidLinkOnSuccess } from "react-plaid-link";
 import { extractErrorMessage } from "src/lib/error";
-import { createTellerEnrollment as createTellerEnrollmentFn } from "~/functions/createTellerEnrollment";
-import { getTellerAccounts } from "~/functions/getTellerAccounts";
-import { setTellerAccountEnabled as setTellerAccountEnabledFn } from "~/functions/setTellerAccountEnabled";
-
-interface TellerEnrollmentResult {
-  accessToken: string;
-  enrollment: {
-    id: string;
-    institution: { name: string };
-  };
-}
-
-interface TellerConnectInstance {
-  open: () => void;
-}
-
-interface TellerConnectSetupOptions {
-  applicationId: string;
-  environment: string;
-  products: string[];
-  onSuccess: (enrollment: TellerEnrollmentResult) => void;
-  onExit?: () => void;
-  onFailure?: (failure: { type: string; code: string; message: string }) => void;
-}
-
-declare global {
-  interface Window {
-    TellerConnect?: {
-      setup: (options: TellerConnectSetupOptions) => TellerConnectInstance;
-    };
-  }
-}
-
-function loadTellerScript(): Promise<void> {
-  const CONNECT_SCRIPT_ID = "teller-connect";
-
-  if (window.TellerConnect) {
-    return Promise.resolve();
-  }
-
-  const existing = document.querySelector<HTMLScriptElement>(`script#${CONNECT_SCRIPT_ID}`);
-  if (existing) {
-    return new Promise((resolve, reject) => {
-      existing.addEventListener("load", () => resolve());
-      existing.addEventListener("error", () => reject(new Error("Failed to load Teller Connect")));
-    });
-  }
-
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.id = CONNECT_SCRIPT_ID;
-    script.src = "https://cdn.teller.io/connect/connect.js";
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Failed to load Teller Connect"));
-    document.head.appendChild(script);
-  });
-}
+import { createLinkToken as createLinkTokenFn } from "~/functions/createLinkToken";
+import { createUpdateLinkToken as createUpdateLinkTokenFn } from "~/functions/createUpdateLinkToken";
+import { exchangePublicToken as exchangePublicTokenFn } from "~/functions/exchangePublicToken";
+import { getExternalAccounts } from "~/functions/getExternalAccounts";
+import { getExternalConnections } from "~/functions/getExternalConnections";
+import { markConnectionReconnected as markConnectionReconnectedFn } from "~/functions/markConnectionReconnected";
+import { setExternalAccountEnabled as setExternalAccountEnabledFn } from "~/functions/setExternalAccountEnabled";
 
 export const Route = createFileRoute("/_layout/import/accounts")({
   component: AccountsPage,
-  loader: () => getTellerAccounts(),
+  loader: async () => ({
+    accounts: await getExternalAccounts(),
+    connections: await getExternalConnections(),
+  }),
   head: () => ({ meta: [{ title: "Import Accounts | Budgeteer" }] }),
 });
 
 function AccountsPage() {
   const router = useRouter();
-  const accounts = Route.useLoaderData();
-  const createTellerEnrollment = useServerFn(createTellerEnrollmentFn);
-  const setTellerAccountEnabled = useServerFn(setTellerAccountEnabledFn);
-  const [ready, setReady] = useState(false);
-  const [opening, setOpening] = useState(false);
+  const { accounts, connections } = Route.useLoaderData();
+  const createLinkToken = useServerFn(createLinkTokenFn);
+  const createUpdateLinkToken = useServerFn(createUpdateLinkTokenFn);
+  const exchangePublicToken = useServerFn(exchangePublicTokenFn);
+  const markConnectionReconnected = useServerFn(markConnectionReconnectedFn);
+  const setExternalAccountEnabled = useServerFn(setExternalAccountEnabledFn);
 
-  useEffect(() => {
-    loadTellerScript().then(
-      () => setReady(true),
-      (error: unknown) =>
-        notifications.show({
-          title: "Teller Connect failed to load",
-          message: extractErrorMessage(error),
-          color: "red",
-        }),
-    );
+  const [linkToken, setLinkToken] = useState<string | null>(null);
+  // Set while reauthenticating an existing Item (update mode)
+  const [reconnectId, setReconnectId] = useState<string | null>(null);
+
+  const reset = useCallback(() => {
+    setLinkToken(null);
+    setReconnectId(null);
   }, []);
 
-  const handleConnect = () => {
-    if (!window.TellerConnect) {
-      return;
-    }
-
-    setOpening(true);
-    const tellerConnect = window.TellerConnect.setup({
-      applicationId: import.meta.env.VITE_TELLER_APP_ID,
-      environment: import.meta.env.VITE_TELLER_ENV,
-      products: ["transactions"],
-      onSuccess: async (enrollment) => {
-        try {
-          await createTellerEnrollment({
-            data: {
-              enrollmentId: enrollment.enrollment.id,
-              accessToken: enrollment.accessToken,
-            },
-          });
-          notifications.show({
-            title: "Account connected",
-            message: `Linked ${enrollment.enrollment.institution.name}.`,
-            color: "green",
-          });
-          await router.invalidate();
-        } catch (error) {
-          notifications.show({
-            title: "Failed to save enrollment",
-            message: extractErrorMessage(error),
-            color: "red",
+  const onSuccess = useCallback<PlaidLinkOnSuccess>(
+    async (publicToken, metadata) => {
+      try {
+        if (reconnectId) {
+          await markConnectionReconnected({ data: { connectionId: reconnectId } });
+        } else {
+          await exchangePublicToken({
+            data: { publicToken, institution: metadata.institution?.name ?? "Unknown" },
           });
         }
-      },
-      onExit: () => setOpening(false),
-      onFailure: (failure) => {
-        setOpening(false);
         notifications.show({
-          title: "Teller Connect error",
-          message: failure.message,
+          title: reconnectId ? "Reconnected" : "Account connected",
+          message: `Linked ${metadata.institution?.name ?? "your bank"}.`,
+          color: "green",
+        });
+        reset();
+        await router.invalidate();
+      } catch (error: unknown) {
+        notifications.show({
+          title: "Failed to save connection",
+          message: extractErrorMessage(error),
           color: "red",
         });
-      },
-    });
-    tellerConnect.open();
+      }
+    },
+    [reconnectId, exchangePublicToken, markConnectionReconnected, reset, router],
+  );
+
+  const onExit = useCallback<PlaidLinkOnExit>(
+    (error) => {
+      if (error) {
+        notifications.show({
+          title: "Connection error",
+          message: error.display_message,
+          color: "red",
+        });
+      }
+      reset();
+    },
+    [reset],
+  );
+
+  const { open, ready } = usePlaidLink({
+    token: linkToken,
+    onSuccess,
+    onExit,
+  });
+
+  // Open Link once it's ready, after the token fetch
+  useEffect(() => {
+    if (linkToken && ready) {
+      // oxlint-disable-next-line typescript/no-unsafe-call
+      open();
+    }
+  }, [linkToken, ready, open]);
+
+  const startLink = (tokenPromise: Promise<{ linkToken: string }>, connectionId: string | null) => {
+    setReconnectId(connectionId);
+    tokenPromise
+      .then(({ linkToken: token }) => {
+        setLinkToken(token);
+      })
+      .catch((error: unknown) => {
+        setReconnectId(null);
+        notifications.show({
+          title: "Could not start Plaid Link",
+          message: extractErrorMessage(error),
+          color: "red",
+        });
+      });
   };
 
+  const handleConnect = () => startLink(createLinkToken(), null);
+
+  const handleReconnect = (connectionId: string) =>
+    startLink(createUpdateLinkToken({ data: { connectionId } }), connectionId);
+
   const handleToggle = async (id: string, enabled: boolean) => {
-    await setTellerAccountEnabled({ data: { id, enabled } });
+    await setExternalAccountEnabled({ data: { id, enabled } });
     await router.invalidate();
   };
 
+  const needsReconnect = connections.filter((connection) => connection.loginRequired);
+
   return (
     <Stack gap="md">
-      <Group>
-        <Button
-          leftSection={<IconBuildingBank />}
-          onClick={handleConnect}
-          loading={opening}
-          disabled={!ready}
+      {needsReconnect.map((connection) => (
+        <Alert
+          key={connection.id}
+          color="yellow"
+          icon={<IconAlertTriangle />}
+          title={`${connection.institution} needs to be reconnected`}
         >
+          <Group justify="space-between">
+            <Text size="sm">
+              Its login expired, so transactions can't be imported until you reconnect.
+            </Text>
+            <Button size="xs" onClick={() => handleReconnect(connection.id)}>
+              Reconnect
+            </Button>
+          </Group>
+        </Alert>
+      ))}
+      <Group>
+        <Button leftSection={<IconBuildingBank />} onClick={handleConnect}>
           Enroll a new account
         </Button>
       </Group>

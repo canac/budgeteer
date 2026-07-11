@@ -2,11 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
 import { prisma } from "~/lib/prisma";
 
-export const getCategorizationRules = createServerFn()
+export const getExternalAccounts = createServerFn()
   .middleware([requireAuth])
   .handler(() =>
-    prisma.categorizationRule.findMany({
-      orderBy: { externalVendor: "asc" },
-      include: { category: true },
+    prisma.externalAccount.findMany({
+      orderBy: [{ institution: "asc" }, { name: "asc" }],
     }),
   );

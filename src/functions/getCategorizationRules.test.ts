@@ -4,16 +4,19 @@ import { describe, expect, it } from "vitest";
 import { getCategorizationRules } from "./getCategorizationRules.ts";
 
 describe("getCategorizationRules", () => {
-  it("returns rules sorted by tellerVendor", async () => {
+  it("returns rules sorted by externalVendor", async () => {
     const category = await createCategory({ name: "Groceries" });
     await Promise.all([
-      createCategorizationRule({ tellerVendor: "VENDOR B" }),
+      createCategorizationRule({ externalVendor: "VENDOR B" }),
       createCategorizationRule({
-        tellerVendor: "VENDOR A",
+        externalVendor: "VENDOR A",
         category: { connect: { id: category.id } },
       }),
     ]);
 
-    expect(pluck(await getCategorizationRules(), "tellerVendor")).toEqual(["VENDOR A", "VENDOR B"]);
+    expect(pluck(await getCategorizationRules(), "externalVendor")).toEqual([
+      "VENDOR A",
+      "VENDOR B",
+    ]);
   });
 });

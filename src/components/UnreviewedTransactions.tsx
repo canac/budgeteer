@@ -12,6 +12,7 @@ interface UnreviewedTransactionsProps {
   transactions: UnreviewedTransaction[];
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
+  onAcknowledge?: (id: string) => void;
   onEdit: (id: string) => void;
   onRestore?: (id: string) => void;
 }
@@ -20,6 +21,7 @@ export function UnreviewedTransactions({
   transactions,
   onAccept,
   onReject,
+  onAcknowledge,
   onEdit,
   onRestore,
 }: UnreviewedTransactionsProps) {
@@ -65,7 +67,16 @@ export function UnreviewedTransactions({
                 {formatCurrency(transaction.amount)}
               </Table.Td>
               <Table.Td ta="center">
-                {transaction.reviewed ? (
+                {transaction.changedAt ? (
+                  <ActionIcon
+                    variant="subtle"
+                    color="green"
+                    aria-label="Acknowledge"
+                    onClick={() => onAcknowledge?.(transaction.id)}
+                  >
+                    <IconCheck />
+                  </ActionIcon>
+                ) : transaction.reviewed ? (
                   <ActionIcon
                     variant="subtle"
                     color="blue"
