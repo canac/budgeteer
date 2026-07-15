@@ -1,12 +1,9 @@
 import {
-  ActionIcon,
   Alert,
   Autocomplete,
   Button,
-  CheckIcon,
   Group,
   Modal,
-  MultiSelect,
   NumberInput,
   Stack,
   Switch,
@@ -14,23 +11,25 @@ import {
   TextInput,
 } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
-import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { extractErrorMessage } from "src/lib/error";
-import { array, boolean, minLength, number, object, positive, refine, string } from "zod/mini";
+import { boolean, minLength, number, object, positive, refine, string } from "zod/mini";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { getFirstMonth } from "~/functions/getFirstMonth";
 import { getVendors } from "~/functions/getVendors";
+import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
-import { useSortedCategories } from "~/hooks/useSortedCategories";
-import { find, pluck } from "~/lib/collections";
+import {
+  CATEGORY_TOTAL_MISMATCH,
+  categorySplitFields,
+  splitTotalPennies,
+} from "~/lib/categorySplit";
+import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
-import { formatCurrency } from "~/lib/formatters";
 import { toISODateString } from "~/lib/iso";
-import "./TransactionModal.css";
 
 interface EditTransaction {
   id: string;
@@ -60,24 +59,12 @@ const formSchema = object({
   description: string(),
   date: string("Date is required"),
   isIncome: boolean(),
-  selectedCategoryIds: array(string()).check(minLength(1, "At least one category is required")),
-  categoryAmounts: array(
-    object({
-      categoryId: string(),
-      amount: amountSchema,
-    }),
-  ),
+  ...categorySplitFields,
 }).check(
   refine(
-    (values) => {
-      const totalCategoryAmount = values.categoryAmounts.reduce(
-        (sum, category) => sum + dollarsToPennies(category.amount),
-        0,
-      );
-      return dollarsToPennies(values.amount) === totalCategoryAmount;
-    },
+    (values) => splitTotalPennies(values.categoryAmounts) === dollarsToPennies(values.amount),
     {
-      message: "Category amounts must equal total amount",
+      message: CATEGORY_TOTAL_MISMATCH,
       path: ["categoryAmounts"],
     },
   ),
@@ -92,7 +79,6 @@ export function TransactionModal({
   const vendors = useServerFnData(getVendors) ?? [];
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
   const firstMonth = useServerFnData(getFirstMonth);
-  const sortedCategories = useSortedCategories(categories);
   const { close, modalProps } = useOpened({ onClose });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -126,32 +112,9 @@ export function TransactionModal({
     validate: schemaResolver(formSchema, { sync: true }),
   });
 
-  const categoryOptions = sortedCategories.map((category) => ({
-    value: category.id,
-    label: category.name,
-  }));
+  const { selectedCategoryIds, amount } = form.getValues();
 
-  const { selectedCategoryIds, categoryAmounts, amount } = form.getValues();
-
-  form.watch("selectedCategoryIds", ({ value, previousValue }) => {
-    if (value.length === 1) {
-      form.setFieldValue("categoryAmounts", [{ categoryId: value[0]!, amount }]);
-    } else if (value.length === 2 && previousValue.length === 1) {
-      form.setFieldValue("categoryAmounts", [
-        { categoryId: value[0]!, amount: 0 },
-        { categoryId: value[1]!, amount: 0 },
-      ]);
-    } else {
-      const newCategoryAmounts = value.map(
-        (categoryId) =>
-          find(categoryAmounts, "categoryId", categoryId) ?? {
-            categoryId,
-            amount: 0,
-          },
-      );
-      form.setFieldValue("categoryAmounts", newCategoryAmounts);
-    }
-  });
+  const { categorySelect, splitFields } = useCategorySplit({ form, categories, total: amount });
 
   form.watch("amount", ({ value }) => {
     if (selectedCategoryIds.length === 1 && value > 0) {
@@ -160,27 +123,6 @@ export function TransactionModal({
       ]);
     }
   });
-
-  const remainingAmount =
-    dollarsToPennies(amount) -
-    categoryAmounts.reduce((sum, category) => sum + dollarsToPennies(category.amount), 0);
-
-  const assignRemainingAmount = (index: number) => {
-    if (categoryAmounts[index]) {
-      form.setFieldValue(
-        `categoryAmounts.${index}.amount`,
-        categoryAmounts[index].amount + penniesToDollars(remainingAmount),
-      );
-    }
-  };
-
-  const removeCategory = (index: number) => {
-    const categoryId = categoryAmounts[index]?.categoryId;
-    form.setFieldValue(
-      "selectedCategoryIds",
-      selectedCategoryIds.filter((id) => id !== categoryId),
-    );
-  };
 
   const handleSubmit = form.onSubmit(async (values) => {
     const sign = values.isIncome ? 1 : -1;
@@ -259,74 +201,8 @@ export function TransactionModal({
             disabled={external}
             min={firstMonth ?? undefined}
           />
-          <MultiSelect
-            label="Category"
-            data={categoryOptions}
-            key={form.key("selectedCategoryIds")}
-            {...form.getInputProps("selectedCategoryIds")}
-            required
-            multiple
-            searchable
-            classNames={{ dropdown: "TransactionModal-dropdown" }}
-            renderOption={({ option, checked }) => {
-              const category = find(categories, "id", option.value);
-              return (
-                category && (
-                  <>
-                    {checked && <CheckIcon className="check-icon" />}
-                    {option.label} ({formatCurrency(category.balance)})
-                  </>
-                )
-              );
-            }}
-          />
-          {selectedCategoryIds.length > 1 && (
-            <Stack gap="xs">
-              <Text size="sm" fw={500}>
-                Split transaction
-              </Text>
-              {remainingAmount !== 0 && (
-                <Alert color={remainingAmount > 0 ? "orange" : "red"}>
-                  {remainingAmount > 0
-                    ? `${formatCurrency(remainingAmount)} remaining to assign`
-                    : `${formatCurrency(Math.abs(remainingAmount))} over budget`}
-                </Alert>
-              )}
-              {categoryAmounts.map((categoryAmount, index) => {
-                const category = find(categories, "id", categoryAmount.categoryId);
-                return (
-                  category && (
-                    <Group key={categoryAmount.categoryId} gap="xs" align="center">
-                      <NumberInput
-                        label={category.name}
-                        key={form.key(`categoryAmounts.${index}.amount`)}
-                        {...form.getInputProps(`categoryAmounts.${index}.amount`)}
-                        style={{ flex: 1 }}
-                      />
-                      <ActionIcon
-                        variant="subtle"
-                        color="red"
-                        onClick={() => removeCategory(index)}
-                        title="Remove category"
-                      >
-                        <IconTrash />
-                      </ActionIcon>
-                      {remainingAmount !== 0 && (
-                        <ActionIcon
-                          variant="subtle"
-                          color="green"
-                          onClick={() => assignRemainingAmount(index)}
-                          title="Assign remaining amount"
-                        >
-                          <IconCircleCheck />
-                        </ActionIcon>
-                      )}
-                    </Group>
-                  )
-                );
-              })}
-            </Stack>
-          )}
+          {categorySelect}
+          {splitFields}
           {errorMessage !== null && <Alert color="red">{errorMessage}</Alert>}
           <Group justify="flex-end">
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>

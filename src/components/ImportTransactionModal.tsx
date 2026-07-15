@@ -1,30 +1,18 @@
-import {
-  ActionIcon,
-  Alert,
-  Button,
-  Checkbox,
-  CheckIcon,
-  Group,
-  Modal,
-  MultiSelect,
-  NumberInput,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Button, Checkbox, Group, Modal, Stack, Text, TextInput } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
-import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
-import { array, boolean, minLength, number, object, string } from "zod/mini";
+import { boolean, minLength, object, refine, string } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { acceptTransaction } from "~/functions/acceptTransaction";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
+import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
-import { useSortedCategories } from "~/hooks/useSortedCategories";
-import { find } from "~/lib/collections";
+import {
+  CATEGORY_TOTAL_MISMATCH,
+  categorySplitFields,
+  splitTotalPennies,
+} from "~/lib/categorySplit";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
-import { formatCurrency } from "~/lib/formatters";
-import "./TransactionModal.css";
 
 export interface ImportTransactionModalProps {
   onClose: () => void;
@@ -32,31 +20,30 @@ export interface ImportTransactionModalProps {
   transaction: UnreviewedTransaction;
 }
 
-const formSchema = object({
-  vendor: string().check(minLength(1, "Vendor is required")),
-  description: string(),
-  selectedCategoryIds: array(string()).check(minLength(1, "At least one category is required")),
-  categoryAmounts: array(
-    object({
-      categoryId: string(),
-      amount: number(),
-    }),
-  ),
-  updateRuleVendor: boolean(),
-  updateRuleCategory: boolean(),
-});
-
 export function ImportTransactionModal({
   onClose,
   onSave,
   transaction,
 }: ImportTransactionModalProps) {
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
-  const sortedCategories = useSortedCategories(categories);
   const { close, modalProps } = useOpened({ onClose });
 
   const sign = transaction.amount < 0 ? -1 : 1;
-  const totalDollars = penniesToDollars(Math.abs(transaction.amount));
+  const totalPennies = Math.abs(transaction.amount);
+  const totalDollars = penniesToDollars(totalPennies);
+
+  const formSchema = object({
+    vendor: string().check(minLength(1, "Vendor is required")),
+    description: string(),
+    ...categorySplitFields,
+    updateRuleVendor: boolean(),
+    updateRuleCategory: boolean(),
+  }).check(
+    refine((values) => splitTotalPennies(values.categoryAmounts) === totalPennies, {
+      message: CATEGORY_TOTAL_MISMATCH,
+      path: ["categoryAmounts"],
+    }),
+  );
 
   const form = useForm({
     validateInputOnBlur: true,
@@ -73,56 +60,16 @@ export function ImportTransactionModal({
     validate: schemaResolver(formSchema, { sync: true }),
   });
 
-  const categoryOptions = sortedCategories.map((category) => ({
-    value: category.id,
-    label: category.name,
-  }));
-
-  const { selectedCategoryIds, categoryAmounts } = form.getValues();
-
-  form.watch("selectedCategoryIds", ({ value, previousValue }) => {
-    if (value.length === 1) {
-      form.setFieldValue("categoryAmounts", [{ categoryId: value[0]!, amount: totalDollars }]);
-    } else if (value.length === 2 && previousValue.length === 1) {
-      form.setFieldValue("categoryAmounts", [
-        { categoryId: value[0]!, amount: 0 },
-        { categoryId: value[1]!, amount: 0 },
-      ]);
-    } else {
-      const newCategoryAmounts = value.map(
-        (categoryId) =>
-          find(categoryAmounts, "categoryId", categoryId) ?? {
-            categoryId,
-            amount: 0,
-          },
-      );
-      form.setFieldValue("categoryAmounts", newCategoryAmounts);
-    }
-    if (value.length !== 1) {
-      form.setFieldValue("updateRuleCategory", false);
-    }
+  const { categorySelect, splitFields } = useCategorySplit({
+    form,
+    categories,
+    total: totalDollars,
+    onCategoryChange: (value) => {
+      if (value.length !== 1) {
+        form.setFieldValue("updateRuleCategory", false);
+      }
+    },
   });
-
-  const remainingAmount =
-    Math.abs(transaction.amount) -
-    categoryAmounts.reduce((sum, category) => sum + dollarsToPennies(category.amount), 0);
-
-  const assignRemainingAmount = (index: number) => {
-    if (categoryAmounts[index]) {
-      form.setFieldValue(
-        `categoryAmounts.${index}.amount`,
-        categoryAmounts[index].amount + penniesToDollars(remainingAmount),
-      );
-    }
-  };
-
-  const removeCategory = (index: number) => {
-    const categoryId = categoryAmounts[index]?.categoryId;
-    form.setFieldValue(
-      "selectedCategoryIds",
-      selectedCategoryIds.filter((id) => id !== categoryId),
-    );
-  };
 
   const handleSubmit = form.onSubmit(async (values) => {
     await acceptTransaction({
@@ -144,6 +91,7 @@ export function ImportTransactionModal({
     onSave();
   });
 
+  const { selectedCategoryIds } = form.getValues();
   const singleCategory = selectedCategoryIds.length === 1;
 
   return (
@@ -170,26 +118,7 @@ export function ImportTransactionModal({
             {...form.getInputProps("description")}
           />
           <Stack gap="xs">
-            <MultiSelect
-              label="Category"
-              data={categoryOptions}
-              key={form.key("selectedCategoryIds")}
-              {...form.getInputProps("selectedCategoryIds")}
-              required
-              searchable
-              classNames={{ dropdown: "TransactionModal-dropdown" }}
-              renderOption={({ option, checked }) => {
-                const category = find(categories, "id", option.value);
-                return (
-                  category && (
-                    <>
-                      {checked && <CheckIcon className="check-icon" />}
-                      {option.label} ({formatCurrency(category.balance)})
-                    </>
-                  )
-                );
-              }}
-            />
+            {categorySelect}
             <Checkbox
               label="Update rule category"
               disabled={!singleCategory}
@@ -197,59 +126,9 @@ export function ImportTransactionModal({
               {...form.getInputProps("updateRuleCategory", { type: "checkbox" })}
             />
           </Stack>
-          {selectedCategoryIds.length > 1 && (
-            <Stack gap="xs">
-              <Text size="sm" fw={500}>
-                Split transaction
-              </Text>
-              {remainingAmount !== 0 && (
-                <Alert color={remainingAmount > 0 ? "orange" : "red"}>
-                  {remainingAmount > 0
-                    ? `${formatCurrency(remainingAmount)} remaining to assign`
-                    : `${formatCurrency(Math.abs(remainingAmount))} over budget`}
-                </Alert>
-              )}
-              {categoryAmounts.map((categoryAmount, index) => {
-                const category = find(categories, "id", categoryAmount.categoryId);
-                return (
-                  category && (
-                    <Group key={categoryAmount.categoryId} gap="xs" align="center">
-                      <NumberInput
-                        label={category.name}
-                        key={form.key(`categoryAmounts.${index}.amount`)}
-                        {...form.getInputProps(`categoryAmounts.${index}.amount`)}
-                        style={{ flex: 1 }}
-                      />
-                      <ActionIcon
-                        variant="subtle"
-                        color="red"
-                        onClick={() => removeCategory(index)}
-                        title="Remove category"
-                      >
-                        <IconTrash />
-                      </ActionIcon>
-                      {remainingAmount !== 0 && (
-                        <ActionIcon
-                          variant="subtle"
-                          color="green"
-                          onClick={() => assignRemainingAmount(index)}
-                          title="Assign remaining amount"
-                        >
-                          <IconCircleCheck />
-                        </ActionIcon>
-                      )}
-                    </Group>
-                  )
-                );
-              })}
-            </Stack>
-          )}
+          {splitFields}
           <Group justify="flex-end">
-            <Button
-              type="submit"
-              loading={form.submitting}
-              disabled={remainingAmount !== 0 || !form.isValid()}
-            >
+            <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               Accept
             </Button>
           </Group>

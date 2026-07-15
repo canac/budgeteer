@@ -26,7 +26,10 @@ export const getUnreviewedTransactions = createServerFn()
       prisma.externalTransaction.findMany({
         where,
         orderBy: [{ date: "desc" }, { id: "asc" }],
-        include: { account: true },
+        include: {
+          account: true,
+          transaction: { include: { transactionCategories: true } },
+        },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),

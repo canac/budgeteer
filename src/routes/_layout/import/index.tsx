@@ -5,11 +5,16 @@ import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { coerce, literal, object, optional, union } from "zod/mini";
+import { DynamicReconcileTransactionModal } from "~/components/DynamicReconcileTransactionModal";
 import { UnreviewedTransactions } from "~/components/UnreviewedTransactions";
 import { acceptTransaction as acceptTransactionFn } from "~/functions/acceptTransaction";
 import { acknowledgeTransactionChange as acknowledgeTransactionChangeFn } from "~/functions/acknowledgeTransactionChange";
-import { getUnreviewedTransactions } from "~/functions/getUnreviewedTransactions";
+import {
+  getUnreviewedTransactions,
+  type UnreviewedTransaction,
+} from "~/functions/getUnreviewedTransactions";
 import { importTransactions as importTransactionsFn } from "~/functions/importTransactions";
+import { reconcileTransaction as reconcileTransactionFn } from "~/functions/reconcileTransaction";
 import { rejectTransaction as rejectTransactionFn } from "~/functions/rejectTransaction";
 import { restoreTransaction as restoreTransactionFn } from "~/functions/restoreTransaction";
 import { useSyncedState } from "~/hooks/useSyncedState";
@@ -61,8 +66,10 @@ function ImportTransactionsPage() {
   const acceptTransaction = useServerFn(acceptTransactionFn);
   const rejectTransaction = useServerFn(rejectTransactionFn);
   const acknowledgeTransactionChange = useServerFn(acknowledgeTransactionChangeFn);
+  const reconcileTransaction = useServerFn(reconcileTransactionFn);
   const restoreTransaction = useServerFn(restoreTransactionFn);
   const [importing, setImporting] = useState(false);
+  const [reconciling, setReconciling] = useState<UnreviewedTransaction | null>(null);
 
   const [transactions, setTransactions] = useSyncedState(loaderData.transactions);
   const [total, setTotal] = useSyncedState(loaderData.total);
@@ -104,6 +111,17 @@ function ImportTransactionsPage() {
   const handleAcknowledge = async (id: string) => {
     removeTransaction(id);
     await acknowledgeTransactionChange({ data: { id } });
+    await router.invalidate();
+  };
+
+  const handleReconcile = async (transaction: UnreviewedTransaction) => {
+    // Splits can't be reconciled automatically; open the modal so the user redistributes them.
+    if ((transaction.transaction?.transactionCategories.length ?? 0) > 1) {
+      setReconciling(transaction);
+      return;
+    }
+    removeTransaction(transaction.id);
+    await reconcileTransaction({ data: { id: transaction.id } });
     await router.invalidate();
   };
 
@@ -160,6 +178,7 @@ function ImportTransactionsPage() {
             onAccept={handleAccept}
             onReject={handleReject}
             onAcknowledge={handleAcknowledge}
+            onReconcile={handleReconcile}
             onEdit={handleEdit}
             onRestore={handleRestore}
           />
@@ -169,6 +188,16 @@ function ImportTransactionsPage() {
             </Group>
           )}
         </>
+      )}
+      {reconciling && (
+        <DynamicReconcileTransactionModal
+          transaction={reconciling}
+          onClose={() => setReconciling(null)}
+          onSave={() => {
+            removeTransaction(reconciling.id);
+            void router.invalidate();
+          }}
+        />
       )}
     </Stack>
   );

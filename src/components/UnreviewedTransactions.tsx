@@ -1,6 +1,12 @@
 import { ActionIcon, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconArrowBackUp, IconCheck, IconEdit, IconX } from "@tabler/icons-react";
+import {
+  IconArrowBackUp,
+  IconArrowsExchange,
+  IconCheck,
+  IconEdit,
+  IconX,
+} from "@tabler/icons-react";
 import { parseISO } from "date-fns";
 import { useState } from "react";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
@@ -13,6 +19,7 @@ interface UnreviewedTransactionsProps {
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
   onAcknowledge?: (id: string) => void;
+  onReconcile?: (transaction: UnreviewedTransaction) => void;
   onEdit: (id: string) => void;
   onRestore?: (id: string) => void;
 }
@@ -22,6 +29,7 @@ export function UnreviewedTransactions({
   onAccept,
   onReject,
   onAcknowledge,
+  onReconcile,
   onEdit,
   onRestore,
 }: UnreviewedTransactionsProps) {
@@ -68,14 +76,24 @@ export function UnreviewedTransactions({
               </Table.Td>
               <Table.Td ta="center">
                 {transaction.changedAt ? (
-                  <ActionIcon
-                    variant="subtle"
-                    color="green"
-                    aria-label="Acknowledge"
-                    onClick={() => onAcknowledge?.(transaction.id)}
-                  >
-                    <IconCheck />
-                  </ActionIcon>
+                  <>
+                    <ActionIcon
+                      variant="subtle"
+                      color="blue"
+                      aria-label="Reconcile"
+                      onClick={() => onReconcile?.(transaction)}
+                    >
+                      <IconArrowsExchange />
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="subtle"
+                      color="green"
+                      aria-label="Acknowledge"
+                      onClick={() => onAcknowledge?.(transaction.id)}
+                    >
+                      <IconCheck />
+                    </ActionIcon>
+                  </>
                 ) : transaction.reviewed ? (
                   <ActionIcon
                     variant="subtle"
