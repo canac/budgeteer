@@ -108,7 +108,6 @@ model ExternalConnection {
   accessToken   String
   institution   String
   cursor        String?
-  lastSyncedAt  DateTime?
   loginRequired Boolean           @default(false)
   accounts      ExternalAccount[]
 }

@@ -156,7 +156,7 @@ export async function syncConnection(connection: ConnectionWithAccounts): Promis
     // A successful sync clears any previous reauthenticate flag
     await prisma.externalConnection.update({
       where: { id: connection.id },
-      data: { lastSyncedAt: new Date(), loginRequired: false },
+      data: { loginRequired: false },
     });
 
     return { imported };

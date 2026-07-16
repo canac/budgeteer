@@ -339,23 +339,6 @@ describe("syncConnection", () => {
     const account = await prisma.externalAccount.findUniqueOrThrow({ where: { id: "acc_fresh" } });
     expect([account.institution, account.creditCard]).toEqual(["Citi", true]);
   });
-
-  it("updates lastSyncedAt", async () => {
-    const connection = await seed();
-    mockAccounts([apiAccount()]);
-    mockSync([{ added: [] }]);
-
-    const before = Date.now();
-    await syncConnection(connection);
-    const after = Date.now();
-
-    const reloaded = await prisma.externalConnection.findUniqueOrThrow({
-      where: { id: connection.id },
-    });
-    const ts = reloaded.lastSyncedAt?.getTime();
-    expect(ts).toBeGreaterThanOrEqual(before);
-    expect(ts).toBeLessThanOrEqual(after);
-  });
 });
 
 describe("syncConnection — modified", () => {
