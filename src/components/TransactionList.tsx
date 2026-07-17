@@ -160,7 +160,7 @@ export function TransactionRow({
   return (
     <div className={clsx("transaction-row", className)}>
       <div className="cell-vendor">
-        <Text component="span" fw="bold" lineClamp={1}>
+        <Text component="span" lineClamp={1}>
           {title}
         </Text>
         {icon}
@@ -251,7 +251,7 @@ export function TransactionList({
                 ) : undefined
               }
               amount={
-                <Text className={income ? "positive" : undefined} fw="bold">
+                <Text className={income ? "positive" : undefined}>
                   {formatCurrency(transaction.transfer?.amount ?? transaction.amount)}
                 </Text>
               }
