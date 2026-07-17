@@ -33,7 +33,7 @@ import { MantineLink } from "~/components/MantineLink";
 import { reorderCategory } from "~/functions/reorderCategory";
 import { useSyncedState } from "~/hooks/useSyncedState";
 import { pluck } from "~/lib/collections";
-import { amountSignClassname, formatCurrency } from "~/lib/formatters";
+import { formatCurrency } from "~/lib/formatters";
 
 export const Route = createFileRoute("/_layout/budget/$month/categories")({
   component: CategoriesPage,
@@ -90,9 +90,7 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
           <CategoryTypeIcons category={budgetCategory.category} />
         </Group>
         <Text
-          className={
-            viewMode === "balance" ? amountSignClassname(budgetCategory.balance) : undefined
-          }
+          className={viewMode === "balance" && budgetCategory.balance < 0 ? "negative" : undefined}
         >
           {formatCurrency(
             viewMode === "budgeted"
