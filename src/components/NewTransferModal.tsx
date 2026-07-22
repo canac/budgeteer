@@ -91,6 +91,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
             label="Amount"
             key={form.key("amount")}
             {...form.getInputProps("amount")}
+            min={0}
             required
           />
           <Select

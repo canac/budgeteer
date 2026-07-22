@@ -1,8 +1,7 @@
 import type { UseFormReturnType } from "@mantine/form";
-import { ActionIcon, Alert, Group, NumberInput, Stack, Text } from "@mantine/core";
-import { IconCircleCheck, IconTrash } from "@tabler/icons-react";
+import { Button, Group, Input, NumberInput, Stack, Text } from "@mantine/core";
 import { find } from "~/lib/collections";
-import { penniesToDollars } from "~/lib/currencyConversion";
+import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatters";
 
 export interface CategorySplitFormValues {
@@ -32,66 +31,57 @@ export function CategorySplitFields({
     return null;
   }
 
+  const assignablePennies = (amount: number) => {
+    const currentPennies = dollarsToPennies(amount);
+    return Math.max(0, currentPennies + remainingAmount) - currentPennies;
+  };
+
   const assignRemainingAmount = (index: number) => {
     const categoryAmount = categoryAmounts[index];
     if (categoryAmount) {
-      splitForm.setFieldValue(
-        `categoryAmounts.${index}.amount`,
-        categoryAmount.amount + penniesToDollars(remainingAmount),
-      );
+      const newPennies =
+        dollarsToPennies(categoryAmount.amount) + assignablePennies(categoryAmount.amount);
+      splitForm.setFieldValue(`categoryAmounts.${index}.amount`, penniesToDollars(newPennies));
     }
-  };
-
-  const removeCategory = (index: number) => {
-    const categoryId = categoryAmounts[index]?.categoryId;
-    splitForm.setFieldValue(
-      "selectedCategoryIds",
-      selectedCategoryIds.filter((id) => id !== categoryId),
-    );
   };
 
   return (
     <Stack gap="xs">
-      <Text size="sm" fw={500}>
+      <Text size="md" fw="bold">
         Split transaction
+        {remainingAmount !== 0 && ` (${formatCurrency(remainingAmount)} remaining)`}
       </Text>
-      {remainingAmount !== 0 && (
-        <Alert color={remainingAmount > 0 ? "orange" : "red"}>
-          {remainingAmount > 0
-            ? `${formatCurrency(remainingAmount)} remaining to assign`
-            : `${formatCurrency(Math.abs(remainingAmount))} over budget`}
-        </Alert>
-      )}
       {categoryAmounts.map((categoryAmount, index) => {
         const category = find(categories, "id", categoryAmount.categoryId);
+        const assigned = assignablePennies(categoryAmount.amount);
+        const assignLabel = `${assigned >= 0 ? "+" : "-"} ${formatCurrency(Math.abs(assigned))}`;
         return (
           category && (
-            <Group key={categoryAmount.categoryId} gap="xs" align="center">
-              <NumberInput
-                label={category.name}
-                key={splitForm.key(`categoryAmounts.${index}.amount`)}
-                {...splitForm.getInputProps(`categoryAmounts.${index}.amount`)}
-                style={{ flex: 1 }}
-              />
-              <ActionIcon
-                variant="subtle"
-                color="red"
-                onClick={() => removeCategory(index)}
-                title="Remove category"
-              >
-                <IconTrash />
-              </ActionIcon>
-              {remainingAmount !== 0 && (
-                <ActionIcon
-                  variant="subtle"
-                  color="green"
-                  onClick={() => assignRemainingAmount(index)}
-                  title="Assign remaining amount"
-                >
-                  <IconCircleCheck />
-                </ActionIcon>
-              )}
-            </Group>
+            <Stack key={categoryAmount.categoryId} gap={4}>
+              <Input.Label size="md" htmlFor={`split-amount-${categoryAmount.categoryId}`}>
+                {category.name}
+              </Input.Label>
+              <Group gap="xs" align="flex-start">
+                <NumberInput
+                  id={`split-amount-${categoryAmount.categoryId}`}
+                  key={splitForm.key(`categoryAmounts.${index}.amount`)}
+                  {...splitForm.getInputProps(`categoryAmounts.${index}.amount`)}
+                  min={0}
+                  style={{ flex: 1 }}
+                />
+                {assigned !== 0 && (
+                  <Button
+                    size="md"
+                    variant="outline"
+                    miw={120}
+                    style={{ fontVariantNumeric: "tabular-nums" }}
+                    onClick={() => assignRemainingAmount(index)}
+                  >
+                    {assignLabel}
+                  </Button>
+                )}
+              </Group>
+            </Stack>
           )
         );
       })}

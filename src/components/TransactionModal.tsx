@@ -51,7 +51,9 @@ export interface TransactionModalProps {
   initialCategoryId?: string;
 }
 
-const amountSchema = number("Amount is required").check(positive("Amount must not be zero"));
+const amountSchema = number("Amount is required").check(
+  positive("Amount must not be greater than zero"),
+);
 
 const formSchema = object({
   amount: amountSchema,
@@ -177,6 +179,7 @@ export function TransactionModal({
             label="Amount"
             key={form.key("amount")}
             {...form.getInputProps("amount")}
+            min={0}
             required
             disabled={external}
           />
