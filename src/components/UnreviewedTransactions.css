@@ -1,9 +1,0 @@
-.UnreviewedTransactions {
-  td {
-    white-space: nowrap;
-  }
-
-  td.wrap {
-    white-space: normal;
-  }
-}

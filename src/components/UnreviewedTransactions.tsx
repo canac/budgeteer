@@ -1,4 +1,4 @@
-import { ActionIcon, Table } from "@mantine/core";
+import { ActionIcon, Badge, Group, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
   IconArrowBackUp,
@@ -11,8 +11,9 @@ import { parseISO } from "date-fns";
 import { useState } from "react";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { DynamicImportTransactionModal } from "~/components/DynamicImportTransactionModal";
-import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
-import "./UnreviewedTransactions.css";
+import { TransactionRow } from "~/components/TransactionList";
+import { formatCurrency } from "~/lib/formatters";
+import "./TransactionList.css";
 
 interface UnreviewedTransactionsProps {
   transactions: UnreviewedTransaction[];
@@ -51,92 +52,102 @@ export function UnreviewedTransactions({
 
   return (
     <>
-      <Table className="UnreviewedTransactions">
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Date</Table.Th>
-            <Table.Th>Vendor</Table.Th>
-            <Table.Th>Category</Table.Th>
-            <Table.Th>Account</Table.Th>
-            <Table.Th ta="right">Amount</Table.Th>
-            <Table.Th ta="center">Actions</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {transactions.map((transaction) => (
-            <Table.Tr key={transaction.id}>
-              <Table.Td>{shortDateFormatter.format(parseISO(transaction.date))}</Table.Td>
-              <Table.Td className="wrap" fs={transaction.rule ? undefined : "italic"}>
-                {transaction.rule?.vendor ?? transaction.vendor}
-              </Table.Td>
-              <Table.Td>{transaction.rule?.category?.name}</Table.Td>
-              <Table.Td>{transaction.account.name}</Table.Td>
-              <Table.Td className={transaction.amount >= 0 ? "positive" : undefined} ta="right">
-                {formatCurrency(transaction.amount)}
-              </Table.Td>
-              <Table.Td ta="center">
-                {transaction.changedAt ? (
-                  <>
-                    <ActionIcon
-                      variant="subtle"
-                      color="blue"
-                      aria-label="Reconcile"
-                      onClick={() => onReconcile?.(transaction)}
-                    >
-                      <IconArrowsExchange />
-                    </ActionIcon>
-                    <ActionIcon
-                      variant="subtle"
-                      color="green"
-                      aria-label="Acknowledge"
-                      onClick={() => onAcknowledge?.(transaction.id)}
-                    >
-                      <IconCheck />
-                    </ActionIcon>
-                  </>
-                ) : transaction.reviewed ? (
-                  <ActionIcon
-                    variant="subtle"
-                    color="blue"
-                    aria-label="Restore"
-                    onClick={() => onRestore?.(transaction.id)}
-                  >
-                    <IconArrowBackUp />
-                  </ActionIcon>
+      <div className="TransactionList">
+        {transactions.map((transaction) => {
+          const vendor = transaction.rule?.vendor ?? transaction.vendor;
+          const category = transaction.rule?.category?.name;
+
+          return (
+            <TransactionRow
+              key={transaction.id}
+              title={
+                transaction.rule ? (
+                  vendor
                 ) : (
-                  <>
-                    <ActionIcon
-                      variant="subtle"
-                      color="green"
-                      aria-label="Accept"
-                      style={{ visibility: transaction.rule?.category ? undefined : "hidden" }}
-                      onClick={() => onAccept(transaction.id)}
-                    >
-                      <IconCheck />
-                    </ActionIcon>
+                  <Text span fs="italic">
+                    {vendor}
+                  </Text>
+                )
+              }
+              date={parseISO(transaction.date)}
+              description={transaction.account.name}
+              categories={
+                category ? (
+                  <Badge variant="light" color="gray" size="lg" tt="none">
+                    {category}
+                  </Badge>
+                ) : undefined
+              }
+              amount={
+                <Text className={transaction.amount >= 0 ? "positive" : undefined}>
+                  {formatCurrency(transaction.amount)}
+                </Text>
+              }
+              actions={
+                <Group gap={4} wrap="nowrap">
+                  {transaction.changedAt ? (
+                    <>
+                      <ActionIcon
+                        variant="subtle"
+                        color="blue"
+                        aria-label="Reconcile"
+                        onClick={() => onReconcile?.(transaction)}
+                      >
+                        <IconArrowsExchange />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="subtle"
+                        color="green"
+                        aria-label="Acknowledge"
+                        onClick={() => onAcknowledge?.(transaction.id)}
+                      >
+                        <IconCheck />
+                      </ActionIcon>
+                    </>
+                  ) : transaction.reviewed ? (
                     <ActionIcon
                       variant="subtle"
                       color="blue"
-                      aria-label="Edit"
-                      onClick={() => openImport(transaction)}
+                      aria-label="Restore"
+                      onClick={() => onRestore?.(transaction.id)}
                     >
-                      <IconEdit />
+                      <IconArrowBackUp />
                     </ActionIcon>
-                    <ActionIcon
-                      variant="subtle"
-                      color="red"
-                      aria-label="Reject"
-                      onClick={() => onReject(transaction.id)}
-                    >
-                      <IconX />
-                    </ActionIcon>
-                  </>
-                )}
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
+                  ) : (
+                    <>
+                      <ActionIcon
+                        variant="subtle"
+                        color="green"
+                        aria-label="Accept"
+                        style={{ visibility: transaction.rule?.category ? undefined : "hidden" }}
+                        onClick={() => onAccept(transaction.id)}
+                      >
+                        <IconCheck />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="subtle"
+                        color="blue"
+                        aria-label="Edit"
+                        onClick={() => openImport(transaction)}
+                      >
+                        <IconEdit />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="subtle"
+                        color="red"
+                        aria-label="Reject"
+                        onClick={() => onReject(transaction.id)}
+                      >
+                        <IconX />
+                      </ActionIcon>
+                    </>
+                  )}
+                </Group>
+              }
+            />
+          );
+        })}
+      </div>
       {modalOpen && importingTransaction && (
         <DynamicImportTransactionModal
           onClose={close}
