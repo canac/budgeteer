@@ -9,6 +9,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
+import { parseISO } from "date-fns";
 import { boolean, minLength, object, refine, string } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { acceptTransaction } from "~/functions/acceptTransaction";
@@ -23,6 +24,7 @@ import {
   splitTotalPennies,
 } from "~/lib/categorySplit";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
+import { formatCurrency, fullDateFormatter } from "~/lib/formatters";
 
 export interface ImportTransactionModalProps {
   onClose: () => void;
@@ -109,6 +111,17 @@ export function ImportTransactionModal({
     <Modal {...modalProps} title={<Text fw="bold">Import Transaction</Text>}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="xs" wrap="nowrap">
+              <Text fw="bold">{transaction.rule?.vendor ?? transaction.vendor}</Text>
+              <Text size="sm" c="dimmed">
+                {fullDateFormatter.format(parseISO(transaction.date))}
+              </Text>
+            </Group>
+            <Text fw="bold" className={transaction.amount >= 0 ? "positive" : undefined}>
+              {formatCurrency(transaction.amount)}
+            </Text>
+          </Group>
           <TextInput label="Bank Vendor" value={transaction.vendor} disabled />
           <Stack gap="xs">
             <Autocomplete
