@@ -6,7 +6,10 @@ import { prisma } from "~/lib/prisma";
 export const importTransactions = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .handler(async () => {
-    const connections = await prisma.externalConnection.findMany({ include: { accounts: true } });
+    const connections = await prisma.externalConnection.findMany({
+      where: { OR: [{ accounts: { none: {} } }, { accounts: { some: { enabled: true } } }] },
+      include: { accounts: true },
+    });
     const results = await Promise.allSettled(connections.map(syncConnection));
     const imported = results.reduce(
       (sum, result) => sum + (result.status === "fulfilled" ? result.value.imported : 0),

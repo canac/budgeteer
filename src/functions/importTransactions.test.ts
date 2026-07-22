@@ -1,6 +1,6 @@
 import * as sync from "src/lib/plaid/sync";
-import { createExternalConnection } from "test/mocks.ts";
-import { describe, expect, it, vi } from "vitest";
+import { createExternalAccount, createExternalConnection } from "test/mocks.ts";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { importTransactions } from "./importTransactions.ts";
 
 vi.mock("src/lib/plaid/sync", () => ({
@@ -8,6 +8,10 @@ vi.mock("src/lib/plaid/sync", () => ({
 }));
 
 describe("importTransactions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("returns imported counts across connections", async () => {
     vi.mocked(sync.syncConnection)
       .mockResolvedValueOnce({ imported: 3 })
@@ -27,5 +31,18 @@ describe("importTransactions", () => {
     await Promise.all([createExternalConnection(), createExternalConnection()]);
 
     expect(await importTransactions()).toEqual({ imported: 4, failed: 1 });
+  });
+
+  it("skips connections where every account is disabled", async () => {
+    const connection = await createExternalConnection();
+    await Promise.all([
+      createExternalAccount({ connection: { connect: { id: connection.id } }, enabled: false }),
+      createExternalAccount({ connection: { connect: { id: connection.id } }, enabled: false }),
+    ]);
+
+    expect(await importTransactions()).toEqual({ imported: 0, failed: 0 });
+    expect(sync.syncConnection).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: connection.id }),
+    );
   });
 });
