@@ -1,9 +1,19 @@
-import { Button, Checkbox, Group, Modal, Stack, Text, TextInput } from "@mantine/core";
+import {
+  Autocomplete,
+  Button,
+  Checkbox,
+  Group,
+  Modal,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
 import { boolean, minLength, object, refine, string } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { acceptTransaction } from "~/functions/acceptTransaction";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
+import { getVendors } from "~/functions/getVendors";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
@@ -26,6 +36,7 @@ export function ImportTransactionModal({
   transaction,
 }: ImportTransactionModalProps) {
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
+  const vendors = useServerFnData(getVendors) ?? [];
   const { close, modalProps } = useOpened({ onClose });
 
   const sign = transaction.amount < 0 ? -1 : 1;
@@ -100,11 +111,12 @@ export function ImportTransactionModal({
         <Stack gap="md">
           <TextInput label="Bank Vendor" value={transaction.vendor} disabled />
           <Stack gap="xs">
-            <TextInput
+            <Autocomplete
               label="Vendor"
               required
               key={form.key("vendor")}
               {...form.getInputProps("vendor")}
+              data={vendors}
             />
             <Checkbox
               label="Update rule vendor"
