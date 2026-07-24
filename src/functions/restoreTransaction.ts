@@ -6,7 +6,7 @@ import { prisma } from "~/lib/prisma";
 const inputSchema = object({ id: string() });
 
 export const restoreTransaction = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
     await prisma.externalTransaction.update({

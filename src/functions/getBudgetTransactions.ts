@@ -12,7 +12,7 @@ const inputSchema = object({
 });
 
 export const getBudgetTransactions = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, hideAccumulating } }) => {
     const startDate = toISODateString(startOfMonth(month));

@@ -11,7 +11,7 @@ const transferSchema = object({
 });
 
 export const createTransfer = createServerFn({ method: "POST" })
-  .inputValidator(transferSchema)
+  .validator(transferSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { amount, date, sourceCategoryId, destinationCategoryId } }) => {
     const transaction = await prisma.transaction.create({

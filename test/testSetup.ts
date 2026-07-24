@@ -12,7 +12,7 @@ vi.mock("@tanstack/react-start", async (importOriginal) => ({
   createServerFn: () => {
     let validator: ZodType | null = null;
     const builder = {
-      inputValidator: (v: unknown) => {
+      validator: (v: unknown) => {
         validator = v instanceof ZodType ? v : null;
         return builder;
       },

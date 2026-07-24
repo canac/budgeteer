@@ -6,7 +6,7 @@ import { transactionSchema } from "~/lib/transactionSchema";
 import { ensureValid, validateTransactionDate } from "~/lib/validation";
 
 export const createTransaction = createServerFn({ method: "POST" })
-  .inputValidator(transactionSchema)
+  .validator(transactionSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categories, ...attributes } }) => {
     ensureValid(await validateTransactionDate(attributes.date, pluck(categories, "categoryId")));

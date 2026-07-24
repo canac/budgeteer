@@ -13,7 +13,7 @@ const inputSchema = object({
 });
 
 export const getUnreviewedTransactions = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { page, pageSize, view } }) => {
     const where =

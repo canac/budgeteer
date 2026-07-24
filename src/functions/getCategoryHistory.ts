@@ -16,7 +16,7 @@ const inputSchema = object({
 });
 
 export const getCategoryHistory = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, startMonth, endMonth, includeTransfers } }) => {
     const category = await prisma.category.findUnique({

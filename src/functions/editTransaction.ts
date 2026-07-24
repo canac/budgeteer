@@ -12,7 +12,7 @@ const inputSchema = transactionSchema.extend({
 });
 
 export const editTransaction = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, categories, ...attributes } }) => {
     ensureValid(await validateTransactionDate(attributes.date, pluck(categories, "categoryId")));

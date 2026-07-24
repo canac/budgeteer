@@ -13,7 +13,7 @@ const inputSchema = object({
 });
 
 export const createCategory = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, name, budgetedAmount, accumulating, flexible } }) => {
     const budget = await prisma.budget.findFirstOrThrow({

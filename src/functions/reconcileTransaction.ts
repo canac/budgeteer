@@ -16,7 +16,7 @@ const inputSchema = object({
 });
 
 export const reconcileTransaction = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, categories } }) => {
     const externalTransaction = await prisma.externalTransaction.findUniqueOrThrow({

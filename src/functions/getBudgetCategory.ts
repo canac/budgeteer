@@ -15,7 +15,7 @@ const inputSchema = object({
 });
 
 export const getBudgetCategory = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, categoryId } }) => {
     const monthString = toISOMonthString(month);

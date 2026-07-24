@@ -8,7 +8,7 @@ const inputSchema = object({
 });
 
 export const login = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .handler(async ({ data }) => {
     const success = await authenticateWithPassword(data.password);
     if (!success) {

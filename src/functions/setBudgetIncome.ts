@@ -9,7 +9,7 @@ const inputSchema = object({
 });
 
 export const setBudgetIncome = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, income } }) => {
     await prisma.budget.updateMany({

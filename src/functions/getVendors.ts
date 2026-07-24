@@ -13,7 +13,7 @@ const inputSchema = optional(
 );
 
 export const getVendors = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data }) => {
     const months = data?.months;

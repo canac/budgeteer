@@ -6,7 +6,7 @@ import { prisma } from "~/lib/prisma";
 const inputSchema = object({ connectionId: string() });
 
 export const markConnectionReconnected = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { connectionId } }) => {
     await prisma.externalConnection.update({

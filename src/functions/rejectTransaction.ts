@@ -8,7 +8,7 @@ const inputSchema = object({
 });
 
 export const rejectTransaction = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
     await prisma.externalTransaction.update({

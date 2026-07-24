@@ -25,7 +25,7 @@ const inputSchema = object({
 });
 
 export const acceptTransaction = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, override } }) => {
     const externalTransaction = await prisma.externalTransaction.findUniqueOrThrow({

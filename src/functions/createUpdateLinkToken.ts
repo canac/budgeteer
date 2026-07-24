@@ -9,7 +9,7 @@ const inputSchema = object({
 });
 
 export const createUpdateLinkToken = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { connectionId } }) => {
     const connection = await prisma.externalConnection.findUniqueOrThrow({

@@ -9,7 +9,7 @@ const inputSchema = object({
 });
 
 export const getTransaction = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
     const transaction = await prisma.transaction.findUnique({

@@ -11,7 +11,7 @@ const inputSchema = object({
 });
 
 export const deleteCategory = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, month } }) => {
     ensureValid(await validateCategoryDeletion(categoryId, month));

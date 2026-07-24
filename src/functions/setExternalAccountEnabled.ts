@@ -9,7 +9,7 @@ const inputSchema = object({
 });
 
 export const setExternalAccountEnabled = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, enabled } }) => {
     const account = await prisma.externalAccount.update({ where: { id }, data: { enabled } });

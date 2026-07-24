@@ -14,7 +14,7 @@ const inputSchema = object({
 });
 
 export const setCategoryBalance = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, month, targetBalance } }) => {
     const monthString = toISOMonthString(month);

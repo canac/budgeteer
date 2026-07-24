@@ -8,6 +8,6 @@ const inputSchema = object({
 });
 
 export const deleteCategorizationRule = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(({ data: { id } }) => prisma.categorizationRule.delete({ where: { id } }));

@@ -95,7 +95,7 @@ const inputSchema = object({
 });
 
 export const getBudgetByMonth = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, hideAccumulating } }) => {
     const budget = await getBudget(month);

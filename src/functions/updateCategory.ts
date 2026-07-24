@@ -11,7 +11,7 @@ const inputSchema = object({
 });
 
 export const updateCategory = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, ...fields } }) => {
     await prisma.category.update({

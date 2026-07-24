@@ -10,7 +10,7 @@ const inputSchema = object({
 });
 
 export const updateCategorizationRule = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(({ data: { id, ...fields } }) =>
     prisma.categorizationRule.update({ where: { id }, data: fields }),

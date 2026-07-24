@@ -11,7 +11,7 @@ const inputSchema = object({
 });
 
 export const exchangePublicToken = createServerFn({ method: "POST" })
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { publicToken, institution } }) => {
     const client = new PlaidClient();

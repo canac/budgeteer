@@ -13,7 +13,7 @@ const inputSchema = object({
 });
 
 export const searchTransactions = createServerFn()
-  .inputValidator(inputSchema)
+  .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { fromDate, toDate, categoryId, vendor } }) => {
     const transactions = await prisma.transaction.findMany({
