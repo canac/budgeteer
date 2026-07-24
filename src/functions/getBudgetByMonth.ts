@@ -2,7 +2,7 @@ import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { isAfter, isBefore, parseISO, startOfMonth } from "date-fns";
 import invariant from "tiny-invariant";
-import { object } from "zod";
+import { boolean, object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
 import { toISOMonthString } from "~/lib/iso";
@@ -91,12 +91,13 @@ async function getBudget(requestedMonth: Date) {
 
 const inputSchema = object({
   month: monthDate(),
+  hideAccumulating: boolean().default(false),
 });
 
 export const getBudgetByMonth = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { month } }) => {
+  .handler(async ({ data: { month, hideAccumulating } }) => {
     const budget = await getBudget(month);
     const totalBudgetedAmount = budget.budgetCategories.reduce(
       (sum, budgetCategory) => sum + budgetCategory.budgetedAmount,
@@ -112,9 +113,13 @@ export const getBudgetByMonth = createServerFn()
       month: toISOMonthString(month),
       totalBudgetedAmount,
       leftoverRemaining,
-      budgetCategories: budgetCategories.map((budgetCategory) => ({
-        ...budgetCategory,
-        name: budgetCategory.category.name,
-      })),
+      budgetCategories: budgetCategories
+        .filter((budgetCategory) =>
+          hideAccumulating ? !budgetCategory.category.accumulating : true,
+        )
+        .map((budgetCategory) => ({
+          ...budgetCategory,
+          name: budgetCategory.category.name,
+        })),
     };
   });

@@ -1,7 +1,14 @@
 import { ActionIcon, Card, Group, SegmentedControl, Stack, Text, Title } from "@mantine/core";
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/react-router";
+import { IconChevronLeft, IconChevronRight, IconFilter } from "@tabler/icons-react";
+import {
+  createFileRoute,
+  Outlet,
+  useMatchRoute,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { addMonths, parseISO, subMonths } from "date-fns";
+import { boolean, catch as zCatch, object, optional } from "zod/mini";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
@@ -11,11 +18,17 @@ import { amountSignClassname, formatCurrency, monthFormatter } from "~/lib/forma
 import { toISOMonthString } from "~/lib/iso";
 import "./BudgetPage.css";
 
+const searchSchema = object({
+  leftover: zCatch(optional(boolean()), undefined),
+});
+
 export const Route = createFileRoute("/_layout/budget/$month")({
   component: BudgetLayout,
-  loader: async ({ params: { month } }) => {
+  validateSearch: searchSchema,
+  loaderDeps: ({ search: { leftover } }) => ({ leftover }),
+  loader: async ({ params: { month }, deps: { leftover } }) => {
     const [budget, budgetMonths] = await Promise.all([
-      getBudgetByMonth({ data: { month } }),
+      getBudgetByMonth({ data: { month, hideAccumulating: leftover } }),
       getBudgetMonths(),
     ]);
     return { ...budget, budgetMonths };
@@ -29,6 +42,8 @@ export const Route = createFileRoute("/_layout/budget/$month")({
 function BudgetLayout() {
   const router = useRouter();
   const { budget, totalBudgetedAmount, budgetMonths, leftoverRemaining } = Route.useLoaderData();
+  const { leftover } = Route.useSearch();
+  const navigate = useNavigate();
   const matchRoute = useMatchRoute();
   const onTransactions = !!matchRoute({ to: "/budget/$month/transactions" });
   const leftToBudget = budget.income - totalBudgetedAmount;
@@ -98,6 +113,7 @@ function BudgetLayout() {
                 ? "/budget/$month/transactions"
                 : "/budget/$month/categories",
             params: { month: budget.month },
+            search: (prev) => prev,
           })
         }
         data={[
@@ -124,7 +140,25 @@ function BudgetLayout() {
             </Group>
           )}
           <Group justify="space-between">
-            <Text>Leftover</Text>
+            <Group gap="xs">
+              <Text>Leftover</Text>
+              <ActionIcon
+                variant={leftover ? "filled" : "subtle"}
+                color="gray"
+                size="sm"
+                aria-label="Show only leftover categories"
+                aria-pressed={!!leftover}
+                onClick={() =>
+                  navigate({
+                    to: tabLink,
+                    params: { month: budget.month },
+                    search: (prev) => ({ ...prev, leftover: leftover ? undefined : true }),
+                  })
+                }
+              >
+                <IconFilter />
+              </ActionIcon>
+            </Group>
             <Text className={amountSignClassname(leftoverRemaining)}>
               {formatCurrency(leftoverRemaining)}
             </Text>

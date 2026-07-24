@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, startOfMonth } from "date-fns";
-import { object } from "zod";
+import { boolean, object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { toISODateString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
@@ -8,12 +8,13 @@ import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
   month: monthDate(),
+  hideAccumulating: boolean().default(false),
 });
 
 export const getBudgetTransactions = createServerFn()
   .inputValidator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { month } }) => {
+  .handler(async ({ data: { month, hideAccumulating } }) => {
     const startDate = toISODateString(startOfMonth(month));
     const endDate = toISODateString(endOfMonth(month));
 
@@ -21,6 +22,13 @@ export const getBudgetTransactions = createServerFn()
       where: {
         date: { gte: startDate, lte: endDate },
         type: { not: "BALANCE_ADJUSTMENT" },
+        ...(hideAccumulating && {
+          OR: [
+            { transactionCategories: { some: { category: { accumulating: false } } } },
+            { transfer: { sourceCategory: { accumulating: false } } },
+            { transfer: { destinationCategory: { accumulating: false } } },
+          ],
+        }),
       },
       include: {
         transactionCategories: {

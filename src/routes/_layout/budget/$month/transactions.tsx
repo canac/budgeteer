@@ -8,8 +8,11 @@ import { monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 
 export const Route = createFileRoute("/_layout/budget/$month/transactions")({
   component: TransactionsPage,
-  loader: async ({ params: { month } }) => {
-    const transactions = await getBudgetTransactions({ data: { month } });
+  loaderDeps: ({ search: { leftover } }) => ({ leftover }),
+  loader: async ({ params: { month }, deps: { leftover } }) => {
+    const transactions = await getBudgetTransactions({
+      data: { month, hideAccumulating: leftover },
+    });
     return { transactions };
   },
   head: ({ params }) => {
