@@ -9,6 +9,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
+import clsx from "clsx";
 import { parseISO } from "date-fns";
 import { boolean, minLength, object, refine, string } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
@@ -111,17 +112,18 @@ export function ImportTransactionModal({
     <Modal {...modalProps} title={<Text fw="bold">Import Transaction</Text>}>
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
-          <Group justify="space-between" wrap="nowrap">
-            <Group gap="xs" wrap="nowrap">
-              <Text fw="bold">{transaction.rule?.vendor ?? transaction.vendor}</Text>
-              <Text size="sm" c="dimmed">
-                {fullDateFormatter.format(parseISO(transaction.date))}
+          <div>
+            <Text fw="bold">{transaction.rule?.vendor ?? transaction.vendor}</Text>
+            <Group justify="space-between" wrap="nowrap">
+              <Text c="dimmed">{fullDateFormatter.format(parseISO(transaction.date))}</Text>
+              <Text
+                className={clsx({ positive: transaction.amount >= 0 })}
+                style={{ whiteSpace: "nowrap" }}
+              >
+                {formatCurrency(transaction.amount)}
               </Text>
             </Group>
-            <Text fw="bold" className={transaction.amount >= 0 ? "positive" : undefined}>
-              {formatCurrency(transaction.amount)}
-            </Text>
-          </Group>
+          </div>
           <TextInput label="Bank Vendor" value={transaction.vendor} disabled />
           <Stack gap="xs">
             <Autocomplete
