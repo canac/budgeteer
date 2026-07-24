@@ -14,7 +14,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, ButtonGroup, Card, Group, Stack, Text, Title } from "@mantine/core";
+import { Button, ButtonGroup, Card, Group, Progress, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconArrowsUpDown, IconCheck, IconGripVertical, IconPlus } from "@tabler/icons-react";
 import {
@@ -64,6 +64,9 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
     transition,
   };
 
+  const { budgetedAmount, spent } = budgetCategory;
+  const spentRatio = budgetedAmount > 0 ? spent / budgetedAmount : spent > 0 ? Infinity : 0;
+
   return (
     <div
       className={clsx("CategoryItem", { dragging: isDragging })}
@@ -101,6 +104,13 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
           )}
         </Text>
       </MantineLink>
+      <Progress
+        className="progress"
+        value={spentRatio * 100}
+        color={spentRatio > 1 ? "red" : "green"}
+        size="sm"
+        radius="xl"
+      />
     </div>
   );
 }

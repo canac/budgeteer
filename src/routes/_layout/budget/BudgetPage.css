@@ -18,7 +18,16 @@
   .CategoryItem {
     display: flex;
     flex-direction: row;
+    position: relative;
+    padding-bottom: var(--mantine-spacing-xs);
     border-radius: var(--mantine-radius-sm);
+
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
 
     &:has(.drag-handle:hover) {
       background-color: var(--mantine-color-gray-0);
