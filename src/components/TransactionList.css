@@ -1,6 +1,9 @@
 .TransactionList {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
 
   .transaction-row {
     display: grid;

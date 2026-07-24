@@ -4,6 +4,10 @@
     font-weight: bold;
   }
 
+  .TransactionList {
+    max-width: none;
+  }
+
   .TransactionList .starting-balance {
     border-top: 2px solid;
   }
