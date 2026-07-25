@@ -12,13 +12,15 @@ export const setExternalAccountEnabled = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, enabled } }) => {
-    const account = await prisma.externalAccount.update({ where: { id }, data: { enabled } });
-    if (enabled) {
-      // Reset the connection cursor so the next import re-fetches full history
-      await prisma.externalConnection.update({
-        where: { id: account.connectionId },
-        data: { cursor: null },
-      });
-    }
-    return account;
+    return prisma.$transaction(async (tx) => {
+      const account = await tx.externalAccount.update({ where: { id }, data: { enabled } });
+      if (enabled) {
+        // Reset the connection cursor so the next import re-fetches full history
+        await tx.externalConnection.update({
+          where: { id: account.connectionId },
+          data: { cursor: null },
+        });
+      }
+      return account;
+    });
   });

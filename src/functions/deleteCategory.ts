@@ -16,16 +16,18 @@ export const deleteCategory = createServerFn({ method: "POST" })
   .handler(async ({ data: { categoryId, month } }) => {
     ensureValid(await validateCategoryDeletion(categoryId, month));
 
-    await prisma.category.update({
-      where: { id: categoryId },
-      data: { deletedMonth: month },
-    });
-    await prisma.budgetCategory.deleteMany({
-      where: {
-        categoryId,
-        budget: {
-          month: { gte: month },
+    await prisma.$transaction(async (tx) => {
+      await tx.category.update({
+        where: { id: categoryId },
+        data: { deletedMonth: month },
+      });
+      await tx.budgetCategory.deleteMany({
+        where: {
+          categoryId,
+          budget: {
+            month: { gte: month },
+          },
         },
-      },
+      });
     });
   });
