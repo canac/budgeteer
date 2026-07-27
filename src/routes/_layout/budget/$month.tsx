@@ -8,7 +8,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { addMonths, parseISO, subMonths } from "date-fns";
-import { boolean, catch as zCatch, object, optional } from "zod/mini";
+import { boolean, object, optional, catch as zCatch } from "zod/mini";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
@@ -73,6 +73,7 @@ function BudgetLayout() {
           <MantineActionIconLink
             to={tabLink}
             params={{ month: previousMonth }}
+            search
             variant="subtle"
             color="gray"
             aria-label="Previous month"
@@ -89,6 +90,7 @@ function BudgetLayout() {
           <MantineActionIconLink
             to={tabLink}
             params={{ month: nextMonth }}
+            search={true}
             variant="subtle"
             color="gray"
             aria-label="Next month"

@@ -67,6 +67,7 @@ function CategoryBadge({ month, category, color = "gray" }: CategoryBadgeProps) 
     ? linkOptions({
         to: "/budget/$month/categories/$category",
         params: { month, category: category.id },
+        search: true,
       })
     : linkOptions({
         to: "/category/$category",

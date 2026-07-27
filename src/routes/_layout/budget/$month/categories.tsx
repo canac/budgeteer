@@ -85,6 +85,7 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
           month: budget.month,
           category: budgetCategory.categoryId,
         }}
+        search
         underline="never"
         c="inherit"
       >

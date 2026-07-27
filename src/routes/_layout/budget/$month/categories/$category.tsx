@@ -46,7 +46,8 @@ function CategoryDetailsPage() {
   const { month, category } = Route.useParams();
   const router = useRouter();
   const { close, modalProps } = useOpened({
-    onClose: () => router.navigate({ to: "/budget/$month/categories", params: { month } }),
+    onClose: () =>
+      router.navigate({ to: "/budget/$month/categories", params: { month }, search: true }),
   });
 
   const handleSaveBudgetedAmount = async (newAmount: number) => {
