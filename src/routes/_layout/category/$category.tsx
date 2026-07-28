@@ -91,7 +91,6 @@ function CategoryHistoryPage() {
                 category={categoryHistory.category}
                 deletable={categoryHistory.deletable}
                 month={currentMonth}
-                size="lg"
                 onSave={() => router.invalidate()}
                 onDelete={() => navigate({ to: "/budget/$month", params: { month: currentMonth } })}
               />

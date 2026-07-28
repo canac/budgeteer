@@ -121,23 +121,23 @@ function CategoryDetailsPage() {
       className="CategoryDetailsPage"
       {...modalProps}
       title={
-        <Group>
-          <MantineLink
-            fw="bold"
-            fz="2rem"
-            c="inherit"
-            underline="never"
-            to="/category/$category"
-            params={{ category }}
-          >
-            {budgetCategory.category.name}
-          </MantineLink>
-          <CategoryTypeIcons category={budgetCategory.category} size={20} />
+        <Group wrap="nowrap">
+          <Title order={3}>
+            <MantineLink
+              inherit
+              c="inherit"
+              underline="never"
+              to="/category/$category"
+              params={{ category }}
+            >
+              {budgetCategory.category.name}
+            </MantineLink>
+          </Title>
+          <CategoryTypeIcons category={budgetCategory.category} size={28} />
           <CategoryHeaderActions
             category={budgetCategory.category}
             deletable={budgetCategory.deletable}
             month={month}
-            size="md"
             onSave={() => router.invalidate()}
             onDelete={close}
           />
@@ -189,7 +189,7 @@ function CategoryDetailsPage() {
               )}
               <MantineActionIconLink
                 variant="subtle"
-                size="md"
+                size="lg"
                 aria-label="Full History"
                 to="/category/$category"
                 params={{ category }}

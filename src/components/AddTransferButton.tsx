@@ -18,7 +18,7 @@ export function AddTransferButton({ sourceCategoryId }: AddTransferButtonProps) 
 
   return (
     <>
-      <ActionIcon variant="subtle" onClick={open} title="Add Transfer">
+      <ActionIcon variant="subtle" size="lg" onClick={open} title="Add Transfer">
         <IconArrowsRightLeft />
       </ActionIcon>
       {transferModalOpen && (

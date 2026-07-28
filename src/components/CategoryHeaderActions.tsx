@@ -1,7 +1,7 @@
 import type { Category } from "src/prisma/client";
-import { ActionIcon, Tooltip } from "@mantine/core";
+import { ActionIcon, Menu, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { IconDots, IconPencil, IconTrash } from "@tabler/icons-react";
 import { DynamicCategoryModal } from "~/components/DynamicCategoryModal";
 import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
 
@@ -11,7 +11,6 @@ export interface CategoryHeaderActionsProps {
   category: Pick<Category, "id" | "name" | "accumulating" | "flexible">;
   deletable: Deletable;
   month: string;
-  size: string;
   onSave: () => void;
   onDelete: () => void;
 }
@@ -20,7 +19,6 @@ export function CategoryHeaderActions({
   category,
   deletable,
   month,
-  size,
   onSave,
   onDelete,
 }: CategoryHeaderActionsProps) {
@@ -30,20 +28,28 @@ export function CategoryHeaderActions({
 
   return (
     <>
-      <ActionIcon variant="subtle" onClick={openEditModal} title="Edit category" size={size}>
-        <IconPencil />
-      </ActionIcon>
-      <Tooltip label={!deletable.valid && deletable.message} disabled={deletable.valid}>
-        <ActionIcon
-          color="red"
-          onClick={openDeleteModal}
-          disabled={!deletable.valid}
-          title="Delete category"
-          size={size}
-        >
-          <IconTrash />
-        </ActionIcon>
-      </Tooltip>
+      <Menu position="bottom-end">
+        <Menu.Target>
+          <ActionIcon variant="subtle" color="gray" size={28} aria-label="Category actions">
+            <IconDots />
+          </ActionIcon>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item leftSection={<IconPencil size={16} />} onClick={openEditModal}>
+            Edit category
+          </Menu.Item>
+          <Tooltip label={!deletable.valid && deletable.message} disabled={deletable.valid}>
+            <Menu.Item
+              color="red"
+              leftSection={<IconTrash size={16} />}
+              disabled={!deletable.valid}
+              onClick={openDeleteModal}
+            >
+              Delete category
+            </Menu.Item>
+          </Tooltip>
+        </Menu.Dropdown>
+      </Menu>
       {editModalOpen && (
         <DynamicCategoryModal
           onClose={closeEditModal}
