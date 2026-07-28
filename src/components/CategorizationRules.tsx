@@ -58,11 +58,17 @@ export function CategorizationRules({ rules }: CategorizationRulesProps) {
               <Table.Td>{rule.category?.name}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="center">
-                  <ActionIcon variant="subtle" aria-label="Edit" onClick={() => openEdit(rule)}>
+                  <ActionIcon
+                    variant="subtle"
+                    size="lg"
+                    aria-label="Edit"
+                    onClick={() => openEdit(rule)}
+                  >
                     <IconPencil />
                   </ActionIcon>
                   <ActionIcon
                     variant="subtle"
+                    size="lg"
                     color="red"
                     aria-label="Delete"
                     onClick={() => handleDelete(rule.id)}

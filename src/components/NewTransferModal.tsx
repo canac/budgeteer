@@ -106,6 +106,7 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
           <Group justify="center">
             <ActionIcon
               variant="subtle"
+              size="lg"
               onClick={handleSwitch}
               title="Switch source and destination"
               disabled={!form.values.sourceCategoryId && !form.values.destinationCategoryId}

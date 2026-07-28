@@ -259,7 +259,12 @@ export function TransactionList({
               actions={
                 <Menu position="bottom-end">
                   <Menu.Target>
-                    <ActionIcon variant="subtle" color="gray" aria-label="Transaction actions">
+                    <ActionIcon
+                      variant="subtle"
+                      size="lg"
+                      color="gray"
+                      aria-label="Transaction actions"
+                    >
                       <IconDots />
                     </ActionIcon>
                   </Menu.Target>

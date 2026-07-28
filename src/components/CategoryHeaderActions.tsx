@@ -30,7 +30,7 @@ export function CategoryHeaderActions({
     <>
       <Menu position="bottom-end">
         <Menu.Target>
-          <ActionIcon variant="subtle" color="gray" size={28} aria-label="Category actions">
+          <ActionIcon variant="subtle" size="lg" color="gray" aria-label="Category actions">
             <IconDots />
           </ActionIcon>
         </Menu.Target>

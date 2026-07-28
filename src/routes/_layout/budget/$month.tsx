@@ -69,13 +69,14 @@ function BudgetLayout() {
             params={{ month: previousMonth }}
             search
             variant="subtle"
+            size="lg"
             color="gray"
             aria-label="Previous month"
           >
             <IconChevronLeft />
           </MantineActionIconLink>
         ) : (
-          <ActionIcon variant="subtle" color="gray" disabled aria-label="Previous month">
+          <ActionIcon variant="subtle" size="lg" color="gray" disabled aria-label="Previous month">
             <IconChevronLeft />
           </ActionIcon>
         )}
@@ -86,13 +87,14 @@ function BudgetLayout() {
             params={{ month: nextMonth }}
             search={true}
             variant="subtle"
+            size="lg"
             color="gray"
             aria-label="Next month"
           >
             <IconChevronRight />
           </MantineActionIconLink>
         ) : (
-          <ActionIcon variant="subtle" color="gray" disabled aria-label="Next month">
+          <ActionIcon variant="subtle" size="lg" color="gray" disabled aria-label="Next month">
             <IconChevronRight />
           </ActionIcon>
         )}

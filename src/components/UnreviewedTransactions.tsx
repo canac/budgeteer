@@ -89,6 +89,7 @@ export function UnreviewedTransactions({
                     <>
                       <ActionIcon
                         variant="subtle"
+                        size="lg"
                         color="blue"
                         aria-label="Reconcile"
                         onClick={() => onReconcile?.(transaction)}
@@ -97,6 +98,7 @@ export function UnreviewedTransactions({
                       </ActionIcon>
                       <ActionIcon
                         variant="subtle"
+                        size="lg"
                         color="green"
                         aria-label="Acknowledge"
                         onClick={() => onAcknowledge?.(transaction.id)}
@@ -107,6 +109,7 @@ export function UnreviewedTransactions({
                   ) : transaction.reviewed ? (
                     <ActionIcon
                       variant="subtle"
+                      size="lg"
                       color="blue"
                       aria-label="Restore"
                       onClick={() => onRestore?.(transaction.id)}
@@ -117,6 +120,7 @@ export function UnreviewedTransactions({
                     <>
                       <ActionIcon
                         variant="subtle"
+                        size="lg"
                         color="green"
                         aria-label="Accept"
                         style={{ visibility: transaction.rule?.category ? undefined : "hidden" }}
@@ -126,6 +130,7 @@ export function UnreviewedTransactions({
                       </ActionIcon>
                       <ActionIcon
                         variant="subtle"
+                        size="lg"
                         color="blue"
                         aria-label="Edit"
                         onClick={() => openImport(transaction)}
@@ -134,6 +139,7 @@ export function UnreviewedTransactions({
                       </ActionIcon>
                       <ActionIcon
                         variant="subtle"
+                        size="lg"
                         color="red"
                         aria-label="Reject"
                         onClick={() => onReject(transaction.id)}
