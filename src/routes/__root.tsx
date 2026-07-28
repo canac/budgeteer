@@ -34,6 +34,15 @@ const theme = createTheme({
         withBorder: true,
       },
     },
+    Drawer: {
+      styles: {
+        title: {
+          fontSize: "var(--mantine-h2-font-size)",
+          fontWeight: "var(--mantine-h2-font-weight)",
+          lineHeight: "var(--mantine-h2-line-height)",
+        },
+      },
+    },
     Modal: {
       defaultProps: {
         size: "md",

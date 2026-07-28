@@ -50,7 +50,6 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
           color: "white",
         },
         header: { background: "transparent", color: "white" },
-        title: { fontWeight: "bold" },
         close: { color: "white" },
       }}
     >

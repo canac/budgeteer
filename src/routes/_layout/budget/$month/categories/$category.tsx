@@ -117,90 +117,94 @@ function CategoryDetailsPage() {
   );
 
   return (
-    <Drawer
-      className="CategoryDetailsPage"
-      {...modalProps}
-      title={
-        <Group wrap="nowrap">
-          <Title order={3}>
-            <MantineLink
-              inherit
-              c="inherit"
-              underline="never"
-              to="/category/$category"
-              params={{ category }}
-            >
-              {budgetCategory.category.name}
-            </MantineLink>
-          </Title>
-          <CategoryTypeIcons category={budgetCategory.category} size={28} />
-          <CategoryHeaderActions
-            category={budgetCategory.category}
-            deletable={budgetCategory.deletable}
-            month={month}
-            onSave={() => router.invalidate()}
-            onDelete={close}
-          />
-        </Group>
-      }
-      position="right"
-      size="xl"
-    >
-      <Stack gap="lg">
-        <div>
-          <Text size="xs" fw="bold" c="dimmed" tt="uppercase">
-            Current Balance
-          </Text>
-          <EditableAmount
-            className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
-            editable={budgetCategory.category.accumulating}
-            amount={budgetCategory.currentBalance}
-            saveAmount={handleSaveBalance}
-          />
-        </div>
-
-        <div>
-          <Group justify="space-between" mb="xs">
-            <Text size="sm">Spent</Text>
-            <Text size="sm">
-              <Text span fw="bold">
-                {formatCurrency(-budgetCategory.transactionTotal)}
-              </Text>{" "}
-              of{" "}
-              <Text span fw="bold">
-                {formatCurrency(budgetCategory.budgetCategory.budgetedAmount)}
-              </Text>
-            </Text>
-          </Group>
-          <Progress value={percentageSpent} color="green" flex={1} />
-        </div>
-
-        <Divider />
-
-        <div>
-          <Title order={3}>
-            <Group align="center" gap="xs">
-              Transactions
-              {budgetCategory.category.deletedMonth === null && (
-                <>
-                  <AddTransactionButton initialCategoryId={budgetCategory.category.id} />
-                  <AddTransferButton sourceCategoryId={budgetCategory.category.id} />
-                </>
-              )}
-              <MantineActionIconLink
-                variant="subtle"
-                size="lg"
-                aria-label="Full History"
+    <Drawer.Root className="CategoryDetailsPage" {...modalProps} position="right" size="xl">
+      <Drawer.Overlay />
+      <Drawer.Content>
+        <Drawer.Header>
+          <Group wrap="nowrap">
+            <Drawer.Title>
+              <MantineLink
+                inherit
+                c="inherit"
+                underline="never"
                 to="/category/$category"
                 params={{ category }}
               >
-                <IconHistory />
-              </MantineActionIconLink>
-            </Group>
-          </Title>
-          <TransactionList transactions={budgetCategory.transactions} extraRows={transactionRows} />
-        </div>
-      </Stack>
-    </Drawer>
+                {budgetCategory.category.name}
+              </MantineLink>
+            </Drawer.Title>
+            <CategoryTypeIcons category={budgetCategory.category} size={28} />
+            <CategoryHeaderActions
+              category={budgetCategory.category}
+              deletable={budgetCategory.deletable}
+              month={month}
+              onSave={() => router.invalidate()}
+              onDelete={close}
+            />
+          </Group>
+          <Drawer.CloseButton />
+        </Drawer.Header>
+        <Drawer.Body>
+          <Stack gap="lg">
+            <div>
+              <Text size="xs" fw="bold" c="dimmed" tt="uppercase">
+                Current Balance
+              </Text>
+              <EditableAmount
+                className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
+                editable={budgetCategory.category.accumulating}
+                amount={budgetCategory.currentBalance}
+                saveAmount={handleSaveBalance}
+              />
+            </div>
+
+            <div>
+              <Group justify="space-between" mb="xs">
+                <Text size="sm">Spent</Text>
+                <Text size="sm">
+                  <Text span fw="bold">
+                    {formatCurrency(-budgetCategory.transactionTotal)}
+                  </Text>{" "}
+                  of{" "}
+                  <Text span fw="bold">
+                    {formatCurrency(budgetCategory.budgetCategory.budgetedAmount)}
+                  </Text>
+                </Text>
+              </Group>
+              <Progress value={percentageSpent} color="green" flex={1} />
+            </div>
+
+            <Divider />
+
+            <div>
+              <Title order={3}>
+                <Group align="center" gap="xs">
+                  Transactions
+                  {budgetCategory.category.deletedMonth === null && (
+                    <>
+                      <AddTransactionButton initialCategoryId={budgetCategory.category.id} />
+                      <AddTransferButton sourceCategoryId={budgetCategory.category.id} />
+                    </>
+                  )}
+                  <MantineActionIconLink
+                    variant="subtle"
+                    size="lg"
+                    aria-label="Full History"
+                    to="/category/$category"
+                    params={{ category }}
+                  >
+                    <IconHistory />
+                  </MantineActionIconLink>
+                </Group>
+              </Title>
+              <TransactionList
+                transactions={budgetCategory.transactions}
+                extraRows={transactionRows}
+              />
+            </div>
+          </Stack>
+        </Drawer.Body>
+      </Drawer.Content>
+    </Drawer.Root>
   );
 }
