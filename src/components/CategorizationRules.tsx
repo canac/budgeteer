@@ -8,7 +8,7 @@ import { DynamicCategorizationRuleModal } from "~/components/DynamicCategorizati
 import { List, ListRow } from "~/components/List";
 import { deleteCategorizationRule as deleteCategorizationRuleFn } from "~/functions/deleteCategorizationRule";
 
-interface Rule {
+export interface Rule {
   id: string;
   externalVendor: string;
   vendor: string;
