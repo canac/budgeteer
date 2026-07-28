@@ -18,6 +18,7 @@ import { reconcileTransaction as reconcileTransactionFn } from "~/functions/reco
 import { rejectTransaction as rejectTransactionFn } from "~/functions/rejectTransaction";
 import { restoreTransaction as restoreTransactionFn } from "~/functions/restoreTransaction";
 import { useSyncedState } from "~/hooks/useSyncedState";
+import "./ImportPage.css";
 
 const PAGE_SIZE = 25;
 
@@ -151,24 +152,23 @@ function ImportTransactionsPage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <Stack gap="md">
+    <Stack className="ImportPage" gap="md">
       <Group justify="space-between">
-        <Text>{header(currentView, total)}</Text>
-        <Group>
-          <SegmentedControl
-            value={currentView}
-            onChange={handleViewChange}
-            data={[
-              { label: "Unreviewed", value: "unreviewed" },
-              { label: "Changed", value: "changed" },
-              { label: "Rejected", value: "rejected" },
-            ]}
-          />
-          <Button leftSection={<IconDownload />} onClick={handleImport} loading={importing}>
-            Import Transactions
-          </Button>
-        </Group>
+        <Text className="header">{header(currentView, total)}</Text>
+        <Button leftSection={<IconDownload />} onClick={handleImport} loading={importing}>
+          Import Transactions
+        </Button>
       </Group>
+      <SegmentedControl
+        fullWidth
+        value={currentView}
+        onChange={handleViewChange}
+        data={[
+          { label: "Unreviewed", value: "unreviewed" },
+          { label: "Changed", value: "changed" },
+          { label: "Rejected", value: "rejected" },
+        ]}
+      />
       {total === 0 ? (
         <Text c="dimmed">{empty(currentView)}</Text>
       ) : (
