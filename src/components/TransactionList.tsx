@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, type BadgeProps, Menu, Text, ThemeIcon } from "@mantine/core";
+import { ActionIcon, Badge, type BadgeProps, Menu, Text, ThemeIcon, Tooltip } from "@mantine/core";
 import {
   IconArrowsRightLeft,
   IconDots,
@@ -238,6 +238,13 @@ export function TransactionList({
       <div className="TransactionList">
         {transactions.map((transaction) => {
           const income = transaction.type !== "TRANSFER" && transaction.amount >= 0;
+          const editable = transaction.type === "TRANSACTION";
+          const uneditableMessage =
+            transaction.type === "TRANSFER"
+              ? "Cannot edit transfers"
+              : transaction.type === "BALANCE_ADJUSTMENT"
+                ? "Cannot edit balance adjustments"
+                : null;
 
           return (
             <TransactionRow
@@ -269,13 +276,15 @@ export function TransactionList({
                     </ActionIcon>
                   </Menu.Target>
                   <Menu.Dropdown>
-                    <Menu.Item
-                      leftSection={<IconEdit size={16} />}
-                      disabled={transaction.type !== "TRANSACTION"}
-                      onClick={() => handleEditTransaction(transaction)}
-                    >
-                      Edit
-                    </Menu.Item>
+                    <Tooltip label={uneditableMessage} disabled={editable}>
+                      <Menu.Item
+                        leftSection={<IconEdit size={16} />}
+                        disabled={!editable}
+                        onClick={() => handleEditTransaction(transaction)}
+                      >
+                        Edit
+                      </Menu.Item>
+                    </Tooltip>
                     <Menu.Item
                       color="red"
                       leftSection={<IconTrash size={16} />}
