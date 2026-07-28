@@ -15,6 +15,32 @@
     }
   }
 
+  .leftover-toggle {
+    /* Bleed past the row so the text lines up with the other rows */
+    width: calc(100% + var(--mantine-spacing-xs) * 2);
+    margin-inline: calc(var(--mantine-spacing-xs) * -1);
+    padding-inline: var(--mantine-spacing-xs);
+    border: none;
+    height: var(--button-height-md);
+    color: var(--mantine-color-text);
+    font-size: var(--mantine-font-size-md);
+    font-weight: normal;
+
+    .hover-icon {
+      display: none;
+    }
+
+    &:hover {
+      .icon {
+        display: none;
+      }
+
+      .hover-icon {
+        display: block;
+      }
+    }
+  }
+
   .CategoryItem {
     display: flex;
     flex-direction: row;

@@ -1,16 +1,11 @@
 import { ActionIcon, Card, Group, SegmentedControl, Stack, Text, Title } from "@mantine/core";
-import { IconChevronLeft, IconChevronRight, IconFilter } from "@tabler/icons-react";
-import {
-  createFileRoute,
-  Outlet,
-  useMatchRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { IconChevronLeft, IconChevronRight, IconFilter, IconFilterOff } from "@tabler/icons-react";
+import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/react-router";
 import { addMonths, parseISO, subMonths } from "date-fns";
 import { boolean, object, optional, catch as zCatch } from "zod/mini";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
+import { MantineButtonLink } from "~/components/MantineButtonLink";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
@@ -43,7 +38,6 @@ function BudgetLayout() {
   const router = useRouter();
   const { budget, totalBudgetedAmount, budgetMonths, leftoverRemaining } = Route.useLoaderData();
   const { leftover } = Route.useSearch();
-  const navigate = useNavigate();
   const matchRoute = useMatchRoute();
   const onTransactions = !!matchRoute({ to: "/budget/$month/transactions" });
   const leftToBudget = budget.income - totalBudgetedAmount;
@@ -141,30 +135,31 @@ function BudgetLayout() {
               </Text>
             </Group>
           )}
-          <Group justify="space-between">
-            <Group gap="xs">
-              <Text>Leftover</Text>
-              <ActionIcon
-                variant={leftover ? "filled" : "subtle"}
-                color="gray"
-                size="sm"
-                aria-label="Show only leftover categories"
-                aria-pressed={!!leftover}
-                onClick={() =>
-                  navigate({
-                    to: tabLink,
-                    params: { month: budget.month },
-                    search: (prev) => ({ ...prev, leftover: leftover ? undefined : true }),
-                  })
-                }
-              >
-                <IconFilter />
-              </ActionIcon>
+          <MantineButtonLink
+            to={tabLink}
+            params={{ month: budget.month }}
+            search={(prev) => ({ ...prev, leftover: leftover ? undefined : true })}
+            variant="subtle"
+            color="gray"
+            justify="space-between"
+            rightSection={
+              <Text className={amountSignClassname(leftoverRemaining)}>
+                {formatCurrency(leftoverRemaining)}
+              </Text>
+            }
+            aria-label={leftover ? "Show all categories" : "Show only leftover categories"}
+            className="leftover-toggle"
+          >
+            <Group gap="xs" wrap="nowrap">
+              Leftover
+              {leftover && <IconFilter className="icon" size={18} />}
+              {leftover ? (
+                <IconFilterOff className="hover-icon" size={18} />
+              ) : (
+                <IconFilter className="hover-icon" size={18} />
+              )}
             </Group>
-            <Text className={amountSignClassname(leftoverRemaining)}>
-              {formatCurrency(leftoverRemaining)}
-            </Text>
-          </Group>
+          </MantineButtonLink>
         </Stack>
       </Card>
       <Outlet />
