@@ -11,9 +11,8 @@ import { parseISO } from "date-fns";
 import { useState } from "react";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { DynamicImportTransactionModal } from "~/components/DynamicImportTransactionModal";
-import { TransactionRow } from "~/components/TransactionList";
-import { formatCurrency } from "~/lib/formatters";
-import "./TransactionList.css";
+import { List, ListRow } from "~/components/List";
+import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
 
 interface UnreviewedTransactionsProps {
   transactions: UnreviewedTransaction[];
@@ -52,13 +51,13 @@ export function UnreviewedTransactions({
 
   return (
     <>
-      <div className="TransactionList">
+      <List>
         {transactions.map((transaction) => {
           const vendor = transaction.rule?.vendor ?? transaction.vendor;
           const category = transaction.rule?.category?.name;
 
           return (
-            <TransactionRow
+            <ListRow
               key={transaction.id}
               title={
                 transaction.rule ? (
@@ -69,16 +68,22 @@ export function UnreviewedTransactions({
                   </Text>
                 )
               }
-              date={parseISO(transaction.date)}
-              description={transaction.account.name}
-              categories={
+              meta={
+                <>
+                  {shortDateFormatter.format(parseISO(transaction.date))}
+                  <Text span inherit fs="italic">
+                    {` · ${transaction.account.name}`}
+                  </Text>
+                </>
+              }
+              tags={
                 category ? (
                   <Badge variant="light" color="gray" size="lg" tt="none">
                     {category}
                   </Badge>
                 ) : undefined
               }
-              amount={
+              value={
                 <Text className={transaction.amount >= 0 ? "positive" : undefined}>
                   {formatCurrency(transaction.amount)}
                 </Text>
@@ -153,7 +158,7 @@ export function UnreviewedTransactions({
             />
           );
         })}
-      </div>
+      </List>
       {modalOpen && importingTransaction && (
         <DynamicImportTransactionModal
           onClose={close}

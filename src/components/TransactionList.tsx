@@ -7,7 +7,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { createLink, linkOptions, useRouter } from "@tanstack/react-router";
-import clsx from "clsx";
 import { parseISO } from "date-fns";
 import { forwardRef, type ReactNode, useState } from "react";
 import type { getBudgetCategory } from "~/functions/getBudgetCategory";
@@ -16,6 +15,7 @@ import {
   DeleteTransactionModal,
   type DeleteTransactionModalProps,
 } from "~/components/DeleteTransactionModal";
+import { List, ListRow } from "~/components/List";
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
 import "./TransactionList.css";
@@ -134,64 +134,6 @@ function TransactionCategories({
   ));
 }
 
-export interface TransactionRowProps {
-  icon?: ReactNode;
-  title: ReactNode;
-  date?: Date;
-  description?: ReactNode;
-  categories?: ReactNode;
-  amount: ReactNode;
-  actions?: ReactNode;
-  className?: string;
-}
-
-/** Shared row layout used by the transaction list and the category page's extra rows. */
-export function TransactionRow({
-  icon,
-  title,
-  date,
-  description,
-  categories,
-  amount,
-  actions,
-  className,
-}: TransactionRowProps) {
-  const hasBottom = Boolean(date) || Boolean(description) || Boolean(categories);
-
-  return (
-    <div className={clsx("transaction-row", className)}>
-      <div className="cell-vendor">
-        <Text component="span" lineClamp={1}>
-          {title}
-        </Text>
-        {icon}
-      </div>
-      <div className="cell-amount">{amount}</div>
-      <div className="cell-menu">{actions}</div>
-      {hasBottom && (
-        <div className="cell-bottom">
-          {(Boolean(date) || Boolean(description)) && (
-            <span className="bottom-meta">
-              {date && (
-                <Text component="span" c="dimmed" size="sm">
-                  {shortDateFormatter.format(date)}
-                </Text>
-              )}
-              {description && (
-                <Text component="span" c="dimmed" size="sm" fs="italic">
-                  {date ? " · " : ""}
-                  {description}
-                </Text>
-              )}
-            </span>
-          )}
-          {categories}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function TransactionList({
   transactions,
   extraRows,
@@ -235,7 +177,7 @@ export function TransactionList({
           onSave={handleUpdate}
         />
       )}
-      <div className="TransactionList">
+      <List className="TransactionList">
         {transactions.map((transaction) => {
           const income = transaction.type !== "TRANSFER" && transaction.amount >= 0;
           const editable = transaction.type === "TRANSACTION";
@@ -247,18 +189,26 @@ export function TransactionList({
                 : null;
 
           return (
-            <TransactionRow
+            <ListRow
               key={transaction.id}
               icon={<TransactionTypeIcon transaction={transaction} />}
               title={transaction.vendor}
-              date={parseISO(transaction.date)}
-              description={transaction.description}
-              categories={
+              meta={
+                <>
+                  {shortDateFormatter.format(parseISO(transaction.date))}
+                  {transaction.description && (
+                    <Text span inherit fs="italic">
+                      {` · ${transaction.description}`}
+                    </Text>
+                  )}
+                </>
+              }
+              tags={
                 showCategories ? (
                   <TransactionCategories transaction={transaction} month={month} />
                 ) : undefined
               }
-              amount={
+              value={
                 <Text className={income ? "positive" : undefined}>
                   {formatCurrency(transaction.transfer?.amount ?? transaction.amount)}
                 </Text>
@@ -299,7 +249,7 @@ export function TransactionList({
           );
         })}
         {extraRows}
-      </div>
+      </List>
     </>
   );
 }

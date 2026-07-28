@@ -8,9 +8,10 @@ import { AddTransferButton } from "~/components/AddTransferButton";
 import { CategoryHeaderActions } from "~/components/CategoryHeaderActions";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { EditableAmount } from "~/components/EditableAmount";
+import { ListRow } from "~/components/List";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineLink } from "~/components/MantineLink";
-import { TransactionList, TransactionRow } from "~/components/TransactionList";
+import { TransactionList } from "~/components/TransactionList";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBalance } from "~/functions/setCategoryBalance";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
@@ -90,10 +91,10 @@ function CategoryDetailsPage() {
   const monthDate = parseISO(month);
   const transactionRows = (
     <>
-      <TransactionRow
+      <ListRow
         className="starting-balance"
         title="Budgeted this month"
-        amount={
+        value={
           <EditableAmount
             className={amountSignClassname(budgetedAmount)}
             amount={budgetedAmount}
@@ -102,9 +103,9 @@ function CategoryDetailsPage() {
         }
       />
       {budgetCategory.category.accumulating && (
-        <TransactionRow
+        <ListRow
           title={`${monthOnlyFormatter.format(subMonths(monthDate, 1))} balance`}
-          amount={
+          value={
             <EditableAmount
               className={amountSignClassname(previousMonthBalance)}
               amount={previousMonthBalance}
