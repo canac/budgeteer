@@ -25,7 +25,7 @@ model Budget {
   id               String           @id @default(uuid(7))
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
-  month            String
+  month            String           @unique
   income           Int
   budgetCategories BudgetCategory[]
 }
