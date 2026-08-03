@@ -35,6 +35,13 @@ function extractVendor(tx: PlaidTransaction): string {
 }
 
 /**
+ * Prefer the purchase date over posted date when available.
+ **/
+function extractDate(tx: PlaidTransaction): string {
+  return tx.authorized_date ?? tx.date;
+}
+
+/**
  * Upsert the connection's remote accounts, returning the full account list.
  **/
 export async function refreshAccounts(
@@ -61,13 +68,13 @@ async function applyAdded(
   oldestIso: string,
 ): Promise<number> {
   const toInsert = added.filter(
-    (tx) => !tx.pending && enabledAccountIds.has(tx.account_id) && tx.date >= oldestIso,
+    (tx) => !tx.pending && enabledAccountIds.has(tx.account_id) && extractDate(tx) >= oldestIso,
   );
   const { count } = await prisma.externalTransaction.createMany({
     data: toInsert.map((tx) => ({
       id: tx.transaction_id,
       amount: extractAmount(tx),
-      date: tx.date,
+      date: extractDate(tx),
       vendor: extractVendor(tx),
       accountId: tx.account_id,
     })),
@@ -87,15 +94,18 @@ async function applyModified(modified: PlaidTransaction[]): Promise<void> {
     }
 
     const amount = extractAmount(tx);
+    const date = extractDate(tx);
     // Flag accepted transactions as modified when the amount changes
     const modified = existing.transaction !== null && amount !== existing.amount;
+    const moved = existing.transaction !== null && date !== existing.date;
     await prisma.externalTransaction.update({
       where: { id: tx.transaction_id },
       data: {
         amount,
-        date: tx.date,
+        date,
         vendor: extractVendor(tx),
         ...(modified ? { changedAt: new Date() } : {}),
+        ...(moved ? { transaction: { update: { date } } } : {}),
       },
     });
   }

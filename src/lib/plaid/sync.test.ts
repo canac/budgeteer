@@ -152,6 +152,51 @@ describe("syncConnection", () => {
     ).toEqual(["t_edge", "t_new"]);
   });
 
+  it("uses the authorized date when Plaid reports one, falling back to the posted date", async () => {
+    const connection = await seed();
+    mockAccounts([apiAccount()]);
+    mockSync([
+      {
+        added: [
+          apiTx({ transaction_id: "t_auth", date: "2026-04-17", authorized_date: "2026-04-15" }),
+          apiTx({ transaction_id: "t_null", date: "2026-04-18", authorized_date: null }),
+          apiTx({ transaction_id: "t_absent", date: "2026-04-19" }),
+        ],
+      },
+    ]);
+
+    await syncConnection(connection);
+
+    const stored = await prisma.externalTransaction.findMany({ orderBy: { id: "asc" } });
+    expect(stored.map((tx) => [tx.id, tx.date])).toEqual([
+      ["t_absent", "2026-04-19"],
+      ["t_auth", "2026-04-15"],
+      ["t_null", "2026-04-18"],
+    ]);
+  });
+
+  it("filters against the authorized date when it precedes the oldest budget", async () => {
+    const connection = await seed();
+    mockAccounts([apiAccount()]);
+    mockSync([
+      {
+        added: [
+          apiTx({
+            transaction_id: "t_crosses",
+            date: "2026-04-02",
+            authorized_date: "2026-03-30",
+          }),
+          apiTx({ transaction_id: "t_inside", date: "2026-04-03", authorized_date: "2026-04-01" }),
+        ],
+      },
+    ]);
+
+    const result = await syncConnection(connection);
+
+    expect(result.imported).toBe(1);
+    expect(pluck(await prisma.externalTransaction.findMany(), "id")).toEqual(["t_inside"]);
+  });
+
   it("uses merchant_name, falling back to name", async () => {
     const connection = await seed();
     mockAccounts([apiAccount()]);
@@ -418,6 +463,76 @@ describe("syncConnection — modified", () => {
 
     const tx = await prisma.externalTransaction.findUniqueOrThrow({ where: { id: "t1" } });
     expect(tx.changedAt).toBeNull();
+  });
+
+  it("applies a late-arriving authorized date to an accepted transaction without flagging it", async () => {
+    const connection = await seed();
+    await createExternalTransaction({
+      id: "t1",
+      account: { connect: { id: "acc_1" } },
+      amount: -1000,
+      date: "2026-04-17",
+      reviewed: true,
+      transaction: { create: transaction({ amount: -1000, date: "2026-04-17" }) },
+    });
+    mockAccounts([apiAccount()]);
+    mockSync([
+      {
+        modified: [
+          apiTx({
+            transaction_id: "t1",
+            amount: 10,
+            date: "2026-04-17",
+            authorized_date: "2026-04-15",
+          }),
+        ],
+      },
+    ]);
+
+    await syncConnection(connection);
+
+    const tx = await prisma.externalTransaction.findUniqueOrThrow({
+      where: { id: "t1" },
+      include: { transaction: true },
+    });
+    expect([tx.date, tx.transaction?.date]).toEqual(["2026-04-15", "2026-04-15"]);
+    expect(tx.changedAt).toBeNull();
+  });
+
+  it("applies a date change alongside an amount change, flagging only for the amount", async () => {
+    const connection = await seed();
+    await createExternalTransaction({
+      id: "t1",
+      account: { connect: { id: "acc_1" } },
+      amount: -1000,
+      date: "2026-04-17",
+      reviewed: true,
+      transaction: { create: transaction({ amount: -1000, date: "2026-04-17" }) },
+    });
+    mockAccounts([apiAccount()]);
+    mockSync([
+      {
+        modified: [
+          apiTx({
+            transaction_id: "t1",
+            amount: 20,
+            date: "2026-04-17",
+            authorized_date: "2026-04-15",
+          }),
+        ],
+      },
+    ]);
+
+    await syncConnection(connection);
+
+    const tx = await prisma.externalTransaction.findUniqueOrThrow({
+      where: { id: "t1" },
+      include: { transaction: true },
+    });
+    expect([tx.amount, tx.date]).toEqual([-2000, "2026-04-15"]);
+    // The amount still needs review, but the date lands on the accepted transaction immediately
+    expect(tx.changedAt).not.toBeNull();
+    expect([tx.transaction?.amount, tx.transaction?.date]).toEqual([-1000, "2026-04-15"]);
   });
 
   it("ignores modifications for transactions it never stored", async () => {

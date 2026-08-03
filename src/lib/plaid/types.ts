@@ -13,6 +13,7 @@ export const plaidTransactionSchema = object({
   account_id: string(),
   amount: number(),
   date: string(),
+  authorized_date: string().nullish(),
   name: string(),
   merchant_name: string().nullish(),
   pending: boolean(),
