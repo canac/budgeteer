@@ -93,6 +93,38 @@ describe("getUnreviewedTransactions", () => {
     expect(pluck(page3.transactions, "vendor")).toEqual(["V0"]);
   });
 
+  it("filters by external account", async () => {
+    const otherAccount = { connect: { id: (await createExternalAccount()).id } };
+    await Promise.all([
+      createExternalTransaction({ vendor: "Mine", account }),
+      createExternalTransaction({ vendor: "Theirs", account: otherAccount }),
+    ]);
+
+    const result = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10, accountId } });
+
+    expect(result.total).toBe(1);
+    expect(pluck(result.transactions, "vendor")).toEqual(["Mine"]);
+  });
+
+  it("combines the external account filter with the view", async () => {
+    const otherAccount = { connect: { id: (await createExternalAccount()).id } };
+    await Promise.all([
+      createExternalTransaction({ vendor: "Pending", account }),
+      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({
+        vendor: "RejectedElsewhere",
+        reviewed: true,
+        account: otherAccount,
+      }),
+    ]);
+
+    const result = await getUnreviewedTransactions({
+      data: { page: 1, pageSize: 10, view: "rejected", accountId },
+    });
+
+    expect(pluck(result.transactions, "vendor")).toEqual(["Rejected"]);
+  });
+
   it("attaches matching categorization rule with category", async () => {
     const category = await createCategory({ name: "Shopping" });
     await Promise.all([

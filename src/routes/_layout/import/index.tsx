@@ -4,11 +4,13 @@ import { IconDownload } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { coerce, literal, object, optional, union } from "zod/mini";
+import { coerce, literal, object, optional, string, union } from "zod/mini";
 import { DynamicReconcileTransactionModal } from "~/components/DynamicReconcileTransactionModal";
+import { ExternalAccountSelect } from "~/components/ExternalAccountSelect";
 import { UnreviewedTransactions } from "~/components/UnreviewedTransactions";
 import { acceptTransaction as acceptTransactionFn } from "~/functions/acceptTransaction";
 import { acknowledgeTransactionChange as acknowledgeTransactionChangeFn } from "~/functions/acknowledgeTransactionChange";
+import { getExternalAccounts } from "~/functions/getExternalAccounts";
 import {
   getUnreviewedTransactions,
   type UnreviewedTransaction,
@@ -27,6 +29,7 @@ type View = "unreviewed" | "changed" | "rejected";
 const searchSchema = object({
   page: optional(coerce.number()),
   view: optional(union([literal("unreviewed"), literal("changed"), literal("rejected")])),
+  account: optional(string()),
 });
 
 function header(view: View, total: number): string {
@@ -39,28 +42,35 @@ function header(view: View, total: number): string {
   return headers[view];
 }
 
-function empty(view: View): string {
+function empty(view: View, filteredByAccount: boolean): string {
   const messages: Record<View, string> = {
-    unreviewed: "No unreviewed transactions.",
-    changed: "No changed transactions.",
-    rejected: "No rejected transactions.",
+    unreviewed: "No unreviewed transactions",
+    changed: "No changed transactions",
+    rejected: "No rejected transactions",
   };
-  return messages[view];
+  return `${messages[view]}${filteredByAccount ? " for this account" : ""}.`;
 }
 
 export const Route = createFileRoute("/_layout/import/")({
   component: ImportTransactionsPage,
   validateSearch: searchSchema,
-  loaderDeps: ({ search: { page, view } }) => ({ page, view }),
-  loader: ({ deps: { page, view } }) =>
-    getUnreviewedTransactions({ data: { page, pageSize: PAGE_SIZE, view: view ?? "unreviewed" } }),
+  loaderDeps: ({ search: { page, view, account } }) => ({ page, view, account }),
+  loader: async ({ deps: { page, view, account } }) => {
+    const [{ transactions, total }, accounts] = await Promise.all([
+      getUnreviewedTransactions({
+        data: { page, pageSize: PAGE_SIZE, view: view ?? "unreviewed", accountId: account },
+      }),
+      getExternalAccounts(),
+    ]);
+    return { transactions, total, accounts };
+  },
   head: () => ({ meta: [{ title: "Import Transactions | Budgeteer" }] }),
 });
 
 function ImportTransactionsPage() {
   const router = useRouter();
-  const loaderData = Route.useLoaderData();
-  const { page, view } = Route.useSearch();
+  const { accounts, ...loaderData } = Route.useLoaderData();
+  const { page, view, account } = Route.useSearch();
   const currentView: View = view ?? "unreviewed";
   const navigate = useNavigate({ from: Route.fullPath });
   const importTransactions = useServerFn(importTransactionsFn);
@@ -149,6 +159,12 @@ function ImportTransactionsPage() {
     });
   };
 
+  const handleAccountChange = async (accountId: string | null) => {
+    await navigate({
+      search: (prev) => ({ ...prev, account: accountId ?? undefined, page: undefined }),
+    });
+  };
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
@@ -169,8 +185,15 @@ function ImportTransactionsPage() {
           { label: "Rejected", value: "rejected" },
         ]}
       />
+      {accounts.length > 0 && (
+        <ExternalAccountSelect
+          accounts={accounts}
+          value={account ?? null}
+          onChange={handleAccountChange}
+        />
+      )}
       {total === 0 ? (
-        <Text c="dimmed">{empty(currentView)}</Text>
+        <Text c="dimmed">{empty(currentView, !!account)}</Text>
       ) : (
         <>
           <UnreviewedTransactions

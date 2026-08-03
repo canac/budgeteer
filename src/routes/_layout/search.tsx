@@ -1,9 +1,11 @@
-import { Button, Group, Select, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Button, Grid, Group, Select, Stack, Text, TextInput, Title } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { object, optional, string } from "zod/mini";
+import { ExternalAccountSelect } from "~/components/ExternalAccountSelect";
 import { PageContainer } from "~/components/PageContainer";
 import { TransactionList } from "~/components/TransactionList";
 import { getCategories } from "~/functions/getCategories";
+import { getExternalAccounts } from "~/functions/getExternalAccounts";
 import { getVendors } from "~/functions/getVendors";
 import { searchTransactions } from "~/functions/searchTransactions";
 
@@ -12,18 +14,35 @@ const searchSchema = object({
   to: optional(string()),
   category: optional(string()),
   vendor: optional(string()),
+  account: optional(string()),
 });
 
-function hasFilter(search: { from?: string; to?: string; category?: string; vendor?: string }) {
+function hasFilter(search: {
+  from?: string;
+  to?: string;
+  category?: string;
+  vendor?: string;
+  account?: string;
+}) {
   return Object.values(search).some(Boolean);
 }
 
 export const Route = createFileRoute("/_layout/search")({
   component: SearchPage,
   validateSearch: searchSchema,
-  loaderDeps: ({ search: { from, to, category, vendor } }) => ({ from, to, category, vendor }),
+  loaderDeps: ({ search: { from, to, category, vendor, account } }) => ({
+    from,
+    to,
+    category,
+    vendor,
+    account,
+  }),
   loader: async ({ deps }) => {
-    const [categories, vendors] = await Promise.all([getCategories(), getVendors()]);
+    const [categories, vendors, accounts] = await Promise.all([
+      getCategories(),
+      getVendors(),
+      getExternalAccounts(),
+    ]);
     const transactions = hasFilter(deps)
       ? await searchTransactions({
           data: {
@@ -31,16 +50,17 @@ export const Route = createFileRoute("/_layout/search")({
             toDate: deps.to,
             categoryId: deps.category,
             vendor: deps.vendor,
+            accountId: deps.account,
           },
         })
       : [];
-    return { categories, vendors, transactions };
+    return { categories, vendors, accounts, transactions };
   },
   head: () => ({ meta: [{ title: "Search | Budgeteer" }] }),
 });
 
 function SearchPage() {
-  const { categories, vendors, transactions } = Route.useLoaderData();
+  const { categories, vendors, accounts, transactions } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
@@ -62,45 +82,60 @@ function SearchPage() {
         <Title order={1}>Search</Title>
 
         <Stack>
-          <Group align="flex-end" gap="md">
-            <TextInput
-              type="date"
-              label="From"
-              flex="1 1 10rem"
-              value={search.from ?? ""}
-              onChange={(event) => update({ from: event.currentTarget.value })}
-            />
-            <TextInput
-              type="date"
-              label="To"
-              flex="1 1 10rem"
-              value={search.to ?? ""}
-              onChange={(event) => update({ to: event.currentTarget.value })}
-            />
-            <Select
-              label="Category"
-              placeholder="Any category"
-              flex="1 1 10rem"
-              clearable
-              searchable
-              value={search.category ?? null}
-              data={categories.map((category) => ({
-                value: category.id,
-                label: category.name,
-              }))}
-              onChange={(value) => update({ category: value ?? undefined })}
-            />
-            <Select
-              label="Vendor"
-              placeholder="Any vendor"
-              flex="1 1 10rem"
-              clearable
-              searchable
-              value={search.vendor ?? null}
-              data={vendors}
-              onChange={(value) => update({ vendor: value ?? undefined })}
-            />
-          </Group>
+          <Grid>
+            <Grid.Col span={{ base: 6, md: 3 }}>
+              <TextInput
+                type="date"
+                label="From"
+                value={search.from ?? ""}
+                onChange={(event) => update({ from: event.currentTarget.value })}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 6, md: 3 }}>
+              <TextInput
+                type="date"
+                label="To"
+                value={search.to ?? ""}
+                onChange={(event) => update({ to: event.currentTarget.value })}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Select
+                label="Category"
+                placeholder="Any category"
+                miw={{ md: "16rem" }}
+                clearable
+                searchable
+                value={search.category ?? null}
+                data={categories.map((category) => ({
+                  value: category.id,
+                  label: category.name,
+                }))}
+                onChange={(value) => update({ category: value ?? undefined })}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 5 }}>
+              <Select
+                label="Vendor"
+                placeholder="Any vendor"
+                miw={{ md: "16rem" }}
+                clearable
+                searchable
+                value={search.vendor ?? null}
+                data={vendors}
+                onChange={(value) => update({ vendor: value ?? undefined })}
+              />
+            </Grid.Col>
+            {accounts.length > 0 && (
+              <Grid.Col span={{ base: 12, md: 7 }}>
+                <ExternalAccountSelect
+                  accounts={accounts}
+                  value={search.account ?? null}
+                  onChange={(value) => update({ account: value ?? undefined })}
+                />
+              </Grid.Col>
+            )}
+          </Grid>
 
           <Group gap="sm">
             <Text c="dimmed" size="sm">

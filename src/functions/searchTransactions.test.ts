@@ -1,4 +1,10 @@
-import { createCategory, createTransaction } from "test/mocks.ts";
+import {
+  createCategory,
+  createExternalAccount,
+  createExternalTransaction,
+  createTransaction,
+  transaction,
+} from "test/mocks.ts";
 import { describe, expect, it } from "vitest";
 import { pluck } from "~/lib/collections";
 import { searchTransactions } from "./searchTransactions.ts";
@@ -38,6 +44,28 @@ describe("searchTransactions", () => {
     ]);
 
     const result = await searchTransactions({ data: { categoryId: category.id } });
+    expect(pluck(result, "vendor")).toEqual(["Matched"]);
+  });
+
+  it("filters by external account", async () => {
+    const [account, otherAccount] = await Promise.all([
+      createExternalAccount(),
+      createExternalAccount(),
+    ]);
+
+    await Promise.all([
+      createExternalTransaction({
+        account: { connect: { id: account.id } },
+        transaction: { create: transaction({ vendor: "Matched" }) },
+      }),
+      createExternalTransaction({
+        account: { connect: { id: otherAccount.id } },
+        transaction: { create: transaction({ vendor: "OtherAccount" }) },
+      }),
+      createTransaction({ vendor: "Manual" }),
+    ]);
+
+    const result = await searchTransactions({ data: { accountId: account.id } });
     expect(pluck(result, "vendor")).toEqual(["Matched"]);
   });
 

@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { literal, number, object, union } from "zod";
+import { literal, number, object, optional, string, union } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
@@ -10,18 +10,20 @@ const inputSchema = object({
   view: union([literal("unreviewed"), literal("changed"), literal("rejected")]).default(
     "unreviewed",
   ),
+  accountId: optional(string()),
 });
 
 export const getUnreviewedTransactions = createServerFn()
   .validator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { page, pageSize, view } }) => {
-    const where =
+  .handler(async ({ data: { page, pageSize, view, accountId } }) => {
+    const viewWhere =
       view === "rejected"
         ? { reviewed: true, transaction: { is: null } }
         : view === "changed"
           ? { changedAt: { not: null }, transaction: { isNot: null } }
           : { reviewed: false };
+    const where = { ...viewWhere, ...(accountId && { accountId }) };
     const [transactions, total] = await Promise.all([
       prisma.externalTransaction.findMany({
         where,

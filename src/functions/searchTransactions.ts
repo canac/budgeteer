@@ -8,6 +8,7 @@ const inputSchema = object({
   toDate: optional(string()),
   categoryId: optional(string()),
   vendor: optional(string()),
+  accountId: optional(string()),
 }).refine((filters) => Object.values(filters).some((filter) => typeof filter === "string"), {
   message: "At least one filter is required",
 });
@@ -15,13 +16,14 @@ const inputSchema = object({
 export const searchTransactions = createServerFn()
   .validator(inputSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { fromDate, toDate, categoryId, vendor } }) => {
+  .handler(async ({ data: { fromDate, toDate, categoryId, vendor, accountId } }) => {
     const transactions = await prisma.transaction.findMany({
       where: {
         type: { not: "BALANCE_ADJUSTMENT" },
         ...((!!fromDate || !!toDate) && { date: { gte: fromDate, lte: toDate } }),
         ...(vendor && { vendor: { equals: vendor } }),
         ...(categoryId && { transactionCategories: { some: { categoryId } } }),
+        ...(accountId && { externalTransaction: { accountId } }),
       },
       include: {
         transactionCategories: {
