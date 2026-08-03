@@ -1,22 +1,35 @@
-import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Group,
+  Modal,
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
 import { IconSwitch } from "@tabler/icons-react";
 import { useParams } from "@tanstack/react-router";
 import { endOfMonth, parseISO } from "date-fns";
 import { number, object, positive, refine, string } from "zod/mini";
 import { createTransfer } from "~/functions/createTransfer";
+import { editTransfer } from "~/functions/editTransfer";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
-import { dollarsToPennies } from "~/lib/currencyConversion";
+import { activeCategories } from "~/lib/activeCategories";
+import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency, fullDateFormatter } from "~/lib/formatters";
-import { toISODateString } from "~/lib/iso";
+import { toISODateString, toISOMonthString } from "~/lib/iso";
 
 const formSchema = object({
   amount: number("Amount is required").check(positive("Amount must be greater than zero")),
   sourceCategoryId: string("Source is required"),
   destinationCategoryId: string("Destination is required"),
+  description: string(),
 }).check(
   refine((values) => values.sourceCategoryId !== values.destinationCategoryId, {
     message: "Source and destination categories must be different",
@@ -24,28 +37,53 @@ const formSchema = object({
   }),
 );
 
-export interface NewTransferModalProps {
+export interface EditTransfer {
+  id: string;
+  amount: number;
+  date: string;
+  description: string | null;
+  sourceCategoryId: string;
+  destinationCategoryId: string;
+}
+
+export interface TransferModalProps {
   onClose: () => void;
   onSave: () => void;
   sourceCategoryId?: string;
+  editingTransfer?: EditTransfer;
 }
 
-export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTransferModalProps) {
+export function TransferModal({
+  onClose,
+  onSave,
+  sourceCategoryId,
+  editingTransfer,
+}: TransferModalProps) {
   const month = useParams({
     from: "/_layout/budget/$month",
     shouldThrow: false,
     select: (params) => params.month,
   });
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
-  const sortedCategories = useSortedCategories(categories);
   const { close, modalProps } = useOpened({ onClose });
+
+  const isEditing = !!editingTransfer;
+
+  const transferDate = editingTransfer
+    ? parseISO(editingTransfer.date)
+    : endOfMonth(typeof month === "string" ? parseISO(month) : new Date());
+
+  const sortedCategories = useSortedCategories(
+    activeCategories(categories, toISOMonthString(transferDate)),
+  );
 
   const form = useForm({
     validateInputOnBlur: true,
     initialValues: {
-      amount: 0,
-      sourceCategoryId: sourceCategoryId ?? null,
-      destinationCategoryId: null as string | null,
+      amount: editingTransfer ? penniesToDollars(editingTransfer.amount) : 0,
+      sourceCategoryId: editingTransfer?.sourceCategoryId ?? sourceCategoryId ?? null,
+      destinationCategoryId: editingTransfer?.destinationCategoryId ?? null,
+      description: editingTransfer?.description ?? "",
     },
     validate: schemaResolver(formSchema, { sync: true }),
     transformValues: (values) => formSchema.parse(values),
@@ -62,29 +100,44 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
     label: `${category.name} (${formatCurrency(category.balance)})`,
   }));
 
-  const transferDate = endOfMonth(typeof month === "string" ? parseISO(month) : new Date());
-
   const handleSwitch = () => {
     form.setFieldValue("sourceCategoryId", form.values.destinationCategoryId);
     form.setFieldValue("destinationCategoryId", form.values.sourceCategoryId);
   };
 
   const handleSubmit = form.onSubmit(async (values) => {
-    await createTransfer({
-      data: {
-        amount: dollarsToPennies(values.amount),
-        date: toISODateString(transferDate),
-        sourceCategoryId: values.sourceCategoryId,
-        destinationCategoryId: values.destinationCategoryId,
-      },
-    });
+    const amount = dollarsToPennies(values.amount);
+    const description = values.description.trim() || null;
+
+    if (editingTransfer) {
+      await editTransfer({
+        data: {
+          id: editingTransfer.id,
+          amount,
+          description,
+        },
+      });
+    } else {
+      await createTransfer({
+        data: {
+          amount,
+          date: toISODateString(transferDate),
+          sourceCategoryId: values.sourceCategoryId,
+          destinationCategoryId: values.destinationCategoryId,
+          description,
+        },
+      });
+    }
 
     close();
     onSave();
   });
 
   return (
-    <Modal {...modalProps} title={<Text fw="bold">New Transfer</Text>}>
+    <Modal
+      {...modalProps}
+      title={<Text fw="bold">{isEditing ? "Edit Transfer" : "New Transfer"}</Text>}
+    >
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <NumberInput
@@ -102,18 +155,21 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
             error={form.errors.sourceCategoryId}
             required
             searchable
+            disabled={isEditing}
           />
-          <Group justify="center">
-            <ActionIcon
-              variant="subtle"
-              size="lg"
-              onClick={handleSwitch}
-              title="Switch source and destination"
-              disabled={!form.values.sourceCategoryId && !form.values.destinationCategoryId}
-            >
-              <IconSwitch />
-            </ActionIcon>
-          </Group>
+          {!isEditing && (
+            <Group justify="center">
+              <ActionIcon
+                variant="subtle"
+                size="lg"
+                onClick={handleSwitch}
+                title="Switch source and destination"
+                disabled={!form.values.sourceCategoryId && !form.values.destinationCategoryId}
+              >
+                <IconSwitch />
+              </ActionIcon>
+            </Group>
+          )}
           <Select
             label="Destination"
             data={categoryOptions.filter((option) => option.value !== form.values.sourceCategoryId)}
@@ -122,13 +178,19 @@ export function NewTransferModal({ onClose, onSave, sourceCategoryId }: NewTrans
             error={form.errors.destinationCategoryId}
             required
             searchable
+            disabled={isEditing}
+          />
+          <TextInput
+            label="Description"
+            key={form.key("description")}
+            {...form.getInputProps("description")}
           />
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
               Transfer Date: {fullDateFormatter.format(transferDate)}
             </Text>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
-              Save
+              {isEditing ? "Update" : "Save"}
             </Button>
           </Group>
         </Stack>

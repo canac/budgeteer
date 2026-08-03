@@ -19,6 +19,7 @@ import { getVendors } from "~/functions/getVendors";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
+import { activeCategories } from "~/lib/activeCategories";
 import {
   CATEGORY_TOTAL_MISMATCH,
   categorySplitFields,
@@ -76,7 +77,7 @@ export function ImportTransactionModal({
 
   const { categorySelect, splitFields } = useCategorySplit({
     form,
-    categories,
+    categories: activeCategories(categories, transaction.date.slice(0, 7)),
     total: totalDollars,
     onCategoryChange: (value) => {
       if (value.length !== 1) {

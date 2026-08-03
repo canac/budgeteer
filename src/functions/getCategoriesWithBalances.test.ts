@@ -56,6 +56,14 @@ describe("getCategoriesWithBalances", () => {
     expect(find(categories, "id", id)?.balance).toBe(4000);
   });
 
+  it("includes deleted categories so callers can filter by date", async () => {
+    const { id } = await createCategory({ createdMonth: lastMonth, deletedMonth: thisMonth });
+
+    const categories = await getCategoriesWithBalances();
+
+    expect(find(categories, "id", id)).toMatchObject({ deletedMonth: thisMonth });
+  });
+
   it("accumulates through the current month for fund categories", async () => {
     const { id } = await createCategory({ accumulating: true, createdMonth: lastMonth });
     await Promise.all([

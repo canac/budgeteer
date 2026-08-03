@@ -16,6 +16,7 @@ import {
   type DeleteTransactionModalProps,
 } from "~/components/DeleteTransactionModal";
 import { List, ListRow } from "~/components/List";
+import { TransferModal, type TransferModalProps } from "~/components/TransferModal";
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
 import "./TransactionList.css";
@@ -147,6 +148,9 @@ export function TransactionList({
   const [editingTransaction, setEditingTransaction] = useState<
     TransactionModalProps["editingTransaction"] | null
   >(null);
+  const [editingTransfer, setEditingTransfer] = useState<
+    TransferModalProps["editingTransfer"] | null
+  >(null);
 
   const handleUpdate = () => router.invalidate();
 
@@ -154,11 +158,19 @@ export function TransactionList({
     setDeletingTransaction(transaction);
   };
   const handleEditTransaction = async (transaction: ListTransaction) => {
-    setEditingTransaction(
-      await getTransaction({
-        data: { id: transaction.id },
-      }),
-    );
+    const fetched = await getTransaction({
+      data: { id: transaction.id },
+    });
+
+    if (fetched.transfer) {
+      setEditingTransfer({
+        ...fetched.transfer,
+        date: fetched.date,
+        description: fetched.description,
+      });
+    } else {
+      setEditingTransaction(fetched);
+    }
   };
 
   return (
@@ -177,16 +189,18 @@ export function TransactionList({
           onSave={handleUpdate}
         />
       )}
+      {editingTransfer && (
+        <TransferModal
+          onClose={() => setEditingTransfer(null)}
+          editingTransfer={editingTransfer}
+          onSave={handleUpdate}
+        />
+      )}
       <List className="TransactionList">
         {transactions.map((transaction) => {
           const income = transaction.type !== "TRANSFER" && transaction.amount >= 0;
-          const editable = transaction.type === "TRANSACTION";
-          const uneditableMessage =
-            transaction.type === "TRANSFER"
-              ? "Cannot edit transfers"
-              : transaction.type === "BALANCE_ADJUSTMENT"
-                ? "Cannot edit balance adjustments"
-                : null;
+          const editable = transaction.type !== "BALANCE_ADJUSTMENT";
+          const uneditableMessage = editable ? null : "Cannot edit balance adjustments";
 
           return (
             <ListRow

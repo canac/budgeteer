@@ -22,6 +22,7 @@ import { getVendors } from "~/functions/getVendors";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
+import { activeCategories } from "~/lib/activeCategories";
 import {
   CATEGORY_TOTAL_MISMATCH,
   categorySplitFields,
@@ -29,7 +30,7 @@ import {
 } from "~/lib/categorySplit";
 import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
-import { toISODateString } from "~/lib/iso";
+import { toISODateString, toISOMonthString } from "~/lib/iso";
 
 interface EditTransaction {
   id: string;
@@ -114,9 +115,14 @@ export function TransactionModal({
     validate: schemaResolver(formSchema, { sync: true }),
   });
 
-  const { selectedCategoryIds, amount } = form.getValues();
+  const { selectedCategoryIds, amount, date } = form.getValues();
 
-  const { categorySelect, splitFields } = useCategorySplit({ form, categories, total: amount });
+  const categoryMonth = date.length >= 7 ? date.slice(0, 7) : toISOMonthString(new Date());
+  const { categorySelect, splitFields } = useCategorySplit({
+    form,
+    categories: activeCategories(categories, categoryMonth),
+    total: amount,
+  });
 
   form.watch("amount", ({ value }) => {
     if (selectedCategoryIds.length === 1 && value > 0) {

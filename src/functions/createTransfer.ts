@@ -8,38 +8,42 @@ const transferSchema = object({
   date: string().regex(/^\d{4}-\d{2}-\d{2}$/),
   sourceCategoryId: string(),
   destinationCategoryId: string(),
+  description: string().nullish(),
 });
 
 export const createTransfer = createServerFn({ method: "POST" })
   .validator(transferSchema)
   .middleware([requireAuth])
-  .handler(async ({ data: { amount, date, sourceCategoryId, destinationCategoryId } }) => {
-    const transaction = await prisma.transaction.create({
-      data: {
-        type: "TRANSFER",
-        amount: 0,
-        date,
-        vendor: "Transfer",
-        transactionCategories: {
-          create: [
-            {
-              categoryId: sourceCategoryId,
-              amount: -amount,
-            },
-            {
-              categoryId: destinationCategoryId,
+  .handler(
+    async ({ data: { amount, date, sourceCategoryId, destinationCategoryId, description } }) => {
+      const transaction = await prisma.transaction.create({
+        data: {
+          type: "TRANSFER",
+          amount: 0,
+          date,
+          vendor: "Transfer",
+          description,
+          transactionCategories: {
+            create: [
+              {
+                categoryId: sourceCategoryId,
+                amount: -amount,
+              },
+              {
+                categoryId: destinationCategoryId,
+                amount,
+              },
+            ],
+          },
+          transfer: {
+            create: {
               amount,
+              sourceCategoryId,
+              destinationCategoryId,
             },
-          ],
-        },
-        transfer: {
-          create: {
-            amount,
-            sourceCategoryId,
-            destinationCategoryId,
           },
         },
-      },
-    });
-    return transaction;
-  });
+      });
+      return transaction;
+    },
+  );

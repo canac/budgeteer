@@ -8,7 +8,6 @@ export const getCategoriesWithBalances = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
     const categories = await prisma.category.findMany({
-      where: { deletedMonth: null },
       orderBy: { sortOrder: "asc" },
     });
 

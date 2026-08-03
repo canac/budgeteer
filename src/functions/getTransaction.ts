@@ -18,6 +18,7 @@ export const getTransaction = createServerFn()
         transactionCategories: {
           include: { category: true },
         },
+        transfer: true,
       },
     });
     if (!transaction) {

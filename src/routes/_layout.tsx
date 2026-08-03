@@ -8,8 +8,8 @@ import {
   useRouter,
   useRouterState,
 } from "@tanstack/react-router";
-import { DynamicNewTransferModal } from "~/components/DynamicNewTransferModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
+import { DynamicTransferModal } from "~/components/DynamicTransferModal";
 import { MantineLink } from "~/components/MantineLink";
 import { NavDrawer } from "~/components/NavDrawer";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
@@ -53,7 +53,7 @@ function LayoutRoute() {
       {transactionOpened && (
         <DynamicTransactionModal onClose={closeTransaction} onSave={handleUpdate} />
       )}
-      {transferOpened && <DynamicNewTransferModal onClose={closeTransfer} onSave={handleUpdate} />}
+      {transferOpened && <DynamicTransferModal onClose={closeTransfer} onSave={handleUpdate} />}
 
       <NavDrawer opened={drawerOpened} onClose={closeDrawer} currentMonth={month ?? null} />
 
