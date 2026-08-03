@@ -6,7 +6,7 @@ import {
   transaction,
 } from "test/mocks.ts";
 import { describe, expect, it } from "vitest";
-import { pluck } from "~/lib/collections";
+import { pluck, range } from "~/lib/collections";
 import { searchTransactions } from "./searchTransactions.ts";
 
 describe("searchTransactions", () => {
@@ -18,9 +18,9 @@ describe("searchTransactions", () => {
     ]);
 
     const result = await searchTransactions({
-      data: { fromDate: "2025-02-01", toDate: "2025-02-28" },
+      data: { pageSize: 10, fromDate: "2025-02-01", toDate: "2025-02-28" },
     });
-    expect(pluck(result, "vendor")).toEqual(["Inside"]);
+    expect(pluck(result.transactions, "vendor")).toEqual(["Inside"]);
   });
 
   it("filters by exact vendor", async () => {
@@ -29,8 +29,8 @@ describe("searchTransactions", () => {
       createTransaction({ vendor: "Costco Gas" }),
     ]);
 
-    const result = await searchTransactions({ data: { vendor: "Costco" } });
-    expect(pluck(result, "vendor")).toEqual(["Costco"]);
+    const result = await searchTransactions({ data: { pageSize: 10, vendor: "Costco" } });
+    expect(pluck(result.transactions, "vendor")).toEqual(["Costco"]);
   });
 
   it("filters by category", async () => {
@@ -43,8 +43,8 @@ describe("searchTransactions", () => {
       createTransaction({ vendor: "Unmatched" }),
     ]);
 
-    const result = await searchTransactions({ data: { categoryId: category.id } });
-    expect(pluck(result, "vendor")).toEqual(["Matched"]);
+    const result = await searchTransactions({ data: { pageSize: 10, categoryId: category.id } });
+    expect(pluck(result.transactions, "vendor")).toEqual(["Matched"]);
   });
 
   it("filters by external account", async () => {
@@ -65,8 +65,8 @@ describe("searchTransactions", () => {
       createTransaction({ vendor: "Manual" }),
     ]);
 
-    const result = await searchTransactions({ data: { accountId: account.id } });
-    expect(pluck(result, "vendor")).toEqual(["Matched"]);
+    const result = await searchTransactions({ data: { pageSize: 10, accountId: account.id } });
+    expect(pluck(result.transactions, "vendor")).toEqual(["Matched"]);
   });
 
   it("excludes balance adjustments when no type is given", async () => {
@@ -76,9 +76,9 @@ describe("searchTransactions", () => {
     ]);
 
     const result = await searchTransactions({
-      data: { fromDate: "2025-02-01", toDate: "2025-02-28" },
+      data: { pageSize: 10, fromDate: "2025-02-01", toDate: "2025-02-28" },
     });
-    expect(pluck(result, "vendor")).toEqual(["Normal"]);
+    expect(pluck(result.transactions, "vendor")).toEqual(["Normal"]);
   });
 
   it("filters by balance adjustment type", async () => {
@@ -87,8 +87,10 @@ describe("searchTransactions", () => {
       createTransaction({ vendor: "Adjustment", type: "BALANCE_ADJUSTMENT" }),
     ]);
 
-    const result = await searchTransactions({ data: { type: "BALANCE_ADJUSTMENT" } });
-    expect(pluck(result, "vendor")).toEqual(["Adjustment"]);
+    const result = await searchTransactions({
+      data: { pageSize: 10, type: "BALANCE_ADJUSTMENT" },
+    });
+    expect(pluck(result.transactions, "vendor")).toEqual(["Adjustment"]);
   });
 
   it("filters by transfer type", async () => {
@@ -97,8 +99,8 @@ describe("searchTransactions", () => {
       createTransaction({ vendor: "Moved", type: "TRANSFER" }),
     ]);
 
-    const result = await searchTransactions({ data: { type: "TRANSFER" } });
-    expect(pluck(result, "vendor")).toEqual(["Moved"]);
+    const result = await searchTransactions({ data: { pageSize: 10, type: "TRANSFER" } });
+    expect(pluck(result.transactions, "vendor")).toEqual(["Moved"]);
   });
 
   it("filters by transaction type", async () => {
@@ -108,8 +110,8 @@ describe("searchTransactions", () => {
       createTransaction({ vendor: "Adjustment", type: "BALANCE_ADJUSTMENT" }),
     ]);
 
-    const result = await searchTransactions({ data: { type: "TRANSACTION" } });
-    expect(pluck(result, "vendor")).toEqual(["Normal"]);
+    const result = await searchTransactions({ data: { pageSize: 10, type: "TRANSACTION" } });
+    expect(pluck(result.transactions, "vendor")).toEqual(["Normal"]);
   });
 
   it("combines filters with AND", async () => {
@@ -135,6 +137,7 @@ describe("searchTransactions", () => {
 
     const result = await searchTransactions({
       data: {
+        pageSize: 10,
         vendor: "Chipotle",
         categoryId: category.id,
         fromDate: "2025-02-01",
@@ -143,7 +146,7 @@ describe("searchTransactions", () => {
       },
     });
 
-    expect(pluck(result, "date")).toEqual(["2025-02-10"]);
+    expect(pluck(result.transactions, "date")).toEqual(["2025-02-10"]);
   });
 
   it("orders by date descending", async () => {
@@ -154,13 +157,41 @@ describe("searchTransactions", () => {
     ]);
 
     const result = await searchTransactions({
-      data: { fromDate: "2025-02-01", toDate: "2025-02-28" },
+      data: { pageSize: 10, fromDate: "2025-02-01", toDate: "2025-02-28" },
     });
-    expect(pluck(result, "vendor")).toEqual(["New", "Mid", "Old"]);
+    expect(pluck(result.transactions, "vendor")).toEqual(["New", "Mid", "Old"]);
+  });
+
+  it("returns the total count alongside the page of transactions", async () => {
+    await Promise.all(
+      range(5).map((i) => createTransaction({ date: `2025-02-0${i + 1}`, vendor: "Costco" })),
+    );
+
+    const result = await searchTransactions({ data: { pageSize: 2, vendor: "Costco" } });
+
+    expect(result.total).toBe(5);
+    expect(result.transactions).toHaveLength(2);
+  });
+
+  it("paginates", async () => {
+    await Promise.all(
+      range(5).map((i) => createTransaction({ date: `2025-02-0${i + 1}`, vendor: `V${i}` })),
+    );
+
+    const [page1, page2, page3] = await Promise.all([
+      searchTransactions({ data: { page: 1, pageSize: 2, fromDate: "2025-02-01" } }),
+      searchTransactions({ data: { page: 2, pageSize: 2, fromDate: "2025-02-01" } }),
+      searchTransactions({ data: { page: 3, pageSize: 2, fromDate: "2025-02-01" } }),
+    ]);
+
+    expect(page1.total).toBe(5);
+    expect(pluck(page1.transactions, "vendor")).toEqual(["V4", "V3"]);
+    expect(pluck(page2.transactions, "vendor")).toEqual(["V2", "V1"]);
+    expect(pluck(page3.transactions, "vendor")).toEqual(["V0"]);
   });
 
   it("throws when no filter is provided", async () => {
-    await expect(searchTransactions({ data: {} })).rejects.toThrow(
+    await expect(searchTransactions({ data: { pageSize: 10 } })).rejects.toThrow(
       "At least one filter is required",
     );
   });
