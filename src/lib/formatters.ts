@@ -30,6 +30,12 @@ export function formatCurrency(pennies: number): string {
   return currencyFormatter.format(Object.is(dollars, -0) ? 0 : dollars);
 }
 
+/** Format an amount where spending is the norm. */
+export function formatSignedCurrency(pennies: number): string {
+  const sign = pennies > 0 ? "+" : "";
+  return sign + formatCurrency(Math.abs(pennies));
+}
+
 export const percentageFormatter = new Intl.NumberFormat("en-US", {
   style: "percent",
   currency: "USD",

@@ -25,7 +25,7 @@ import {
   splitTotalPennies,
 } from "~/lib/categorySplit";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
-import { formatCurrency, fullDateFormatter } from "~/lib/formatters";
+import { formatSignedCurrency, fullDateFormatter } from "~/lib/formatters";
 
 export interface ImportTransactionModalProps {
   onClose: () => void;
@@ -120,7 +120,7 @@ export function ImportTransactionModal({
                 className={clsx({ positive: transaction.amount >= 0 })}
                 style={{ whiteSpace: "nowrap" }}
               >
-                {formatCurrency(transaction.amount)}
+                {formatSignedCurrency(transaction.amount)}
               </Text>
             </Group>
           </div>

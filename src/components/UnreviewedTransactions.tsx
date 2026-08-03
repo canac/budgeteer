@@ -12,7 +12,7 @@ import { useState } from "react";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { DynamicImportTransactionModal } from "~/components/DynamicImportTransactionModal";
 import { List, ListRow } from "~/components/List";
-import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
+import { formatSignedCurrency, shortDateFormatter } from "~/lib/formatters";
 
 interface UnreviewedTransactionsProps {
   transactions: UnreviewedTransaction[];
@@ -85,7 +85,7 @@ export function UnreviewedTransactions({
               }
               value={
                 <Text className={transaction.amount >= 0 ? "positive" : undefined}>
-                  {formatCurrency(transaction.amount)}
+                  {formatSignedCurrency(transaction.amount)}
                 </Text>
               }
               actions={
