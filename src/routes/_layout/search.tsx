@@ -1,6 +1,6 @@
 import { Button, Grid, Group, Select, Stack, Text, TextInput, Title } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { object, optional, string } from "zod/mini";
+import { enum as enumType, object, optional, string } from "zod/mini";
 import { ExternalAccountSelect } from "~/components/ExternalAccountSelect";
 import { PageContainer } from "~/components/PageContainer";
 import { TransactionList } from "~/components/TransactionList";
@@ -8,12 +8,14 @@ import { getCategories } from "~/functions/getCategories";
 import { getExternalAccounts } from "~/functions/getExternalAccounts";
 import { getVendors } from "~/functions/getVendors";
 import { searchTransactions } from "~/functions/searchTransactions";
+import { TransactionType } from "~/prisma/enums.ts";
 
 const searchSchema = object({
   from: optional(string()),
   to: optional(string()),
   category: optional(string()),
   vendor: optional(string()),
+  type: optional(enumType(TransactionType)),
   account: optional(string()),
 });
 
@@ -22,6 +24,7 @@ function hasFilter(search: {
   to?: string;
   category?: string;
   vendor?: string;
+  type?: string;
   account?: string;
 }) {
   return Object.values(search).some(Boolean);
@@ -30,11 +33,12 @@ function hasFilter(search: {
 export const Route = createFileRoute("/_layout/search")({
   component: SearchPage,
   validateSearch: searchSchema,
-  loaderDeps: ({ search: { from, to, category, vendor, account } }) => ({
+  loaderDeps: ({ search: { from, to, category, vendor, type, account } }) => ({
     from,
     to,
     category,
     vendor,
+    type,
     account,
   }),
   loader: async ({ deps }) => {
@@ -50,6 +54,7 @@ export const Route = createFileRoute("/_layout/search")({
             toDate: deps.to,
             categoryId: deps.category,
             vendor: deps.vendor,
+            type: deps.type,
             accountId: deps.account,
           },
         })
@@ -114,7 +119,7 @@ function SearchPage() {
                 onChange={(value) => update({ category: value ?? undefined })}
               />
             </Grid.Col>
-            <Grid.Col span={{ base: 12, md: 5 }}>
+            <Grid.Col span={{ base: 12, md: 4 }}>
               <Select
                 label="Vendor"
                 placeholder="Any vendor"
@@ -126,8 +131,22 @@ function SearchPage() {
                 onChange={(value) => update({ vendor: value ?? undefined })}
               />
             </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 3 }}>
+              <Select
+                label="Type"
+                placeholder="Any type"
+                clearable
+                value={search.type ?? null}
+                data={[
+                  { value: TransactionType.TRANSACTION, label: "Transaction" },
+                  { value: TransactionType.TRANSFER, label: "Transfer" },
+                  { value: TransactionType.BALANCE_ADJUSTMENT, label: "Balance Adjustment" },
+                ]}
+                onChange={(value) => update({ type: value ?? undefined })}
+              />
+            </Grid.Col>
             {accounts.length > 0 && (
-              <Grid.Col span={{ base: 12, md: 7 }}>
+              <Grid.Col span={{ base: 12, md: 5 }}>
                 <ExternalAccountSelect
                   accounts={accounts}
                   value={search.account ?? null}

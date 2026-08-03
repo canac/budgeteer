@@ -69,6 +69,49 @@ describe("searchTransactions", () => {
     expect(pluck(result, "vendor")).toEqual(["Matched"]);
   });
 
+  it("excludes balance adjustments when no type is given", async () => {
+    await Promise.all([
+      createTransaction({ vendor: "Normal", date: "2025-02-10" }),
+      createTransaction({ vendor: "Adjustment", date: "2025-02-11", type: "BALANCE_ADJUSTMENT" }),
+    ]);
+
+    const result = await searchTransactions({
+      data: { fromDate: "2025-02-01", toDate: "2025-02-28" },
+    });
+    expect(pluck(result, "vendor")).toEqual(["Normal"]);
+  });
+
+  it("filters by balance adjustment type", async () => {
+    await Promise.all([
+      createTransaction({ vendor: "Normal" }),
+      createTransaction({ vendor: "Adjustment", type: "BALANCE_ADJUSTMENT" }),
+    ]);
+
+    const result = await searchTransactions({ data: { type: "BALANCE_ADJUSTMENT" } });
+    expect(pluck(result, "vendor")).toEqual(["Adjustment"]);
+  });
+
+  it("filters by transfer type", async () => {
+    await Promise.all([
+      createTransaction({ vendor: "Normal" }),
+      createTransaction({ vendor: "Moved", type: "TRANSFER" }),
+    ]);
+
+    const result = await searchTransactions({ data: { type: "TRANSFER" } });
+    expect(pluck(result, "vendor")).toEqual(["Moved"]);
+  });
+
+  it("filters by transaction type", async () => {
+    await Promise.all([
+      createTransaction({ vendor: "Normal" }),
+      createTransaction({ vendor: "Moved", type: "TRANSFER" }),
+      createTransaction({ vendor: "Adjustment", type: "BALANCE_ADJUSTMENT" }),
+    ]);
+
+    const result = await searchTransactions({ data: { type: "TRANSACTION" } });
+    expect(pluck(result, "vendor")).toEqual(["Normal"]);
+  });
+
   it("combines filters with AND", async () => {
     const category = await createCategory({ name: "Dining" });
     const withCategory = (vendor: string, date: string) =>
@@ -82,6 +125,12 @@ describe("searchTransactions", () => {
       withCategory("Chipotle", "2025-02-10"),
       withCategory("Chipotle", "2025-05-10"),
       createTransaction({ vendor: "Chipotle", date: "2025-02-12" }),
+      createTransaction({
+        vendor: "Chipotle",
+        date: "2025-02-14",
+        type: "TRANSFER",
+        transactionCategories: { create: [{ amount: -100, categoryId: category.id }] },
+      }),
     ]);
 
     const result = await searchTransactions({
@@ -90,6 +139,7 @@ describe("searchTransactions", () => {
         categoryId: category.id,
         fromDate: "2025-02-01",
         toDate: "2025-02-28",
+        type: "TRANSACTION",
       },
     });
 
