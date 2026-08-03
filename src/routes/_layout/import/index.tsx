@@ -172,7 +172,7 @@ function ImportTransactionsPage() {
       <Group justify="space-between">
         <Text className="header">{header(currentView, total)}</Text>
         <Button leftSection={<IconDownload />} onClick={handleImport} loading={importing}>
-          Import Transactions
+          Import
         </Button>
       </Group>
       <SegmentedControl
