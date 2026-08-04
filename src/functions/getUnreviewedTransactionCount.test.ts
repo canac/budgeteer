@@ -26,4 +26,28 @@ describe("getUnreviewedTransactionCount", () => {
 
     expect(await getUnreviewedTransactionCount()).toBe(3);
   });
+
+  it("excludes unreviewed transactions Plaid has removed", async () => {
+    const account = await createExternalAccount();
+    const connect = { connect: { id: account.id } };
+    await Promise.all([
+      createExternalTransaction({ account: connect }),
+      createExternalTransaction({ account: connect, removedAt: new Date() }),
+    ]);
+
+    expect(await getUnreviewedTransactionCount()).toBe(1);
+  });
+
+  it("still counts an accepted transaction that Plaid removed", async () => {
+    const account = await createExternalAccount();
+    await createExternalTransaction({
+      account: { connect: { id: account.id } },
+      reviewed: true,
+      changedAt: new Date(),
+      removedAt: new Date(),
+      transaction: { create: transaction() },
+    });
+
+    expect(await getUnreviewedTransactionCount()).toBe(1);
+  });
 });

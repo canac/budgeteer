@@ -8,7 +8,10 @@ export const getUnreviewedTransactionCount = createServerFn()
     prisma.externalTransaction.count({
       where: {
         // Transactions awaiting review or accepted ones flagged as changed at the bank
-        OR: [{ reviewed: false }, { changedAt: { not: null }, transaction: { isNot: null } }],
+        OR: [
+          { reviewed: false, removedAt: null },
+          { changedAt: { not: null }, transaction: { isNot: null } },
+        ],
       },
     }),
   );

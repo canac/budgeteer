@@ -134,6 +134,7 @@ model ExternalTransaction {
   vendor      String
   reviewed    Boolean         @default(false)
   changedAt   DateTime?
+  removedAt   DateTime?
   accountId   String
   account     ExternalAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
   transaction Transaction?

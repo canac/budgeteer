@@ -546,7 +546,7 @@ describe("syncConnection — modified", () => {
 });
 
 describe("syncConnection — removed", () => {
-  it("deletes an unreviewed transaction", async () => {
+  it("records the removal of an unreviewed transaction without deleting it", async () => {
     const connection = await seed();
     await createExternalTransaction({ id: "t1", account: { connect: { id: "acc_1" } } });
     mockAccounts([apiAccount()]);
@@ -554,10 +554,12 @@ describe("syncConnection — removed", () => {
 
     await syncConnection(connection);
 
-    expect(await prisma.externalTransaction.findUnique({ where: { id: "t1" } })).toBeNull();
+    const tx = await prisma.externalTransaction.findUniqueOrThrow({ where: { id: "t1" } });
+    expect(tx.removedAt).not.toBeNull();
+    expect(tx.changedAt).toBeNull();
   });
 
-  it("deletes a rejected transaction", async () => {
+  it("records the removal of a rejected transaction without deleting it", async () => {
     const connection = await seed();
     await createExternalTransaction({
       id: "t1",
@@ -569,7 +571,43 @@ describe("syncConnection — removed", () => {
 
     await syncConnection(connection);
 
-    expect(await prisma.externalTransaction.findUnique({ where: { id: "t1" } })).toBeNull();
+    const tx = await prisma.externalTransaction.findUniqueOrThrow({ where: { id: "t1" } });
+    expect(tx.removedAt).not.toBeNull();
+  });
+
+  it("keeps the original removal timestamp when Plaid repeats a removal", async () => {
+    const connection = await seed();
+    await createExternalTransaction({ id: "t1", account: { connect: { id: "acc_1" } } });
+    mockAccounts([apiAccount()]);
+    mockSync([{ removed: [{ transaction_id: "t1" }] }]);
+
+    await syncConnection(connection);
+    const first = await prisma.externalTransaction.findUniqueOrThrow({ where: { id: "t1" } });
+    await syncConnection(connection);
+    const second = await prisma.externalTransaction.findUniqueOrThrow({ where: { id: "t1" } });
+
+    expect(second.removedAt).toEqual(first.removedAt);
+  });
+
+  it("clears the removal when Plaid serves the transaction again", async () => {
+    const connection = await seed();
+    await createExternalTransaction({
+      id: "t1",
+      account: { connect: { id: "acc_1" } },
+      date: "2026-04-15",
+    });
+    mockAccounts([apiAccount()]);
+    mockSync([{ removed: [{ transaction_id: "t1" }] }]);
+    await syncConnection(connection);
+    expect(
+      (await prisma.externalTransaction.findUniqueOrThrow({ where: { id: "t1" } })).removedAt,
+    ).not.toBeNull();
+
+    mockSync([{ added: [apiTx({ transaction_id: "t1", date: "2026-04-15" })] }]);
+    await syncConnection(connection);
+
+    const tx = await prisma.externalTransaction.findUniqueOrThrow({ where: { id: "t1" } });
+    expect(tx.removedAt).toBeNull();
   });
 
   it("flags an accepted transaction instead of deleting it", async () => {
@@ -591,6 +629,7 @@ describe("syncConnection — removed", () => {
     });
     expect(tx).not.toBeNull();
     expect(tx?.changedAt).not.toBeNull();
+    expect(tx?.removedAt).not.toBeNull();
     expect(tx?.transaction).not.toBeNull();
   });
 

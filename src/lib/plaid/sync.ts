@@ -2,6 +2,7 @@ import { parseISO } from "date-fns";
 import type { ExternalAccount, ExternalConnection } from "~/prisma/client";
 import { prisma } from "~/lib/prisma";
 import type { PlaidSyncPage, PlaidTransaction } from "./types";
+import { pluck } from "../collections";
 import { dollarsToPennies } from "../currencyConversion";
 import { toISODateString } from "../iso";
 import { PlaidClient, PlaidError } from "./client";
@@ -80,6 +81,14 @@ async function applyAdded(
     })),
     skipDuplicates: true,
   });
+  // Clear un-removed transactions
+  await prisma.externalTransaction.updateMany({
+    where: {
+      id: { in: pluck(toInsert, "transaction_id") },
+      removedAt: { not: null },
+    },
+    data: { removedAt: null },
+  });
   return count;
 }
 
@@ -120,18 +129,18 @@ async function applyRemoved(removed: { transaction_id: string }[]): Promise<void
     if (!existing) {
       continue;
     }
-
-    if (existing.transaction) {
-      // Flagged accepted transactions as modified when they are removed
-      await prisma.externalTransaction.update({
-        where: { id: transaction_id },
-        data: {
-          changedAt: new Date(),
-        },
-      });
-    } else {
-      await prisma.externalTransaction.delete({ where: { id: transaction_id } });
+    if (existing.removedAt !== null) {
+      continue;
     }
+
+    await prisma.externalTransaction.update({
+      where: { id: transaction_id },
+      data: {
+        removedAt: new Date(),
+        // Flag accepted transactions as changed so the removal surfaces for review
+        ...(existing.transaction ? { changedAt: new Date() } : {}),
+      },
+    });
   }
 }
 

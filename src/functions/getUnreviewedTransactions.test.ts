@@ -147,4 +147,44 @@ describe("getUnreviewedTransactions", () => {
     );
     expect(find(transactions, "vendor", "UNKNOWN")?.rule).toBeNull();
   });
+
+  it("excludes transactions Plaid has removed from the unreviewed and rejected views", async () => {
+    await Promise.all([
+      createExternalTransaction({ vendor: "Live", account }),
+      createExternalTransaction({ vendor: "Removed", removedAt: new Date(), account }),
+      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({
+        vendor: "RejectedThenRemoved",
+        reviewed: true,
+        removedAt: new Date(),
+        account,
+      }),
+    ]);
+
+    const unreviewed = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10 } });
+    const rejected = await getUnreviewedTransactions({
+      data: { page: 1, pageSize: 10, view: "rejected" },
+    });
+
+    expect(pluck(unreviewed.transactions, "vendor")).toEqual(["Live"]);
+    expect(unreviewed.total).toBe(1);
+    expect(pluck(rejected.transactions, "vendor")).toEqual(["Rejected"]);
+  });
+
+  it("still shows an accepted transaction that Plaid removed under the changed view", async () => {
+    await createExternalTransaction({
+      vendor: "AcceptedThenRemoved",
+      reviewed: true,
+      changedAt: new Date(),
+      removedAt: new Date(),
+      transaction: { create: transaction() },
+      account,
+    });
+
+    const { transactions } = await getUnreviewedTransactions({
+      data: { page: 1, pageSize: 10, view: "changed" },
+    });
+
+    expect(pluck(transactions, "vendor")).toEqual(["AcceptedThenRemoved"]);
+  });
 });

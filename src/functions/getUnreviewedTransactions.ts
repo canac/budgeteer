@@ -19,10 +19,11 @@ export const getUnreviewedTransactions = createServerFn()
   .handler(async ({ data: { page, pageSize, view, accountId } }) => {
     const viewWhere =
       view === "rejected"
-        ? { reviewed: true, transaction: { is: null } }
+        ? { reviewed: true, transaction: { is: null }, removedAt: null }
         : view === "changed"
-          ? { changedAt: { not: null }, transaction: { isNot: null } }
-          : { reviewed: false };
+          ? // Removed accepted transactions still appear under "changed"
+            { changedAt: { not: null }, transaction: { isNot: null } }
+          : { reviewed: false, removedAt: null };
     const where = { ...viewWhere, ...(accountId && { accountId }) };
     const [transactions, total] = await Promise.all([
       prisma.externalTransaction.findMany({
