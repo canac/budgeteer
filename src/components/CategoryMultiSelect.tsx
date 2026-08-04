@@ -1,5 +1,7 @@
 import type { UseFormReturnType } from "@mantine/form";
 import { CheckIcon, MultiSelect } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useRef } from "react";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { find } from "~/lib/collections";
 import { formatCurrency } from "~/lib/formatters";
@@ -24,6 +26,9 @@ export function CategoryMultiSelect({ form, categories }: CategoryMultiSelectPro
     label: category.name,
   }));
 
+  const [opened, { open, close }] = useDisclosure(false);
+  const hasPicked = useRef(false);
+
   return (
     <MultiSelect
       label="Category"
@@ -32,6 +37,16 @@ export function CategoryMultiSelect({ form, categories }: CategoryMultiSelectPro
       {...form.getInputProps("selectedCategoryIds")}
       required
       searchable
+      dropdownOpened={opened}
+      onDropdownOpen={open}
+      onDropdownClose={close}
+      onOptionSubmit={() => {
+        if (!hasPicked.current) {
+          // Optimize for the single-category case and close after the first pick
+          hasPicked.current = true;
+          close();
+        }
+      }}
       classNames={{ dropdown: "TransactionModal-dropdown" }}
       renderOption={({ option, checked }) => {
         const category = find(categories, "id", option.value);
