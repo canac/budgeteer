@@ -7,7 +7,7 @@ import { prisma } from "~/lib/prisma";
 const inputSchema = object({
   page: number().int().min(1).default(1),
   pageSize: number().int().min(1).max(200),
-  view: union([literal("unreviewed"), literal("changed"), literal("rejected")]).default(
+  view: union([literal("unreviewed"), literal("changed"), literal("dismissed")]).default(
     "unreviewed",
   ),
   accountId: optional(string()),
@@ -18,7 +18,7 @@ export const getUnreviewedTransactions = createServerFn()
   .middleware([requireAuth])
   .handler(async ({ data: { page, pageSize, view, accountId } }) => {
     const viewWhere =
-      view === "rejected"
+      view === "dismissed"
         ? { reviewed: true, transaction: { is: null }, removedAt: null }
         : view === "changed"
           ? // Removed accepted transactions still appear under "changed"

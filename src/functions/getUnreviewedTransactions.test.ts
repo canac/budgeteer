@@ -31,10 +31,10 @@ describe("getUnreviewedTransactions", () => {
     expect(result.transactions[0]!.account.id).toBe(accountId);
   });
 
-  it("returns only rejected transactions when view is rejected", async () => {
+  it("returns only dismissed transactions when view is dismissed", async () => {
     await Promise.all([
       createExternalTransaction({ vendor: "Pending", account }),
-      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({ vendor: "Dismissed", reviewed: true, account }),
       createExternalTransaction({
         vendor: "Accepted",
         reviewed: true,
@@ -44,15 +44,15 @@ describe("getUnreviewedTransactions", () => {
     ]);
 
     const result = await getUnreviewedTransactions({
-      data: { page: 1, pageSize: 10, view: "rejected" },
+      data: { page: 1, pageSize: 10, view: "dismissed" },
     });
-    expect(pluck(result.transactions, "vendor")).toEqual(["Rejected"]);
+    expect(pluck(result.transactions, "vendor")).toEqual(["Dismissed"]);
   });
 
   it("returns only accepted transactions flagged as changed when view is changed", async () => {
     await Promise.all([
       createExternalTransaction({ vendor: "Pending", account }),
-      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({ vendor: "Dismissed", reviewed: true, account }),
       createExternalTransaction({
         vendor: "AcceptedUnchanged",
         reviewed: true,
@@ -110,19 +110,19 @@ describe("getUnreviewedTransactions", () => {
     const otherAccount = { connect: { id: (await createExternalAccount()).id } };
     await Promise.all([
       createExternalTransaction({ vendor: "Pending", account }),
-      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({ vendor: "Dismissed", reviewed: true, account }),
       createExternalTransaction({
-        vendor: "RejectedElsewhere",
+        vendor: "DismissedElsewhere",
         reviewed: true,
         account: otherAccount,
       }),
     ]);
 
     const result = await getUnreviewedTransactions({
-      data: { page: 1, pageSize: 10, view: "rejected", accountId },
+      data: { page: 1, pageSize: 10, view: "dismissed", accountId },
     });
 
-    expect(pluck(result.transactions, "vendor")).toEqual(["Rejected"]);
+    expect(pluck(result.transactions, "vendor")).toEqual(["Dismissed"]);
   });
 
   it("attaches matching categorization rule with category", async () => {
@@ -148,13 +148,13 @@ describe("getUnreviewedTransactions", () => {
     expect(find(transactions, "vendor", "UNKNOWN")?.rule).toBeNull();
   });
 
-  it("excludes transactions Plaid has removed from the unreviewed and rejected views", async () => {
+  it("excludes transactions Plaid has removed from the unreviewed and dismissed views", async () => {
     await Promise.all([
       createExternalTransaction({ vendor: "Live", account }),
       createExternalTransaction({ vendor: "Removed", removedAt: new Date(), account }),
-      createExternalTransaction({ vendor: "Rejected", reviewed: true, account }),
+      createExternalTransaction({ vendor: "Dismissed", reviewed: true, account }),
       createExternalTransaction({
-        vendor: "RejectedThenRemoved",
+        vendor: "DismissedThenRemoved",
         reviewed: true,
         removedAt: new Date(),
         account,
@@ -162,13 +162,13 @@ describe("getUnreviewedTransactions", () => {
     ]);
 
     const unreviewed = await getUnreviewedTransactions({ data: { page: 1, pageSize: 10 } });
-    const rejected = await getUnreviewedTransactions({
-      data: { page: 1, pageSize: 10, view: "rejected" },
+    const dismissed = await getUnreviewedTransactions({
+      data: { page: 1, pageSize: 10, view: "dismissed" },
     });
 
     expect(pluck(unreviewed.transactions, "vendor")).toEqual(["Live"]);
     expect(unreviewed.total).toBe(1);
-    expect(pluck(rejected.transactions, "vendor")).toEqual(["Rejected"]);
+    expect(pluck(dismissed.transactions, "vendor")).toEqual(["Dismissed"]);
   });
 
   it("still shows an accepted transaction that Plaid removed under the changed view", async () => {

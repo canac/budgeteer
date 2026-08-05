@@ -559,7 +559,7 @@ describe("syncConnection — removed", () => {
     expect(tx.changedAt).toBeNull();
   });
 
-  it("records the removal of a rejected transaction without deleting it", async () => {
+  it("records the removal of a dismissed transaction without deleting it", async () => {
     const connection = await seed();
     await createExternalTransaction({
       id: "t1",

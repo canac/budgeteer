@@ -17,7 +17,7 @@ import { formatSignedCurrency, shortDateFormatter } from "~/lib/formatters";
 interface UnreviewedTransactionsProps {
   transactions: UnreviewedTransaction[];
   onAccept: (id: string) => void;
-  onReject: (id: string) => void;
+  onDismissed: (id: string) => void;
   onAcknowledge?: (id: string) => void;
   onReconcile?: (transaction: UnreviewedTransaction) => void;
   onEdit: (id: string) => void;
@@ -27,7 +27,7 @@ interface UnreviewedTransactionsProps {
 export function UnreviewedTransactions({
   transactions,
   onAccept,
-  onReject,
+  onDismissed,
   onAcknowledge,
   onReconcile,
   onEdit,
@@ -146,8 +146,8 @@ export function UnreviewedTransactions({
                         variant="subtle"
                         size="lg"
                         color="red"
-                        aria-label="Reject"
-                        onClick={() => onReject(transaction.id)}
+                        aria-label="Dismiss"
+                        onClick={() => onDismissed(transaction.id)}
                       >
                         <IconX />
                       </ActionIcon>

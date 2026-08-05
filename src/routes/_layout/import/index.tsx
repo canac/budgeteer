@@ -10,6 +10,7 @@ import { ExternalAccountSelect } from "~/components/ExternalAccountSelect";
 import { UnreviewedTransactions } from "~/components/UnreviewedTransactions";
 import { acceptTransaction as acceptTransactionFn } from "~/functions/acceptTransaction";
 import { acknowledgeTransactionChange as acknowledgeTransactionChangeFn } from "~/functions/acknowledgeTransactionChange";
+import { dismissTransaction as dismissTransactionFn } from "~/functions/dismissTransaction";
 import { getExternalAccounts } from "~/functions/getExternalAccounts";
 import {
   getUnreviewedTransactions,
@@ -17,18 +18,17 @@ import {
 } from "~/functions/getUnreviewedTransactions";
 import { importTransactions as importTransactionsFn } from "~/functions/importTransactions";
 import { reconcileTransaction as reconcileTransactionFn } from "~/functions/reconcileTransaction";
-import { rejectTransaction as rejectTransactionFn } from "~/functions/rejectTransaction";
 import { restoreTransaction as restoreTransactionFn } from "~/functions/restoreTransaction";
 import { useSyncedState } from "~/hooks/useSyncedState";
 import "./ImportPage.css";
 
 const PAGE_SIZE = 25;
 
-type View = "unreviewed" | "changed" | "rejected";
+type View = "unreviewed" | "changed" | "dismissed";
 
 const searchSchema = object({
   page: optional(coerce.number()),
-  view: optional(union([literal("unreviewed"), literal("changed"), literal("rejected")])),
+  view: optional(union([literal("unreviewed"), literal("changed"), literal("dismissed")])),
   account: optional(string()),
 });
 
@@ -37,7 +37,7 @@ function header(view: View, total: number): string {
   const headers: Record<View, string> = {
     unreviewed: `You have ${total} transaction${plural} pending review`,
     changed: `${total} accepted transaction${plural} changed at the bank`,
-    rejected: `${total} rejected transaction${plural}`,
+    dismissed: `${total} dismissed transaction${plural}`,
   };
   return headers[view];
 }
@@ -46,7 +46,7 @@ function empty(view: View, filteredByAccount: boolean): string {
   const messages: Record<View, string> = {
     unreviewed: "No unreviewed transactions",
     changed: "No changed transactions",
-    rejected: "No rejected transactions",
+    dismissed: "No dismissed transactions",
   };
   return `${messages[view]}${filteredByAccount ? " for this account" : ""}.`;
 }
@@ -75,7 +75,7 @@ function ImportTransactionsPage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const importTransactions = useServerFn(importTransactionsFn);
   const acceptTransaction = useServerFn(acceptTransactionFn);
-  const rejectTransaction = useServerFn(rejectTransactionFn);
+  const dismissTransaction = useServerFn(dismissTransactionFn);
   const acknowledgeTransactionChange = useServerFn(acknowledgeTransactionChangeFn);
   const reconcileTransaction = useServerFn(reconcileTransactionFn);
   const restoreTransaction = useServerFn(restoreTransactionFn);
@@ -113,9 +113,9 @@ function ImportTransactionsPage() {
     await router.invalidate();
   };
 
-  const handleReject = async (id: string) => {
+  const handleDismissed = async (id: string) => {
     removeTransaction(id);
-    await rejectTransaction({ data: { id } });
+    await dismissTransaction({ data: { id } });
     await router.invalidate();
   };
 
@@ -153,7 +153,7 @@ function ImportTransactionsPage() {
 
   const handleViewChange = async (value: string) => {
     const next: View | undefined =
-      value === "changed" ? "changed" : value === "rejected" ? "rejected" : undefined;
+      value === "changed" ? "changed" : value === "dismissed" ? "dismissed" : undefined;
     await navigate({
       search: (prev) => ({ ...prev, view: next, page: undefined }),
     });
@@ -182,7 +182,7 @@ function ImportTransactionsPage() {
         data={[
           { label: "Unreviewed", value: "unreviewed" },
           { label: "Changed", value: "changed" },
-          { label: "Rejected", value: "rejected" },
+          { label: "Dismissed", value: "dismissed" },
         ]}
       />
       {accounts.length > 0 && (
@@ -199,7 +199,7 @@ function ImportTransactionsPage() {
           <UnreviewedTransactions
             transactions={transactions}
             onAccept={handleAccept}
-            onReject={handleReject}
+            onDismissed={handleDismissed}
             onAcknowledge={handleAcknowledge}
             onReconcile={handleReconcile}
             onEdit={handleEdit}

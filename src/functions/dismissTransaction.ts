@@ -7,7 +7,7 @@ const inputSchema = object({
   id: string(),
 });
 
-export const rejectTransaction = createServerFn({ method: "POST" })
+export const dismissTransaction = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
