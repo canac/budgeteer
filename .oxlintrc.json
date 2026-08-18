@@ -4,6 +4,9 @@
   "options": {
     "typeAware": true
   },
+  "categories": {
+    "correctness": "error"
+  },
   "rules": {
     "no-console": "error",
     "object-shorthand": "error",
