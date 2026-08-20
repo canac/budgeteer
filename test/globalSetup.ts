@@ -1,10 +1,10 @@
-import "dotenv/config";
 import { exec } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import { Client } from "pg";
+import "../loadEnv.ts";
 
 const execAsync = promisify(exec);
 const CACHE_DIR = path.join(process.cwd(), "node_modules", ".cache", "vitest-db");

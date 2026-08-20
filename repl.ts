@@ -1,4 +1,5 @@
 import repl from "node:repl";
+import "./loadEnv.ts";
 import { prisma } from "./src/lib/prisma.ts";
 
 const r = repl.start();

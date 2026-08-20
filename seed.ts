@@ -1,3 +1,4 @@
+import "./loadEnv.ts";
 import { prisma } from "./src/lib/prisma.ts";
 
 // Delete all existing data
