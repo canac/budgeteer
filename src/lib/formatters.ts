@@ -1,3 +1,9 @@
+import {
+  differenceInCalendarDays,
+  differenceInMonths,
+  differenceInWeeks,
+  differenceInYears,
+} from "date-fns";
 import { penniesToDollars } from "./currencyConversion";
 
 export const shortDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -19,6 +25,27 @@ export const monthFormatter = new Intl.DateTimeFormat("en-US", {
 export const monthOnlyFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
 });
+
+const relativeFormatter = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
+
+export function formatRelativeDate(date: Date, now = new Date()): string {
+  const days = differenceInCalendarDays(date, now);
+  if (Math.abs(days) < 7) {
+    return relativeFormatter.format(days, "day");
+  }
+
+  const weeks = differenceInWeeks(date, now);
+  if (Math.abs(weeks) < 5) {
+    return relativeFormatter.format(weeks, "week");
+  }
+
+  const months = differenceInMonths(date, now);
+  if (Math.abs(months) < 12) {
+    return relativeFormatter.format(months, "month");
+  }
+
+  return relativeFormatter.format(differenceInYears(date, now), "year");
+}
 
 export const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

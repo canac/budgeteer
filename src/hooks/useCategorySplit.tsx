@@ -12,10 +12,16 @@ interface CategoryWithBalance {
   balance: number;
 }
 
+interface CategorySuggestion {
+  categoryId: string;
+  date: string;
+}
+
 export interface UseCategorySplitOptions {
   form: UseFormReturnType<CategorySplitFormValues>;
   categories: CategoryWithBalance[];
   total: number;
+  suggestions?: CategorySuggestion[];
   onCategoryChange?: (selectedCategoryIds: string[]) => void;
 }
 
@@ -37,6 +43,7 @@ export function useCategorySplit({
   form,
   categories,
   total,
+  suggestions,
   onCategoryChange,
 }: UseCategorySplitOptions): UseCategorySplitResult {
   const { categoryAmounts } = form.getValues();
@@ -58,7 +65,9 @@ export function useCategorySplit({
 
   return {
     remainingAmount: remaining,
-    categorySelect: <CategoryMultiSelect form={form} categories={categories} />,
+    categorySelect: (
+      <CategoryMultiSelect form={form} categories={categories} suggestions={suggestions} />
+    ),
     splitFields: (
       <CategorySplitFields form={form} categories={categories} remainingAmount={remaining} />
     ),

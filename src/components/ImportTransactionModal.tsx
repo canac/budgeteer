@@ -11,10 +11,12 @@ import {
 import { schemaResolver, useForm } from "@mantine/form";
 import clsx from "clsx";
 import { parseISO } from "date-fns";
+import { useCallback } from "react";
 import { boolean, minLength, object, refine, string } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import { acceptTransaction } from "~/functions/acceptTransaction";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
+import { getVendorCategorySuggestions } from "~/functions/getVendorCategorySuggestions";
 import { getVendors } from "~/functions/getVendors";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
@@ -25,6 +27,7 @@ import {
   categorySplitFields,
   splitTotalPennies,
 } from "~/lib/categorySplit";
+import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatSignedCurrency, fullDateFormatter } from "~/lib/formatters";
 
@@ -42,6 +45,18 @@ export function ImportTransactionModal({
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
   const vendors = useServerFnData(getVendors) ?? [];
   const { close, modalProps } = useOpened({ onClose });
+
+  const vendor = transaction.rule?.vendor ?? transaction.vendor;
+  const availableCategories = activeCategories(categories, transaction.date.slice(0, 7));
+  const loadSuggestions = useCallback(
+    ({ signal }: { signal: AbortSignal }) =>
+      getVendorCategorySuggestions({ data: { vendor }, signal }),
+    [vendor],
+  );
+  const availableCategoryIds = pluck(availableCategories, "id");
+  const suggestions = useServerFnData(loadSuggestions)?.filter(({ categoryId }) =>
+    availableCategoryIds.includes(categoryId),
+  );
 
   const sign = transaction.amount < 0 ? -1 : 1;
   const totalPennies = Math.abs(transaction.amount);
@@ -63,7 +78,7 @@ export function ImportTransactionModal({
   const form = useForm({
     validateInputOnBlur: true,
     initialValues: {
-      vendor: transaction.rule?.vendor ?? transaction.vendor,
+      vendor,
       description: "",
       selectedCategoryIds: transaction.rule?.category ? [transaction.rule.category.id] : [],
       categoryAmounts: transaction.rule?.category
@@ -77,8 +92,9 @@ export function ImportTransactionModal({
 
   const { categorySelect, splitFields } = useCategorySplit({
     form,
-    categories: activeCategories(categories, transaction.date.slice(0, 7)),
+    categories: availableCategories,
     total: totalDollars,
+    suggestions,
     onCategoryChange: (value) => {
       if (value.length !== 1) {
         form.setFieldValue("updateRuleCategory", false);
@@ -114,7 +130,7 @@ export function ImportTransactionModal({
       <form onSubmit={handleSubmit}>
         <Stack gap="md">
           <div>
-            <Text fw="bold">{transaction.rule?.vendor ?? transaction.vendor}</Text>
+            <Text fw="bold">{vendor}</Text>
             <Group justify="space-between" wrap="nowrap">
               <Text c="dimmed">{fullDateFormatter.format(parseISO(transaction.date))}</Text>
               <Text

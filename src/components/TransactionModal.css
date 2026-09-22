@@ -4,4 +4,22 @@
     height: 0.8em;
     opacity: 0.4;
   }
+
+  .option-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    width: 100%;
+  }
+
+  .option-date {
+    margin-left: auto;
+    padding-left: 1em;
+    color: var(--mantine-color-dimmed);
+    white-space: nowrap;
+  }
+}
+
+.TransactionModal-groupLabel {
+  text-transform: uppercase;
 }
