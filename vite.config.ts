@@ -13,5 +13,10 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  plugins: [tanstackStart(), react(), netlify()],
+  plugins: [
+    tanstackStart(),
+    react(),
+    // Edge functions dev server is broken with Deno 2.9 https://github.com/netlify/framework-adapters/issues/67
+    netlify({ dev: { edgeFunctions: { enabled: false } } }),
+  ],
 });
