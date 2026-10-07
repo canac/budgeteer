@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#MISE description="Replace the local database with a copy of prod"
+#MISE secrets=["PROD_DATABASE_URL"]
+
+set -euo pipefail
+
+dump=$(mktemp)
+trap 'rm -f "$dump"' EXIT
+
+if [[ "$DATABASE_URL" != *@localhost/* ]]; then
+  echo "Refusing to overwrite non-local database: $DATABASE_URL" >&2
+  exit 1
+fi
+
+# Create the database if it doesn't exist
+if ! psql --dbname "$DATABASE_URL" --command '' 2>/dev/null; then
+  createdb "${DATABASE_URL##*/}"
+fi
+
+pg_dump --format=custom --exclude-table 'neon_*' --file "$dump" "$PROD_DATABASE_URL"
+psql --dbname "$DATABASE_URL" --quiet --command 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
+pg_restore --no-owner --no-privileges --dbname "$DATABASE_URL" "$dump"

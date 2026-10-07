@@ -1,0 +1,11 @@
+root = true
+
+[providers]
+doppler = { type = "doppler", project = "budgeteer", config = "dev" }
+doppler_prd = { type = "doppler", project = "budgeteer", config = "prd" }
+
+[secrets]
+PLAID_ENV = { provider = "doppler", value = "PLAID_ENV" }
+PLAID_CLIENT_ID = { provider = "doppler", value = "PLAID_CLIENT_ID" }
+PLAID_SECRET = { provider = "doppler", value = "PLAID_SECRET" }
+PROD_DATABASE_URL = { provider = "doppler_prd", value = "DATABASE_URL" }

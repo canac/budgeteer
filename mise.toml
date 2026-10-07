@@ -1,0 +1,13 @@
+min_version = "2026.10.4"
+
+[settings]
+experimental = true
+
+[tools]
+fnox = "1.39"
+
+[env]
+_.file = ".env.local"
+DATABASE_URL = "postgres://postgres@localhost/{{ env.DATABASE_NAME | default(value='budgeteer') }}"
+
+[secrets.fnox]

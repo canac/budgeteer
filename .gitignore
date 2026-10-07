@@ -6,3 +6,4 @@
 /src/prisma/
 /src/routeTree.gen.ts
 /.env.local
+/fnox.local.toml
