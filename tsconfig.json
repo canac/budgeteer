@@ -3,9 +3,9 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "types": ["vite/client"],
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": ["DOM", "DOM.Iterable", "ES2024"],
     "isolatedModules": true,
     "resolveJsonModule": true,
     "noUncheckedIndexedAccess": true,
