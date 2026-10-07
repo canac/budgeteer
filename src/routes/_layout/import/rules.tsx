@@ -2,19 +2,25 @@ import { Stack, Text, TextInput } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { CategorizationRules, type Rule } from "~/components/CategorizationRules";
-import { getCategorizationRules } from "~/functions/getCategorizationRules";
+import type { VendorRules } from "~/lib/ruleLookup";
+import { ImportRules } from "~/components/ImportRules";
+import { getImportRules } from "~/functions/getImportRules";
+import { pluck } from "~/lib/collections";
 
-function matchesSearch(rule: Rule, search: string) {
+function matchesSearch(rule: VendorRules, search: string) {
   const query = search.toLowerCase();
-  return [rule.externalVendor, rule.vendor, rule.category?.name].some((field) =>
+  const categoryNames = [rule.vendorRule, ...pluck(rule.amountRules, "outcome")].flatMap(
+    (outcome) =>
+      outcome?.type === "categorize" ? pluck(pluck(outcome.splits, "category"), "name") : [],
+  );
+  return [rule.externalVendor, rule.vendorAlias, ...categoryNames].some((field) =>
     field?.toLowerCase().includes(query),
   );
 }
 
 export const Route = createFileRoute("/_layout/import/rules")({
   component: ImportRulesPage,
-  loader: () => getCategorizationRules(),
+  loader: () => getImportRules(),
   head: () => ({ meta: [{ title: "Rules | Budgeteer" }] }),
 });
 
@@ -36,7 +42,7 @@ function ImportRulesPage() {
       {filteredRules.length === 0 ? (
         <Text c="dimmed">{rules.length === 0 ? "No rules yet" : "No rules found"}</Text>
       ) : (
-        <CategorizationRules rules={filteredRules} />
+        <ImportRules rules={filteredRules} />
       )}
     </Stack>
   );

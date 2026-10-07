@@ -35,13 +35,21 @@ export async function validateCategoryDeletion(
           ? invalid("Cannot delete categories with transactions in the current or future months")
           : valid(),
       ),
-    prisma.categorizationRule
+    prisma.vendorRule
+      .findFirst({
+        where: { categoryId },
+        select: { externalVendor: true },
+      })
+      .then((rule) =>
+        rule ? invalid("Cannot delete categories used by an import rule") : valid(),
+      ),
+    prisma.amountRuleSplit
       .findFirst({
         where: { categoryId },
         select: { id: true },
       })
-      .then((rule) =>
-        rule ? invalid("Cannot delete categories used by a categorization rule") : valid(),
+      .then((split) =>
+        split ? invalid("Cannot delete categories used by an import rule") : valid(),
       ),
   ]);
   return firstInvalid(results);

@@ -1,6 +1,7 @@
 import {
+  createAmountRule,
   createBudget,
-  createCategorizationRule,
+  createVendorRule,
   createCategory,
   createTransaction,
 } from "test/mocks.ts";
@@ -52,11 +53,22 @@ describe("deleteCategory", () => {
     );
   });
 
-  it("rejects deletion when a categorization rule references the category", async () => {
-    await createCategorizationRule({ category: { connect: { id: categoryId } } });
+  it("rejects deletion when a vendor rule references the category", async () => {
+    await createVendorRule({ category: { connect: { id: categoryId } } });
 
     await expect(() => deleteCategory({ data: { categoryId, month: "2025-02" } })).rejects.toThrow(
-      /categorization rule/,
+      /import rule/,
+    );
+  });
+
+  it("rejects deletion when an amount rule's split references the category", async () => {
+    await createAmountRule({
+      amount: -1000,
+      splits: { create: [{ categoryId, amount: -1000 }] },
+    });
+
+    await expect(() => deleteCategory({ data: { categoryId, month: "2025-02" } })).rejects.toThrow(
+      /import rule/,
     );
   });
 });

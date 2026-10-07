@@ -8,9 +8,7 @@ import { coerce, literal, object, optional, string, union } from "zod/mini";
 import { DynamicReconcileTransactionModal } from "~/components/DynamicReconcileTransactionModal";
 import { ExternalAccountSelect } from "~/components/ExternalAccountSelect";
 import { UnreviewedTransactions } from "~/components/UnreviewedTransactions";
-import { acceptTransaction as acceptTransactionFn } from "~/functions/acceptTransaction";
 import { acknowledgeTransactionChange as acknowledgeTransactionChangeFn } from "~/functions/acknowledgeTransactionChange";
-import { dismissTransaction as dismissTransactionFn } from "~/functions/dismissTransaction";
 import { getExternalAccounts } from "~/functions/getExternalAccounts";
 import {
   getUnreviewedTransactions,
@@ -19,6 +17,7 @@ import {
 import { importTransactions as importTransactionsFn } from "~/functions/importTransactions";
 import { reconcileTransaction as reconcileTransactionFn } from "~/functions/reconcileTransaction";
 import { restoreTransaction as restoreTransactionFn } from "~/functions/restoreTransaction";
+import { reviewTransaction as reviewTransactionFn } from "~/functions/reviewTransaction";
 import { useSyncedState } from "~/hooks/useSyncedState";
 import "./ImportPage.css";
 
@@ -74,8 +73,7 @@ function ImportTransactionsPage() {
   const currentView: View = view ?? "unreviewed";
   const navigate = useNavigate({ from: Route.fullPath });
   const importTransactions = useServerFn(importTransactionsFn);
-  const acceptTransaction = useServerFn(acceptTransactionFn);
-  const dismissTransaction = useServerFn(dismissTransactionFn);
+  const reviewTransaction = useServerFn(reviewTransactionFn);
   const acknowledgeTransactionChange = useServerFn(acknowledgeTransactionChangeFn);
   const reconcileTransaction = useServerFn(reconcileTransactionFn);
   const restoreTransaction = useServerFn(restoreTransactionFn);
@@ -107,23 +105,48 @@ function ImportTransactionsPage() {
     }
   };
 
-  const handleAccept = async (id: string) => {
+  const reviewOptimistically = async (id: string, action: () => Promise<unknown>) => {
     removeTransaction(id);
-    await acceptTransaction({ data: { id } });
-    await router.invalidate();
+    try {
+      await action();
+    } catch {
+    } finally {
+      await router.invalidate();
+    }
   };
 
-  const handleDismissed = async (id: string) => {
-    removeTransaction(id);
-    await dismissTransaction({ data: { id } });
-    await router.invalidate();
+  const handleAccept = async (transaction: UnreviewedTransaction) => {
+    const { suggestion } = transaction;
+    const suggested = suggestion?.outcome;
+    if (suggested?.type !== "categorize") {
+      return;
+    }
+
+    await reviewOptimistically(transaction.id, () =>
+      reviewTransaction({
+        data: {
+          id: transaction.id,
+          decision: {
+            type: "accept",
+            vendor: suggestion?.vendorAlias ?? transaction.vendor,
+            updateAlias: false,
+            splits: suggested.splits.map(({ category, amount }) => ({
+              categoryId: category.id,
+              amount,
+            })),
+          },
+        },
+      }),
+    );
   };
 
-  const handleAcknowledge = async (id: string) => {
-    removeTransaction(id);
-    await acknowledgeTransactionChange({ data: { id } });
-    await router.invalidate();
-  };
+  const handleDismissed = async (id: string) =>
+    reviewOptimistically(id, () =>
+      reviewTransaction({ data: { id, decision: { type: "dismiss" } } }),
+    );
+
+  const handleAcknowledge = async (id: string) =>
+    reviewOptimistically(id, () => acknowledgeTransactionChange({ data: { id } }));
 
   const handleReconcile = async (transaction: UnreviewedTransaction) => {
     // Splits can't be reconciled automatically; open the modal so the user redistributes them.
@@ -131,21 +154,19 @@ function ImportTransactionsPage() {
       setReconciling(transaction);
       return;
     }
-    removeTransaction(transaction.id);
-    await reconcileTransaction({ data: { id: transaction.id } });
-    await router.invalidate();
+
+    await reviewOptimistically(transaction.id, () =>
+      reconcileTransaction({ data: { id: transaction.id } }),
+    );
   };
 
-  const handleEdit = async (id: string) => {
+  const handleReviewed = async (id: string) => {
     removeTransaction(id);
     await router.invalidate();
   };
 
-  const handleRestore = async (id: string) => {
-    removeTransaction(id);
-    await restoreTransaction({ data: { id } });
-    await router.invalidate();
-  };
+  const handleRestore = async (id: string) =>
+    reviewOptimistically(id, () => restoreTransaction({ data: { id } }));
 
   const handlePageChange = async (newPage: number) => {
     await navigate({ search: (prev) => ({ ...prev, page: newPage }) });
@@ -202,7 +223,7 @@ function ImportTransactionsPage() {
             onDismissed={handleDismissed}
             onAcknowledge={handleAcknowledge}
             onReconcile={handleReconcile}
-            onEdit={handleEdit}
+            onReviewed={handleReviewed}
             onRestore={handleRestore}
           />
           {totalPages > 1 && (

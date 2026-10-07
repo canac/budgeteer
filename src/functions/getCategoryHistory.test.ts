@@ -1,4 +1,4 @@
-import { createBudget, createCategorizationRule, createCategory } from "test/mocks.ts";
+import { createBudget, createCategory, createVendorRule } from "test/mocks.ts";
 import { beforeEach, describe, expect, it } from "vitest";
 import { getPrisma } from "../../test/helpers.ts";
 import { getCategoryHistory } from "./getCategoryHistory.ts";
@@ -37,8 +37,8 @@ describe("getCategoryHistory", () => {
     expect(result.deletable).toEqual({ valid: true });
   });
 
-  it("reports the category as not deletable when a categorization rule references it", async () => {
-    await createCategorizationRule({ category: { connect: { id: categoryId } } });
+  it("reports the category as not deletable when a vendor rule references it", async () => {
+    await createVendorRule({ category: { connect: { id: categoryId } } });
 
     const result = await getCategoryHistory({
       data: { categoryId, startMonth: "2025-01", endMonth: "2025-01" },

@@ -22,7 +22,6 @@ export interface UseCategorySplitOptions {
   categories: CategoryWithBalance[];
   total: number;
   suggestions?: CategorySuggestion[];
-  onCategoryChange?: (selectedCategoryIds: string[]) => void;
 }
 
 export interface UseCategorySplitResult {
@@ -44,7 +43,6 @@ export function useCategorySplit({
   categories,
   total,
   suggestions,
-  onCategoryChange,
 }: UseCategorySplitOptions): UseCategorySplitResult {
   const { categoryAmounts } = form.getValues();
 
@@ -58,7 +56,6 @@ export function useCategorySplit({
         total,
       }),
     );
-    onCategoryChange?.(value);
   });
 
   const remaining = remainingAmount(dollarsToPennies(total), categoryAmounts);

@@ -1,8 +1,42 @@
 import { createServerFn } from "@tanstack/react-start";
 import { literal, number, object, optional, string, union } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { pluck } from "~/lib/collections";
+import { find, pluck } from "~/lib/collections";
 import { prisma } from "~/lib/prisma";
+import { loadRules, type RuleOutcome, type VendorRules } from "~/lib/ruleLookup";
+
+interface Suggestion {
+  vendorAlias: string | null;
+  /** null suggests only the alias */
+  outcome: RuleOutcome | null;
+  amountRule: boolean;
+}
+
+export function suggestRule(
+  { vendorAlias, vendorRule, amountRules }: VendorRules,
+  amount: number,
+): Suggestion | null {
+  const amountRule = find(amountRules, "amount", amount);
+  if (amountRule) {
+    return { vendorAlias, outcome: amountRule.outcome, amountRule: true };
+  }
+
+  if (vendorRule) {
+    return {
+      vendorAlias,
+      outcome:
+        vendorRule.type === "categorize"
+          ? {
+              type: "categorize",
+              splits: vendorRule.splits.map(({ category }) => ({ category, amount })),
+            }
+          : vendorRule,
+      amountRule: false,
+    };
+  }
+
+  return vendorAlias ? { vendorAlias, outcome: null, amountRule: false } : null;
+}
 
 const inputSchema = object({
   page: number().int().min(1).default(1),
@@ -39,21 +73,15 @@ export const getUnreviewedTransactions = createServerFn()
       prisma.externalTransaction.count({ where }),
     ]);
 
-    const rules = await prisma.categorizationRule.findMany({
-      where: { externalVendor: { in: pluck(transactions, "vendor") } },
-      include: {
-        category: {
-          select: { id: true, name: true },
-        },
-      },
-    });
-    const ruleByVendor = new Map(rules.map((rule) => [rule.externalVendor, rule]));
-
+    const rules = await loadRules(pluck(transactions, "vendor"));
     return {
-      transactions: transactions.map((transaction) => ({
-        ...transaction,
-        rule: ruleByVendor.get(transaction.vendor) ?? null,
-      })),
+      transactions: transactions.map((transaction) => {
+        const vendorRules = rules.get(transaction.vendor);
+        return {
+          ...transaction,
+          suggestion: vendorRules ? suggestRule(vendorRules, transaction.amount) : null,
+        };
+      }),
       total,
     };
   });

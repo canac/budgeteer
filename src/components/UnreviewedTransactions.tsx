@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Group, Text } from "@mantine/core";
+import { ActionIcon, Group, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
   IconArrowBackUp,
@@ -10,17 +10,18 @@ import {
 import { parseISO } from "date-fns";
 import { useState } from "react";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
-import { DynamicImportTransactionModal } from "~/components/DynamicImportTransactionModal";
+import { DynamicReviewTransactionModal } from "~/components/DynamicReviewTransactionModal";
 import { List, ListRow } from "~/components/List";
+import { RuleBadges } from "~/components/RuleBadges";
 import { formatSignedCurrency, shortDateFormatter } from "~/lib/formatters";
 
 interface UnreviewedTransactionsProps {
   transactions: UnreviewedTransaction[];
-  onAccept: (id: string) => void;
+  onAccept: (transaction: UnreviewedTransaction) => void;
   onDismissed: (id: string) => void;
   onAcknowledge?: (id: string) => void;
   onReconcile?: (transaction: UnreviewedTransaction) => void;
-  onEdit: (id: string) => void;
+  onReviewed: (id: string) => void;
   onRestore?: (id: string) => void;
 }
 
@@ -30,22 +31,22 @@ export function UnreviewedTransactions({
   onDismissed,
   onAcknowledge,
   onReconcile,
-  onEdit,
+  onReviewed,
   onRestore,
 }: UnreviewedTransactionsProps) {
   const [modalOpen, { open, close }] = useDisclosure(false);
-  const [importingTransaction, setImportingTransaction] = useState<
+  const [reviewingTransaction, setReviewingTransaction] = useState<
     UnreviewedTransaction | undefined
   >(undefined);
 
-  const openImport = (transaction: UnreviewedTransaction) => {
-    setImportingTransaction(transaction);
+  const openReview = (transaction: UnreviewedTransaction) => {
+    setReviewingTransaction(transaction);
     open();
   };
 
-  const handleImport = () => {
-    if (importingTransaction) {
-      onEdit(importingTransaction.id);
+  const handleReviewed = () => {
+    if (reviewingTransaction) {
+      onReviewed(reviewingTransaction.id);
     }
   };
 
@@ -53,14 +54,17 @@ export function UnreviewedTransactions({
     <>
       <List>
         {transactions.map((transaction) => {
-          const vendor = transaction.rule?.vendor ?? transaction.vendor;
-          const category = transaction.rule?.category?.name;
+          const { suggestion } = transaction;
+          const vendor = suggestion?.vendorAlias ?? transaction.vendor;
+          const suggested = suggestion?.outcome ?? null;
+          const outcome = transaction.reviewed && suggested?.type === "dismiss" ? null : suggested;
 
           return (
             <ListRow
               key={transaction.id}
+              className={outcome?.type === "dismiss" ? "dismiss-suggested" : undefined}
               title={
-                transaction.rule ? (
+                suggestion?.vendorAlias ? (
                   vendor
                 ) : (
                   <Text span fs="italic">
@@ -76,13 +80,7 @@ export function UnreviewedTransactions({
                   </Text>
                 </>
               }
-              tags={
-                category ? (
-                  <Badge variant="light" color="gray" size="lg" tt="none">
-                    {category}
-                  </Badge>
-                ) : undefined
-              }
+              tags={<RuleBadges outcome={outcome} />}
               value={
                 <Text className={transaction.amount >= 0 ? "positive" : undefined}>
                   {formatSignedCurrency(transaction.amount)}
@@ -128,8 +126,10 @@ export function UnreviewedTransactions({
                         size="lg"
                         color="green"
                         aria-label="Accept"
-                        style={{ visibility: transaction.rule?.category ? undefined : "hidden" }}
-                        onClick={() => onAccept(transaction.id)}
+                        style={{
+                          visibility: outcome?.type === "categorize" ? undefined : "hidden",
+                        }}
+                        onClick={() => onAccept(transaction)}
                       >
                         <IconCheck />
                       </ActionIcon>
@@ -137,8 +137,8 @@ export function UnreviewedTransactions({
                         variant="subtle"
                         size="lg"
                         color="blue"
-                        aria-label="Edit"
-                        onClick={() => openImport(transaction)}
+                        aria-label="Review"
+                        onClick={() => openReview(transaction)}
                       >
                         <IconEdit />
                       </ActionIcon>
@@ -159,11 +159,11 @@ export function UnreviewedTransactions({
           );
         })}
       </List>
-      {modalOpen && importingTransaction && (
-        <DynamicImportTransactionModal
+      {modalOpen && reviewingTransaction && (
+        <DynamicReviewTransactionModal
           onClose={close}
-          onSave={handleImport}
-          transaction={importingTransaction}
+          onSave={handleReviewed}
+          transaction={reviewingTransaction}
         />
       )}
     </>

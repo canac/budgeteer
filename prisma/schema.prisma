@@ -44,7 +44,8 @@ model Category {
   budgetCategories      BudgetCategory[]
   transfersFrom         Transfer[]            @relation("TransferSource")
   transfersTo           Transfer[]            @relation("TransferDestination")
-  categorizationRules   CategorizationRule[]
+  vendorRules           VendorRule[]
+  ruleSplits            AmountRuleSplit[]
 }
 
 model BudgetCategory {
@@ -140,12 +141,43 @@ model ExternalTransaction {
   transaction Transaction?
 }
 
-model CategorizationRule {
-  id             String    @id @default(uuid(7))
+model VendorAlias {
+  externalVendor String   @id
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  vendor         String
+}
+
+model VendorRule {
+  externalVendor String    @id
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-  externalVendor String    @unique
-  vendor         String
+  /// Null dismisses
   categoryId     String?
-  category       Category? @relation(fields: [categoryId], references: [id])
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+}
+
+model AmountRule {
+  id             String            @id @default(uuid(7))
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  externalVendor String
+  amount         Int
+  /// Empty dismisses
+  splits         AmountRuleSplit[]
+
+  @@unique([externalVendor, amount])
+}
+
+model AmountRuleSplit {
+  id           String     @id @default(uuid(7))
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  amount       Int
+  amountRuleId String
+  amountRule   AmountRule @relation(fields: [amountRuleId], references: [id], onDelete: Cascade)
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id])
+
+  @@unique([amountRuleId, categoryId])
 }

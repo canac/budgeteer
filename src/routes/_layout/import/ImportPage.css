@@ -6,4 +6,8 @@
   .header {
     min-width: min(100%, max-content);
   }
+
+  .list-row.dismiss-suggested {
+    opacity: 0.6;
+  }
 }

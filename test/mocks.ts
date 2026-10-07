@@ -1,12 +1,15 @@
 import type {
+  AmountRuleCreateInput,
+  AmountRuleSplitCreateInput,
   BudgetCategoryCreateInput,
   BudgetCreateInput,
-  CategorizationRuleCreateInput,
   CategoryCreateInput,
   ExternalAccountCreateInput,
   ExternalConnectionCreateInput,
   ExternalTransactionCreateInput,
   TransactionCreateInput,
+  VendorAliasCreateInput,
+  VendorRuleCreateInput,
 } from "src/prisma/models";
 import { faker } from "@faker-js/faker";
 import { getPrisma } from "./helpers";
@@ -73,11 +76,27 @@ export const transaction = (fields?: Partial<TransactionCreateInput>): Transacti
   ...fields,
 });
 
-export const categorizationRule = (
-  fields?: Partial<CategorizationRuleCreateInput>,
-): CategorizationRuleCreateInput => ({
+export const vendorAlias = (fields?: Partial<VendorAliasCreateInput>): VendorAliasCreateInput => ({
   externalVendor: faker.company.name().toUpperCase(),
   vendor: faker.company.name(),
+  ...fields,
+});
+
+export const vendorRule = (fields?: Partial<VendorRuleCreateInput>): VendorRuleCreateInput => ({
+  externalVendor: faker.company.name().toUpperCase(),
+  ...fields,
+});
+
+export const amountRule = (fields?: Partial<AmountRuleCreateInput>): AmountRuleCreateInput => ({
+  externalVendor: faker.company.name().toUpperCase(),
+  amount: -faker.number.int({ min: 100, max: 50000 }),
+  ...fields,
+});
+
+export const amountRuleSplit = (
+  fields: WithRequired<AmountRuleSplitCreateInput, "amountRule" | "category">,
+): AmountRuleSplitCreateInput => ({
+  amount: -faker.number.int({ min: 100, max: 50000 }),
   ...fields,
 });
 
@@ -99,8 +118,17 @@ export const createCategory = (...args: Parameters<typeof category>) =>
 export const createTransaction = (...args: Parameters<typeof transaction>) =>
   getPrisma().transaction.create({ data: transaction(...args) });
 
-export const createCategorizationRule = (...args: Parameters<typeof categorizationRule>) =>
-  getPrisma().categorizationRule.create({ data: categorizationRule(...args) });
+export const createVendorAlias = (...args: Parameters<typeof vendorAlias>) =>
+  getPrisma().vendorAlias.create({ data: vendorAlias(...args) });
+
+export const createVendorRule = (...args: Parameters<typeof vendorRule>) =>
+  getPrisma().vendorRule.create({ data: vendorRule(...args) });
 
 export const createBudgetCategory = (...args: Parameters<typeof budgetCategory>) =>
   getPrisma().budgetCategory.create({ data: budgetCategory(...args) });
+
+export const createAmountRule = (...args: Parameters<typeof amountRule>) =>
+  getPrisma().amountRule.create({ data: amountRule(...args) });
+
+export const createAmountRuleSplit = (...args: Parameters<typeof amountRuleSplit>) =>
+  getPrisma().amountRuleSplit.create({ data: amountRuleSplit(...args) });

@@ -1,0 +1,17 @@
+.List.ImportRules .list-row {
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "title actions"
+    "bottom actions";
+}
+
+.ImportRules .rule-separator {
+  margin-inline: var(--mantine-spacing-xs);
+  color: var(--mantine-color-dimmed);
+}
+
+.ImportRules .rule-amount {
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
