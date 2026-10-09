@@ -9,6 +9,7 @@ import { MantineButtonLink } from "~/components/MantineButtonLink";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
+import { useToday } from "~/hooks/useToday";
 import { amountSignClassname, formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
 import "./BudgetPage.css";
@@ -39,6 +40,7 @@ function BudgetLayout() {
   const { budget, totalBudgetedAmount, budgetMonths, leftoverRemaining } = Route.useLoaderData();
   const { leftover } = Route.useSearch();
   const matchRoute = useMatchRoute();
+  const today = useToday();
   const onTransactions = !!matchRoute({ to: "/budget/$month/transactions" });
   const leftToBudget = budget.income - totalBudgetedAmount;
 
@@ -47,7 +49,7 @@ function BudgetLayout() {
       ? undefined
       : toISOMonthString(subMonths(parseISO(budget.month), 1));
   const nextMonth =
-    budget.month === toISOMonthString(new Date())
+    budget.month === toISOMonthString(today)
       ? undefined
       : toISOMonthString(addMonths(parseISO(budget.month), 1));
 

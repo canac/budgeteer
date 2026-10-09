@@ -10,7 +10,6 @@
   "rules": {
     "no-console": "error",
     "object-shorthand": "error",
-    "react/react-compiler": "error",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/await-thenable": "error",
     "typescript/ban-ts-comment": "error",

@@ -20,6 +20,7 @@ import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
+import { useToday } from "~/hooks/useToday";
 import { activeCategories } from "~/lib/activeCategories";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency, fullDateFormatter } from "~/lib/formatters";
@@ -66,12 +67,13 @@ export function TransferModal({
   });
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
   const { close, modalProps } = useOpened({ onClose });
+  const today = useToday();
 
   const isEditing = !!editingTransfer;
 
   const transferDate = editingTransfer
     ? parseISO(editingTransfer.date)
-    : endOfMonth(typeof month === "string" ? parseISO(month) : new Date());
+    : endOfMonth(typeof month === "string" ? parseISO(month) : today);
 
   const sortedCategories = useSortedCategories(
     activeCategories(categories, toISOMonthString(transferDate)),

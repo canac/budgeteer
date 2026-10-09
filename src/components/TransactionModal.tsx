@@ -22,6 +22,7 @@ import { getVendors } from "~/functions/getVendors";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
+import { useToday } from "~/hooks/useToday";
 import { activeCategories } from "~/lib/activeCategories";
 import {
   CATEGORY_TOTAL_MISMATCH,
@@ -83,6 +84,7 @@ export function TransactionModal({
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
   const firstMonth = useServerFnData(getFirstMonth);
   const { close, modalProps } = useOpened({ onClose });
+  const today = useToday();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isEditing = !!editingTransaction;
@@ -107,7 +109,7 @@ export function TransactionModal({
           amount: 0,
           vendor: "",
           description: "",
-          date: toISODateString(new Date()),
+          date: toISODateString(today),
           isIncome: false,
           selectedCategoryIds: initialCategoryId ? [initialCategoryId] : [],
           categoryAmounts: initialCategoryId ? [{ categoryId: initialCategoryId, amount: 0 }] : [],
@@ -117,7 +119,7 @@ export function TransactionModal({
 
   const { selectedCategoryIds, amount, date } = form.getValues();
 
-  const categoryMonth = date.length >= 7 ? date.slice(0, 7) : toISOMonthString(new Date());
+  const categoryMonth = date.length >= 7 ? date.slice(0, 7) : toISOMonthString(today);
   const { categorySelect, splitFields } = useCategorySplit({
     form,
     categories: activeCategories(categories, categoryMonth),

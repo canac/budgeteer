@@ -8,6 +8,7 @@ import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { PageContainer } from "~/components/PageContainer";
 import { TransactionList } from "~/components/TransactionList";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
+import { useToday } from "~/hooks/useToday";
 import { formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
 
@@ -68,7 +69,8 @@ function CategoryHistoryPage() {
   const { range, transfers } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
-  const currentMonth = toISOMonthString(new Date());
+  const today = useToday();
+  const currentMonth = toISOMonthString(today);
 
   const { startMonth, endMonth, totalBudgeted, totalSpent } = categoryHistory;
   const startMonthFormatted = monthFormatter.format(parseISO(startMonth));

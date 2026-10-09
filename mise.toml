@@ -5,6 +5,7 @@ experimental = true
 
 [tools]
 fnox = "1.39"
+node = "24.21.0"
 
 [env]
 _.file = ".env.local"

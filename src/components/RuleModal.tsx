@@ -7,6 +7,7 @@ import { updateRule } from "~/functions/updateRule";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
+import { useToday } from "~/hooks/useToday";
 import { activeCategories } from "~/lib/activeCategories";
 import { CATEGORY_TOTAL_MISMATCH, splitTotalPennies } from "~/lib/categorySplit";
 import { pluck } from "~/lib/collections";
@@ -70,9 +71,10 @@ export function RuleModal({ onClose, onSave, draft }: RuleModalProps) {
     },
   });
 
+  const today = useToday();
   const { categorySelect, splitFields } = useCategorySplit({
     form,
-    categories: activeCategories(categories, new Date().toISOString().slice(0, 7)),
+    categories: activeCategories(categories, today.toISOString().slice(0, 7)),
     total: totalDollars,
   });
 

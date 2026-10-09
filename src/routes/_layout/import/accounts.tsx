@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useState } from "react";
 import { usePlaidLink, type PlaidLinkOnExit, type PlaidLinkOnSuccess } from "react-plaid-link";
 import { extractErrorMessage } from "src/lib/error";
+import invariant from "tiny-invariant";
 import { createLinkToken as createLinkTokenFn } from "~/functions/createLinkToken";
 import { createUpdateLinkToken as createUpdateLinkTokenFn } from "~/functions/createUpdateLinkToken";
 import { exchangePublicToken as exchangePublicTokenFn } from "~/functions/exchangePublicToken";
@@ -47,6 +48,7 @@ function AccountsPage() {
         if (reconnectId) {
           await markConnectionReconnected({ data: { connectionId: reconnectId } });
         } else {
+          invariant(publicToken, "Plaid did not return a public token");
           await exchangePublicToken({
             data: { publicToken, institution: metadata.institution?.name ?? "Unknown" },
           });
@@ -74,7 +76,7 @@ function AccountsPage() {
       if (error) {
         notifications.show({
           title: "Connection error",
-          message: error.display_message,
+          message: error.display_message ?? error.error_message,
           color: "red",
         });
       }
