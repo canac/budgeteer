@@ -2,7 +2,7 @@ import { parseISO } from "date-fns";
 import type { ExternalAccount, ExternalConnection } from "~/prisma/client";
 import { prisma } from "~/lib/prisma";
 import type { PlaidSyncPage, PlaidTransaction } from "./types";
-import { pluck } from "../collections";
+import { find, pluck } from "../collections";
 import { dollarsToPennies } from "../currencyConversion";
 import { toISODateString } from "../iso";
 import { PlaidClient, PlaidError } from "./client";
@@ -93,55 +93,55 @@ async function applyAdded(
 }
 
 async function applyModified(modified: PlaidTransaction[]): Promise<void> {
-  for (const tx of modified) {
-    const existing = await prisma.externalTransaction.findUnique({
-      where: { id: tx.transaction_id },
-      include: { transaction: true },
-    });
-    if (!existing) {
-      continue;
-    }
+  const existingTransactions = await prisma.externalTransaction.findMany({
+    where: { id: { in: pluck(modified, "transaction_id") } },
+    include: { transaction: true },
+  });
 
-    const amount = extractAmount(tx);
-    const date = extractDate(tx);
-    // Flag accepted transactions as modified when the amount changes
-    const modified = existing.transaction !== null && amount !== existing.amount;
-    const moved = existing.transaction !== null && date !== existing.date;
-    await prisma.externalTransaction.update({
-      where: { id: tx.transaction_id },
-      data: {
-        amount,
-        date,
-        vendor: extractVendor(tx),
-        ...(modified ? { changedAt: new Date() } : {}),
-        ...(moved ? { transaction: { update: { date } } } : {}),
-      },
-    });
-  }
+  await Promise.all(
+    modified.map(async (tx) => {
+      const existing = find(existingTransactions, "id", tx.transaction_id);
+      if (!existing) {
+        return;
+      }
+
+      const amount = extractAmount(tx);
+      const date = extractDate(tx);
+      // Flag accepted transactions as modified when the amount changes
+      const modified = existing.transaction !== null && amount !== existing.amount;
+      const moved = existing.transaction !== null && date !== existing.date;
+      await prisma.externalTransaction.update({
+        where: { id: tx.transaction_id },
+        data: {
+          amount,
+          date,
+          vendor: extractVendor(tx),
+          ...(modified ? { changedAt: new Date() } : {}),
+          ...(moved ? { transaction: { update: { date } } } : {}),
+        },
+      });
+    }),
+  );
 }
 
 async function applyRemoved(removed: { transaction_id: string }[]): Promise<void> {
-  for (const { transaction_id } of removed) {
-    const existing = await prisma.externalTransaction.findUnique({
-      where: { id: transaction_id },
-      include: { transaction: true },
-    });
-    if (!existing) {
-      continue;
-    }
-    if (existing.removedAt !== null) {
-      continue;
-    }
+  const existingTransactions = await prisma.externalTransaction.findMany({
+    where: { id: { in: pluck(removed, "transaction_id") }, removedAt: null },
+    include: { transaction: true },
+  });
 
-    await prisma.externalTransaction.update({
-      where: { id: transaction_id },
-      data: {
-        removedAt: new Date(),
-        // Flag accepted transactions as changed so the removal surfaces for review
-        ...(existing.transaction ? { changedAt: new Date() } : {}),
-      },
-    });
-  }
+  await Promise.all(
+    existingTransactions.map((existing) =>
+      prisma.externalTransaction.update({
+        where: { id: existing.id },
+        data: {
+          removedAt: new Date(),
+          // Flag accepted transactions as changed so the removal surfaces for review
+          ...(existing.transaction ? { changedAt: new Date() } : {}),
+        },
+      }),
+    ),
+  );
 }
 
 export async function syncConnection(connection: ConnectionWithAccounts): Promise<SyncCount> {
@@ -157,6 +157,7 @@ export async function syncConnection(connection: ConnectionWithAccounts): Promis
     let cursor = connection.cursor;
     let imported = 0;
     let hasMore = true;
+    /* oxlint-disable no-await-in-loop */
     while (hasMore) {
       const page: PlaidSyncPage = await client.syncTransactions(connection.accessToken, cursor);
 
@@ -171,6 +172,7 @@ export async function syncConnection(connection: ConnectionWithAccounts): Promis
         data: { cursor },
       });
     }
+    /* oxlint-enable no-await-in-loop */
 
     // A successful sync clears any previous reauthenticate flag
     await prisma.externalConnection.update({

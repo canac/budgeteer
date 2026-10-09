@@ -148,13 +148,15 @@ describe("updateRule", () => {
   describe("amount scope", () => {
     const amountRuleWith = async (splits: Array<{ categoryId: string; amount?: number }>) => {
       const rule = await createAmountRule({ externalVendor, amount: -1245 });
-      for (const { categoryId, amount } of splits) {
-        await createAmountRuleSplit({
-          amountRule: { connect: { id: rule.id } },
-          category: { connect: { id: categoryId } },
-          amount: amount ?? -1245,
-        });
-      }
+      await Promise.all(
+        splits.map(({ categoryId, amount }) =>
+          createAmountRuleSplit({
+            amountRule: { connect: { id: rule.id } },
+            category: { connect: { id: categoryId } },
+            amount: amount ?? -1245,
+          }),
+        ),
+      );
       return rule;
     };
 

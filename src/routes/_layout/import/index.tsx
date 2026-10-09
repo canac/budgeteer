@@ -90,29 +90,25 @@ function ImportTransactionsPage() {
 
   const handleImport = async () => {
     setImporting(true);
-    try {
-      const { imported, failed } = await importTransactions();
-      notifications.show({
-        title: failed ? "Import finished with errors" : "Import completed",
-        message:
-          `Imported ${imported} new transaction${imported === 1 ? "" : "s"}.` +
-          (failed ? ` ${failed} connection${failed === 1 ? "" : "s"} failed to sync.` : ""),
-        color: failed ? "yellow" : "green",
-      });
-      await router.invalidate();
-    } finally {
-      setImporting(false);
-    }
+    await importTransactions()
+      .then(async ({ imported, failed }) => {
+        notifications.show({
+          title: failed ? "Import finished with errors" : "Import completed",
+          message:
+            `Imported ${imported} new transaction${imported === 1 ? "" : "s"}.` +
+            (failed ? ` ${failed} connection${failed === 1 ? "" : "s"} failed to sync.` : ""),
+          color: failed ? "yellow" : "green",
+        });
+        await router.invalidate();
+      })
+      .finally(() => setImporting(false));
   };
 
   const reviewOptimistically = async (id: string, action: () => Promise<unknown>) => {
     removeTransaction(id);
-    try {
-      await action();
-    } catch {
-    } finally {
-      await router.invalidate();
-    }
+    await action()
+      .catch(() => {})
+      .finally(() => router.invalidate());
   };
 
   const handleAccept = async (transaction: UnreviewedTransaction) => {

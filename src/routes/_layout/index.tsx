@@ -24,7 +24,12 @@ function isChartDatum(value: unknown): value is ChartDatum {
   return typeof value === "object" && value !== null && "percentageSpent" in value;
 }
 
-function Tooltip({ datum }: { datum: ChartDatum }) {
+function Tooltip({ payload }: { payload: ReadonlyArray<{ payload?: unknown }> }) {
+  const datum: unknown = payload[0]?.payload;
+  if (!isChartDatum(datum)) {
+    return null;
+  }
+
   return (
     <Paper px="md" py="sm" shadow="md" radius="md" withBorder miw={200}>
       <Text fw={500} mb="xs">
@@ -158,12 +163,7 @@ function OverviewPage() {
               valueFormatter={(value) => percentageFormatter.format(value)}
               xAxisProps={{ domain: [0, 1], allowDataOverflow: true }}
               yAxisProps={{ width: 100 }}
-              tooltipProps={{
-                content: ({ payload }) => {
-                  const datum: unknown = payload[0]?.payload;
-                  return isChartDatum(datum) ? <Tooltip datum={datum} /> : null;
-                },
-              }}
+              tooltipProps={{ content: Tooltip }}
             />
           </Stack>
         </Card>

@@ -31,10 +31,12 @@ export interface CategoryMultiSelectProps {
   suggestions?: CategorySuggestion[];
 }
 
+const NO_SUGGESTIONS: CategorySuggestion[] = [];
+
 export function CategoryMultiSelect({
   form,
   categories,
-  suggestions = [],
+  suggestions = NO_SUGGESTIONS,
 }: CategoryMultiSelectProps) {
   const sortedCategories = useSortedCategories(categories);
 

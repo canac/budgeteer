@@ -5,11 +5,17 @@
     "typeAware": true
   },
   "categories": {
-    "correctness": "error"
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
   },
   "rules": {
     "no-console": "error",
+    "no-shadow": "off",
+    "no-underscore-dangle": ["error", { "allow": ["_sum"] }],
     "object-shorthand": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/todo": "error",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/await-thenable": "error",
     "typescript/ban-ts-comment": "error",
@@ -116,6 +122,14 @@
     "typescript/unified-signatures": "error",
     "typescript/use-unknown-in-catch-callback-variable": "error"
   },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        "unicorn/consistent-function-scoping": "off"
+      }
+    }
+  ],
   "settings": {
     "vitest": {
       "typecheck": false

@@ -31,8 +31,9 @@ export async function setup() {
          WHERE schema_name LIKE $1`,
         [`test_${runId}_%`],
       );
-      for (const { schema_name } of rows) {
-        await client.query(`DROP SCHEMA IF EXISTS "${schema_name}" CASCADE`);
+      if (rows.length > 0) {
+        const schemas = rows.map(({ schema_name }) => `"${schema_name}"`).join(", ");
+        await client.query(`DROP SCHEMA IF EXISTS ${schemas} CASCADE`);
       }
     } finally {
       await client.end();
