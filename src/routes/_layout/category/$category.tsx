@@ -1,4 +1,4 @@
-import { Button, Card, Group, Select, SimpleGrid, Stack, Switch, Text, Title } from "@mantine/core";
+import { Button, Card, Grid, Group, Select, Stack, Switch, Text, Title } from "@mantine/core";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
 import { coerce, enum as enumType, object, optional, string } from "zod/mini";
@@ -12,6 +12,7 @@ import { useToday } from "~/hooks/useToday";
 import { range as makeRange } from "~/lib/collections";
 import { formatCurrency, monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
+import "./CategoryHistoryPage.css";
 
 const ranges = ["current", "last1", "last3", "last6", "last12"] as const;
 type Range = (typeof ranges)[number];
@@ -69,6 +70,9 @@ const rangeOptions: Array<{ value: Range; label: string }> = [
   { value: "last12", label: "Last 12 months" },
 ];
 
+const statSpan = { base: 30, sm: 10, lg: 6 };
+const wideStatSpan = { base: 30, sm: 15, lg: 6 };
+
 function getMonthOptions(
   today: Date,
   budgetMonths: string[],
@@ -99,7 +103,7 @@ function CategoryHistoryPage() {
   const percentageUsed = (totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted) * 100;
 
   return (
-    <PageContainer size="xl">
+    <PageContainer className="CategoryHistoryPage" size="xl">
       <Stack gap="xl">
         <Group justify="space-between" align="flex-start">
           <div>
@@ -172,62 +176,57 @@ function CategoryHistoryPage() {
           </Group>
         </Stack>
 
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 5 }} spacing="lg">
-          <Card>
-            <Stack gap="xs">
-              <Text size="sm" c="gray.6">
-                Total Budgeted
-              </Text>
-              <Text size="2.25rem" fw="bold">
-                {formatCurrency(totalBudgeted)}
-              </Text>
-            </Stack>
-          </Card>
-
-          <Card>
-            <Stack gap="xs">
-              <Text size="sm" c="gray.6">
-                Total Spent
-              </Text>
-              <Text size="2.25rem" fw="bold" c={totalSpent > totalBudgeted ? "red" : undefined}>
-                {formatCurrency(totalSpent)}
-              </Text>
-            </Stack>
-          </Card>
-
-          <Card>
-            <Stack gap="xs">
-              <Text size="sm" c="gray.6">
-                Percentage Used
-              </Text>
-              <Text size="2.25rem" fw="bold" c={percentageUsed > 100 ? "red" : undefined}>
-                {percentageUsed.toFixed(1)}%
-              </Text>
-            </Stack>
-          </Card>
-
-          <Card>
-            <Stack gap="xs">
-              <Text size="sm" c="gray.6">
-                Spent per Month
-              </Text>
-              <Text size="2.25rem" fw="bold">
-                {formatCurrency(totalSpent / monthCount)}
-              </Text>
-            </Stack>
-          </Card>
-
-          <Card>
-            <Stack gap="xs">
-              <Text size="sm" c="gray.6">
-                Transactions per Month
-              </Text>
-              <Text size="2.25rem" fw="bold">
-                {(totalTransactions / monthCount).toFixed(1)}
-              </Text>
-            </Stack>
-          </Card>
-        </SimpleGrid>
+        <Grid
+          className="stats"
+          columns={30}
+          type="container"
+          breakpoints={{ xs: "36rem", sm: "48rem", md: "62rem", lg: "80rem", xl: "88rem" }}
+        >
+          <Grid.Col span={statSpan}>
+            <Card>
+              <Stack>
+                <Text className="label">Total Budgeted</Text>
+                <Text className="value">{formatCurrency(totalBudgeted)}</Text>
+              </Stack>
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={statSpan}>
+            <Card>
+              <Stack>
+                <Text className="label">Total Spent</Text>
+                <Text className="value" c={totalSpent > totalBudgeted ? "red" : undefined}>
+                  {formatCurrency(totalSpent)}
+                </Text>
+              </Stack>
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={statSpan}>
+            <Card>
+              <Stack>
+                <Text className="label">Percentage Used</Text>
+                <Text className="value" c={percentageUsed > 100 ? "red" : undefined}>
+                  {percentageUsed.toFixed(1)}%
+                </Text>
+              </Stack>
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={wideStatSpan}>
+            <Card>
+              <Stack>
+                <Text className="label">Spent per Month</Text>
+                <Text className="value">{formatCurrency(totalSpent / monthCount)}</Text>
+              </Stack>
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={wideStatSpan}>
+            <Card>
+              <Stack>
+                <Text className="label">Transactions per Month</Text>
+                <Text className="value">{(totalTransactions / monthCount).toFixed(1)}</Text>
+              </Stack>
+            </Card>
+          </Grid.Col>
+        </Grid>
 
         <Card>
           <Stack gap="md">
