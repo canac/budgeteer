@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { endOfMonth, parseISO } from "date-fns";
 import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
+import { pluck } from "~/lib/collections";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
 import { prisma } from "~/lib/prisma";
 import { validateCategoryDeletion } from "~/lib/validation";
@@ -26,7 +27,7 @@ export const getCategoryHistory = createServerFn()
       throw notFound();
     }
 
-    const [transactionCategories, budgetCategories, deletable] = await Promise.all([
+    const [transactionCategories, budgetCategories, budgetMonths, deletable] = await Promise.all([
       prisma.transactionCategory.findMany({
         where: {
           categoryId,
@@ -61,6 +62,10 @@ export const getCategoryHistory = createServerFn()
         include: {
           budget: true,
         },
+      }),
+      prisma.budget.findMany({
+        where: { budgetCategories: { some: { categoryId } } },
+        select: { month: true },
       }),
       validateCategoryDeletion(categoryId, toISOMonthString(new Date())),
     ]);
@@ -105,6 +110,7 @@ export const getCategoryHistory = createServerFn()
       totalBudgeted,
       totalSpent,
       monthlyBreakdown,
+      budgetMonths: pluck(budgetMonths, "month"),
       deletable,
     };
   });

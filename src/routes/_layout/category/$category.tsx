@@ -1,7 +1,7 @@
-import { Button, Card, Group, SimpleGrid, Stack, Switch, Text, Title } from "@mantine/core";
+import { Button, Card, Group, Select, SimpleGrid, Stack, Switch, Text, Title } from "@mantine/core";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
-import { _default, coerce, enum as enumType, object } from "zod/mini";
+import { coerce, enum as enumType, object, optional, string } from "zod/mini";
 import { CategoryHeaderActions } from "~/components/CategoryHeaderActions";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
@@ -9,15 +9,17 @@ import { PageContainer } from "~/components/PageContainer";
 import { TransactionList } from "~/components/TransactionList";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
 import { useToday } from "~/hooks/useToday";
-import { formatCurrency, monthFormatter } from "~/lib/formatters";
+import { range as makeRange } from "~/lib/collections";
+import { formatCurrency, monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
 
 const ranges = ["current", "last1", "last3", "last6", "last12"] as const;
 type Range = (typeof ranges)[number];
 
 const searchSchema = object({
-  range: _default(enumType(ranges), "current"),
-  transfers: _default(coerce.boolean(), false),
+  range: optional(enumType(ranges)),
+  month: optional(string()),
+  transfers: optional(coerce.boolean()),
 });
 
 function getRangeMonths(range: Range) {
@@ -36,12 +38,15 @@ function getRangeMonths(range: Range) {
 export const Route = createFileRoute("/_layout/category/$category")({
   component: CategoryHistoryPage,
   validateSearch: searchSchema,
-  loaderDeps: ({ search: { range, transfers } }) => ({
+  loaderDeps: ({ search: { range, month, transfers } }) => ({
     range,
+    month,
     transfers,
   }),
-  loader: ({ params: { category }, deps: { range, transfers } }) => {
-    const { startMonth, endMonth } = getRangeMonths(range);
+  loader: ({ params: { category }, deps: { range = "current", month, transfers = false } }) => {
+    const { startMonth, endMonth } = month
+      ? { startMonth: month, endMonth: month }
+      : getRangeMonths(range);
     return getCategoryHistory({
       data: {
         categoryId: category,
@@ -64,9 +69,23 @@ const rangeOptions: Array<{ value: Range; label: string }> = [
   { value: "last12", label: "Last 12 months" },
 ];
 
+function getMonthOptions(
+  today: Date,
+  budgetMonths: string[],
+): Array<{ value: string; label: string }> {
+  return makeRange(12)
+    .map((offset) => subMonths(today, offset))
+    .filter((date) => budgetMonths.includes(toISOMonthString(date)))
+    .map((date) => {
+      const formatter =
+        date.getFullYear() === today.getFullYear() ? monthOnlyFormatter : monthFormatter;
+      return { value: toISOMonthString(date), label: formatter.format(date) };
+    });
+}
+
 function CategoryHistoryPage() {
   const categoryHistory = Route.useLoaderData();
-  const { range, transfers } = Route.useSearch();
+  const { range = "current", month, transfers = false } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
   const today = useToday();
@@ -110,13 +129,34 @@ function CategoryHistoryPage() {
             {rangeOptions.map((option) => (
               <Button
                 key={option.value}
-                variant={range === option.value ? "filled" : "outline"}
+                variant={!month && range === option.value ? "filled" : "outline"}
                 size="sm"
-                onClick={() => navigate({ search: (prev) => ({ ...prev, range: option.value }) })}
+                onClick={() =>
+                  navigate({
+                    search: (prev) => ({
+                      ...prev,
+                      range: option.value === "current" ? undefined : option.value,
+                      month: undefined,
+                    }),
+                  })
+                }
               >
                 {option.label}
               </Button>
             ))}
+            <Select
+              size="sm"
+              placeholder="Choose a month"
+              aria-label="Month"
+              clearable
+              value={month ?? null}
+              data={getMonthOptions(today, categoryHistory.budgetMonths)}
+              onChange={(value) =>
+                navigate({
+                  search: (prev) => ({ ...prev, range: undefined, month: value ?? undefined }),
+                })
+              }
+            />
           </Group>
 
           <Group gap="xl">
@@ -124,7 +164,9 @@ function CategoryHistoryPage() {
               label="Include transfers"
               checked={transfers}
               onChange={(event) =>
-                navigate({ search: (prev) => ({ ...prev, transfers: event.target.checked }) })
+                navigate({
+                  search: (prev) => ({ ...prev, transfers: event.target.checked || undefined }),
+                })
               }
             />
           </Group>

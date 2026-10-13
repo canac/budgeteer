@@ -37,6 +37,20 @@ describe("getCategoryHistory", () => {
     expect(result.deletable).toEqual({ valid: true });
   });
 
+  it("returns every month the category has a budget, even outside the range", async () => {
+    const budget = await createBudget({ month: "2025-03" });
+    await prisma.budgetCategory.create({
+      data: { budgetedAmount: 5000, categoryId, budgetId: budget.id },
+    });
+    await createBudget({ month: "2025-02" });
+
+    const result = await getCategoryHistory({
+      data: { categoryId, startMonth: "2025-01", endMonth: "2025-01" },
+    });
+
+    expect(result.budgetMonths.toSorted()).toEqual(["2025-01", "2025-03"]);
+  });
+
   it("reports the category as not deletable when a vendor rule references it", async () => {
     await createVendorRule({ category: { connect: { id: categoryId } } });
 
