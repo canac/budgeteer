@@ -13,3 +13,6 @@ autoDedupe: true
 
 lockfile:
   includeResolutionSettings: true
+
+minimumReleaseAgeExclude:
+  - "@canac/oxc-config"

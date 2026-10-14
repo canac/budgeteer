@@ -246,6 +246,9 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
     devDependencies:
+      '@canac/oxc-config':
+        specifier: ^0.1.0
+        version: 0.1.0(oxfmt@0.72.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.87.0(oxlint-tsgolint@7.0.2003))
       '@faker-js/faker':
         specifier: ^10.6.0
         version: 10.6.0
@@ -376,6 +379,20 @@ packages:
   '@babel/types@7.29.8':
     resolution: {integrity: sha512-Vj1jF3cPfxg7OAfoI7QnVKLoILlm2JF9pnVHrX8qx7AHMiYWT+NDAA7jChlNgRS4WTLc/fD1lXLmPixluj+3Gg==}
     engines: {node: '>=6.9.0'}
+
+  '@canac/oxc-config@0.1.0':
+    resolution: {integrity: sha512-eP4uaQYOHTiWo644rxgmGCLemIJ0Q5+giLvsH0xjeA4RpzYM8sozQlMipLf2jhqMRakXS/mrKbjmD8nFTZn2DA==}
+    peerDependencies:
+      oxfmt: '>=0.72.0 <1.0.0'
+      oxlint: ^1.87.0
+      oxlint-tsgolint: ^7.0.0
+    peerDependenciesMeta:
+      oxfmt:
+        optional: true
+      oxlint:
+        optional: true
+      oxlint-tsgolint:
+        optional: true
 
   '@colors/colors@1.6.0':
     resolution: {integrity: sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==}
@@ -5221,6 +5238,12 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
+
+  '@canac/oxc-config@0.1.0(oxfmt@0.72.0)(oxlint-tsgolint@7.0.2003)(oxlint@1.87.0(oxlint-tsgolint@7.0.2003))':
+    optionalDependencies:
+      oxfmt: 0.72.0
+      oxlint: 1.87.0(oxlint-tsgolint@7.0.2003)
+      oxlint-tsgolint: 7.0.2003
 
   '@colors/colors@1.6.0': {}
 
