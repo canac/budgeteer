@@ -10,3 +10,6 @@ allowBuilds:
   sharp: false
 
 autoDedupe: true
+
+lockfile:
+  includeResolutionSettings: true
