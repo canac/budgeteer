@@ -8,3 +8,5 @@ allowBuilds:
   msw: false
   prisma: true
   sharp: false
+
+autoDedupe: true
