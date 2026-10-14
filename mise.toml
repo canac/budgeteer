@@ -1,4 +1,4 @@
-min_version = "2026.10.4"
+min_version = { soft = "2026.10.4" } # soft because Netlify currently uses an older version
 
 [settings]
 experimental = true
