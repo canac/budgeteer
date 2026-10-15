@@ -1,8 +1,6 @@
 allowBuilds:
-  "@parcel/watcher": true
   "@prisma/client": true
   "@prisma/engines": true
-  "@swc/core": true
   esbuild: true
   lefthook: true
   msw: false
