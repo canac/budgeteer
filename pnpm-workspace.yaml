@@ -14,3 +14,11 @@ lockfile:
 
 minimumReleaseAgeExclude:
   - "@canac/oxc-config"
+
+permissions:
+  "@tanstack/react-start":
+    skills: true
+
+skills:
+  dirs:
+    - .claude/skills
