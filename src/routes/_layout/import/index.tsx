@@ -55,12 +55,13 @@ export const Route = createFileRoute("/_layout/import/")({
   validateSearch: searchSchema,
   loaderDeps: ({ search: { page, view, account } }) => ({ page, view, account }),
   loader: async ({ deps: { page, view, account } }) => {
-    const [{ transactions, total }, accounts] = await Promise.all([
+    const [{ transactions, total }, allAccounts] = await Promise.all([
       getUnreviewedTransactions({
         data: { page, pageSize: PAGE_SIZE, view: view ?? "unreviewed", accountId: account },
       }),
       getExternalAccounts(),
     ]);
+    const accounts = allAccounts.filter((account) => !account.archived);
     return { transactions, total, accounts };
   },
   head: () => ({ meta: [{ title: "Import Transactions | Budgeteer" }] }),

@@ -1,6 +1,11 @@
-import { Alert, Button, Group, Stack, Switch, Table, Text } from "@mantine/core";
+import { ActionIcon, Alert, Button, Group, Stack, Switch, Table, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconAlertTriangle, IconBuildingBank } from "@tabler/icons-react";
+import {
+  IconAlertTriangle,
+  IconArchive,
+  IconArchiveOff,
+  IconBuildingBank,
+} from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useState } from "react";
@@ -13,6 +18,7 @@ import { exchangePublicToken as exchangePublicTokenFn } from "~/functions/exchan
 import { getExternalAccounts } from "~/functions/getExternalAccounts";
 import { getExternalConnections } from "~/functions/getExternalConnections";
 import { markConnectionReconnected as markConnectionReconnectedFn } from "~/functions/markConnectionReconnected";
+import { setExternalAccountArchived as setExternalAccountArchivedFn } from "~/functions/setExternalAccountArchived";
 import { setExternalAccountEnabled as setExternalAccountEnabledFn } from "~/functions/setExternalAccountEnabled";
 
 export const Route = createFileRoute("/_layout/import/accounts")({
@@ -32,6 +38,7 @@ function AccountsPage() {
   const exchangePublicToken = useServerFn(exchangePublicTokenFn);
   const markConnectionReconnected = useServerFn(markConnectionReconnectedFn);
   const setExternalAccountEnabled = useServerFn(setExternalAccountEnabledFn);
+  const setExternalAccountArchived = useServerFn(setExternalAccountArchivedFn);
 
   const [linkToken, setLinkToken] = useState<string | null>(null);
   // Set while reauthenticating an existing Item (update mode)
@@ -125,6 +132,11 @@ function AccountsPage() {
     await router.invalidate();
   };
 
+  const handleArchive = async (id: string, archived: boolean) => {
+    await setExternalAccountArchived({ data: { id, archived } });
+    await router.invalidate();
+  };
+
   const needsReconnect = connections.filter((connection) => connection.loginRequired);
 
   return (
@@ -160,21 +172,33 @@ function AccountsPage() {
               <Table.Th>Institution</Table.Th>
               <Table.Th>Account</Table.Th>
               <Table.Th ta="center">Sync transactions</Table.Th>
+              <Table.Th />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {accounts.map((account) => (
-              <Table.Tr key={account.id}>
+              <Table.Tr key={account.id} c={account.archived ? "dimmed" : undefined}>
                 <Table.Td>{account.institution}</Table.Td>
                 <Table.Td>{account.name}</Table.Td>
                 <Table.Td ta="center">
                   <Group justify="center">
                     <Switch
                       checked={account.enabled}
+                      disabled={account.archived}
                       onChange={(event) => handleToggle(account.id, event.currentTarget.checked)}
                       aria-label={`${account.enabled ? "Disable" : "Enable"} ${account.name}`}
                     />
                   </Group>
+                </Table.Td>
+                <Table.Td ta="right">
+                  <ActionIcon
+                    variant="subtle"
+                    size="lg"
+                    aria-label={`${account.archived ? "Unarchive" : "Archive"} ${account.name}`}
+                    onClick={() => handleArchive(account.id, !account.archived)}
+                  >
+                    {account.archived ? <IconArchiveOff /> : <IconArchive />}
+                  </ActionIcon>
                 </Table.Td>
               </Table.Tr>
             ))}

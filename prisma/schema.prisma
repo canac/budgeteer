@@ -121,6 +121,7 @@ model ExternalAccount {
   institution  String
   creditCard   Boolean               @default(false)
   enabled      Boolean               @default(true)
+  archived     Boolean               @default(false)
   connectionId String
   connection   ExternalConnection    @relation(fields: [connectionId], references: [id], onDelete: Cascade)
   transactions ExternalTransaction[]

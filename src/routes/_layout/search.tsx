@@ -56,11 +56,12 @@ export const Route = createFileRoute("/_layout/search")({
     page,
   }),
   loader: async ({ deps: { page, ...filters } }) => {
-    const [categories, vendors, accounts] = await Promise.all([
+    const [categories, vendors, allAccounts] = await Promise.all([
       getCategories(),
       getVendors(),
       getExternalAccounts(),
     ]);
+    const accounts = allAccounts.filter((account) => !account.archived);
     const { transactions, total } = hasFilter(filters)
       ? await searchTransactions({
           data: {

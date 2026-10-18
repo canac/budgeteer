@@ -6,6 +6,6 @@ export const getExternalAccounts = createServerFn()
   .middleware([requireAuth])
   .handler(() =>
     prisma.externalAccount.findMany({
-      orderBy: [{ institution: "asc" }, { name: "asc" }],
+      orderBy: [{ archived: "asc" }, { institution: "asc" }, { name: "asc" }],
     }),
   );

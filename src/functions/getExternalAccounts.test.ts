@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { pluck } from "~/lib/collections.ts";
 import { createExternalAccount, createExternalConnection } from "../../test/mocks.ts";
 import { getExternalAccounts } from "./getExternalAccounts.ts";
 
@@ -19,5 +20,19 @@ describe("getExternalAccounts", () => {
       ["Chase", "Checking"],
       ["Chase", "Savings"],
     ]);
+  });
+
+  it("sorts archived accounts last", async () => {
+    const connection = { connect: { id: (await createExternalConnection()).id } };
+    const archived = await createExternalAccount({
+      institution: "BofA",
+      archived: true,
+      connection,
+    });
+    const active = await createExternalAccount({ institution: "Chase", connection });
+
+    const accounts = await getExternalAccounts();
+
+    expect(pluck(accounts, "id")).toEqual([active.id, archived.id]);
   });
 });
