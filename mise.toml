@@ -7,8 +7,4 @@ experimental = true
 fnox = "1.39"
 node = "24.21.0"
 
-[env]
-_.file = ".env.local"
-DATABASE_URL = "postgres://postgres@localhost/{{ env.DATABASE_NAME | default(value='budgeteer') }}"
-
 [secrets.fnox]

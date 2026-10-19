@@ -1,3 +1,4 @@
+import "./loadEnv.ts";
 import netlify from "@netlify/vite-plugin-tanstack-start";
 import transformImports from "@rolldown/plugin-transform-imports";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";

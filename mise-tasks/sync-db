@@ -4,6 +4,7 @@
 
 set -euo pipefail
 
+DATABASE_URL=$(pnpm exec dotenvx get DATABASE_URL --file .env.local --file .env --ignore=MISSING_ENV_FILE)
 dump=$(mktemp)
 trap 'rm -f "$dump"' EXIT
 
