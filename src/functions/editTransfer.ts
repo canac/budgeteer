@@ -16,6 +16,9 @@ export const editTransfer = createServerFn({ method: "POST" })
     const prisma = getPrisma();
     const { transactionId, sourceCategoryId, destinationCategoryId } =
       await prisma.transfer.findUniqueOrThrow({ where: { id } });
+    if (!sourceCategoryId) {
+      throw new Error("Leftovers transfers may not be edited");
+    }
 
     return prisma.transfer.update({
       where: { id },

@@ -3,9 +3,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { isAfter, isBefore, parseISO, startOfMonth } from "date-fns";
 import invariant from "tiny-invariant";
 import { boolean, object } from "zod";
+import { activeCategories } from "~/lib/activeCategories";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
 import { toISOMonthString } from "~/lib/iso";
+import { leftoversTransferWhere } from "~/lib/leftoversTransferWhere";
 import { getPrisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 import { getFirstMonth } from "./getFirstMonth";
@@ -105,7 +107,18 @@ export const getBudgetByMonth = createServerFn()
       0,
     );
 
-    const budgetCategories = await calculateBalances(budget.budgetCategories, month);
+    const [budgetCategories, leftoversTransfers] = await Promise.all([
+      calculateBalances(budget.budgetCategories, month),
+      getPrisma().transaction.findMany({
+        where: leftoversTransferWhere(month, {
+          destinationCategory: {
+            OR: [{ deletedMonth: null }, { deletedMonth: { gt: toISOMonthString(month) } }],
+          },
+        }),
+        orderBy: { createdAt: "desc" },
+        select: { transfer: { select: { destinationCategoryId: true } } },
+      }),
+    ]);
     const leftoverRemaining = budgetCategories
       .filter((budgetCategory) => !budgetCategory.category.accumulating)
       .reduce((sum, budgetCategory) => sum + budgetCategory.balance, 0);
@@ -114,6 +127,15 @@ export const getBudgetByMonth = createServerFn()
       month: toISOMonthString(month),
       totalBudgetedAmount,
       leftoverRemaining,
+      leftoversDestinationIds: leftoversTransfers.flatMap(({ transfer }) =>
+        transfer ? [transfer.destinationCategoryId] : [],
+      ),
+      funds: activeCategories(
+        budgetCategories
+          .filter(({ category }) => category.accumulating)
+          .map(({ category, balance }) => ({ ...category, balance })),
+        toISOMonthString(month),
+      ),
       budgetCategories: budgetCategories
         .filter((budgetCategory) =>
           hideAccumulating ? !budgetCategory.category.accumulating : true,

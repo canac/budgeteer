@@ -9,6 +9,7 @@ import {
 import { createLink, linkOptions, useRouter } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
 import { forwardRef, type ReactNode, useState } from "react";
+import invariant from "tiny-invariant";
 import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import type { Category } from "~/prisma/client";
 import {
@@ -28,7 +29,7 @@ type CategoryRef = Pick<Category, "id" | "name">;
 type ListTransaction = Omit<BaseTransaction, "transfer"> & {
   transfer:
     | (NonNullable<BaseTransaction["transfer"]> & {
-        sourceCategory?: CategoryRef;
+        sourceCategory?: CategoryRef | null;
         destinationCategory?: CategoryRef;
       })
     | null;
@@ -82,6 +83,36 @@ function CategoryBadge({ month, category, color = "gray" }: CategoryBadgeProps) 
   );
 }
 
+function TransferSourceBadge({
+  category,
+  ...props
+}: Omit<CategoryBadgeProps, "category"> & { category?: CategoryRef | null }) {
+  if (category) {
+    return <CategoryBadge category={category} {...props} />;
+  }
+
+  return (
+    <Badge className="category-badge" variant="light" color={props.color} size="lg" tt="none">
+      Leftovers
+    </Badge>
+  );
+}
+
+function isLeftoversTransfer(transaction: ListTransaction) {
+  const { transfer } = transaction;
+  return !!transfer && !transfer.sourceCategoryId;
+}
+
+function uneditableReason(transaction: ListTransaction) {
+  if (transaction.type === "BALANCE_ADJUSTMENT") {
+    return "Cannot edit balance adjustments";
+  }
+  if (isLeftoversTransfer(transaction)) {
+    return "Cannot edit leftovers transfers";
+  }
+  return null;
+}
+
 interface TransactionTypeIconProps {
   transaction: ListTransaction;
 }
@@ -113,20 +144,16 @@ function TransactionCategories({
   transaction: ListTransaction;
   month?: string;
 }) {
-  if (transaction.transfer?.sourceCategory && transaction.transfer.destinationCategory) {
+  const { transfer } = transaction;
+  if (
+    transfer?.destinationCategory &&
+    (transfer.sourceCategory || isLeftoversTransfer(transaction))
+  ) {
     return (
       <>
-        <CategoryBadge
-          month={month}
-          category={transaction.transfer.sourceCategory}
-          color="orange"
-        />
+        <TransferSourceBadge month={month} category={transfer.sourceCategory} color="orange" />
         {" → "}
-        <CategoryBadge
-          month={month}
-          category={transaction.transfer.destinationCategory}
-          color="teal"
-        />
+        <CategoryBadge month={month} category={transfer.destinationCategory} color="teal" />
       </>
     );
   }
@@ -163,8 +190,11 @@ export function TransactionList({
     });
 
     if (fetched.transfer) {
+      const { sourceCategoryId } = fetched.transfer;
+      invariant(sourceCategoryId, "Leftovers transfers cannot be edited");
       setEditingTransfer({
         ...fetched.transfer,
+        sourceCategoryId,
         date: fetched.date,
         description: fetched.description,
       });
@@ -199,8 +229,12 @@ export function TransactionList({
       <List className="TransactionList">
         {transactions.map((transaction) => {
           const income = transaction.type !== "TRANSFER" && transaction.amount >= 0;
-          const editable = transaction.type !== "BALANCE_ADJUSTMENT";
-          const uneditableMessage = editable ? null : "Cannot edit balance adjustments";
+          const uneditableMessage = uneditableReason(transaction);
+          const editable = uneditableMessage === null;
+          // Per-category lists show this category's split, so transfers keep their direction
+          const amount = showCategories
+            ? (transaction.transfer?.amount ?? transaction.amount)
+            : transaction.amount;
 
           return (
             <ListRow
@@ -223,9 +257,7 @@ export function TransactionList({
                 ) : undefined
               }
               value={
-                <Text className={income ? "positive" : undefined}>
-                  {formatCurrency(transaction.transfer?.amount ?? transaction.amount)}
-                </Text>
+                <Text className={income ? "positive" : undefined}>{formatCurrency(amount)}</Text>
               }
               actions={
                 <Menu position="bottom-end">

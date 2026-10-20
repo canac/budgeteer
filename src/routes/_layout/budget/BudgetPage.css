@@ -15,6 +15,12 @@
     }
   }
 
+  .leftover-row .leftover-toggle {
+    flex: 1;
+    width: auto;
+    margin-inline-end: 0;
+  }
+
   .leftover-toggle {
     /* Bleed past the row so the text lines up with the other rows */
     width: calc(100% + var(--mantine-spacing-xs) * 2);

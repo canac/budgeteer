@@ -1,8 +1,16 @@
 import { ActionIcon, Card, Group, SegmentedControl, Stack, Text, Title } from "@mantine/core";
-import { IconChevronLeft, IconChevronRight, IconFilter, IconFilterOff } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
+import {
+  IconArrowsRightLeft,
+  IconChevronLeft,
+  IconChevronRight,
+  IconFilter,
+  IconFilterOff,
+} from "@tabler/icons-react";
 import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/react-router";
-import { addMonths, parseISO, subMonths } from "date-fns";
+import { addMonths, parseISO, startOfMonth, subMonths } from "date-fns";
 import { boolean, object, optional, catch as zCatch } from "zod/mini";
+import { DynamicLeftoversTransferModal } from "~/components/DynamicLeftoversTransferModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineButtonLink } from "~/components/MantineButtonLink";
@@ -37,7 +45,17 @@ export const Route = createFileRoute("/_layout/budget/$month")({
 
 function BudgetLayout() {
   const router = useRouter();
-  const { budget, totalBudgetedAmount, budgetMonths, leftoverRemaining } = Route.useLoaderData();
+  const {
+    budget,
+    budgetCategories,
+    totalBudgetedAmount,
+    budgetMonths,
+    leftoverRemaining,
+    leftoversDestinationIds,
+    funds,
+  } = Route.useLoaderData();
+  const [leftoversTransferOpened, { open: openLeftoversTransfer, close: closeLeftoversTransfer }] =
+    useDisclosure(false);
   const { leftover } = Route.useSearch();
   const matchRoute = useMatchRoute();
   const today = useToday();
@@ -53,6 +71,11 @@ function BudgetLayout() {
       ? undefined
       : toISOMonthString(addMonths(parseISO(budget.month), 1));
 
+  const leftovers = budgetCategories.filter(
+    ({ category, balance }) => !category.accumulating && balance !== 0,
+  );
+  const canTransferLeftovers = parseISO(budget.month) < startOfMonth(today) && leftovers.length > 0;
+
   const tabLink = onTransactions ? "/budget/$month/transactions" : "/budget/$month/categories";
 
   const handleSaveIncome = async (newIncome: number) => {
@@ -64,6 +87,16 @@ function BudgetLayout() {
 
   return (
     <Stack className="BudgetPage" align="center">
+      {leftoversTransferOpened && (
+        <DynamicLeftoversTransferModal
+          month={budget.month}
+          leftovers={leftovers}
+          funds={funds}
+          existingDestinationIds={leftoversDestinationIds}
+          onClose={closeLeftoversTransfer}
+          onSave={() => router.invalidate()}
+        />
+      )}
       <Group gap="xs">
         {previousMonth ? (
           <MantineActionIconLink
@@ -139,31 +172,45 @@ function BudgetLayout() {
               </Text>
             </Group>
           )}
-          <MantineButtonLink
-            to={tabLink}
-            params={{ month: budget.month }}
-            search={(prev) => ({ ...prev, leftover: leftover ? undefined : true })}
-            variant="subtle"
-            color="gray"
-            justify="space-between"
-            rightSection={
-              <Text className={amountSignClassname(leftoverRemaining)}>
-                {formatCurrency(leftoverRemaining)}
-              </Text>
-            }
-            aria-label={leftover ? "Show all categories" : "Show only leftover categories"}
-            className="leftover-toggle"
-          >
-            <Group gap="xs" wrap="nowrap">
-              Leftover
-              {leftover && <IconFilter className="icon" size={18} />}
-              {leftover ? (
-                <IconFilterOff className="hover-icon" size={18} />
-              ) : (
-                <IconFilter className="hover-icon" size={18} />
-              )}
-            </Group>
-          </MantineButtonLink>
+          <Group className="leftover-row" gap={0} wrap="nowrap">
+            <MantineButtonLink
+              to={tabLink}
+              params={{ month: budget.month }}
+              search={(prev) => ({ ...prev, leftover: leftover ? undefined : true })}
+              variant="subtle"
+              color="gray"
+              justify="space-between"
+              rightSection={
+                <Text className={amountSignClassname(leftoverRemaining)}>
+                  {formatCurrency(leftoverRemaining)}
+                </Text>
+              }
+              aria-label={leftover ? "Show all categories" : "Show only leftover categories"}
+              className="leftover-toggle"
+            >
+              <Group gap="xs" wrap="nowrap">
+                Leftover
+                {leftover && <IconFilter className="icon" size={18} />}
+                {leftover ? (
+                  <IconFilterOff className="hover-icon" size={18} />
+                ) : (
+                  <IconFilter className="hover-icon" size={18} />
+                )}
+              </Group>
+            </MantineButtonLink>
+            {canTransferLeftovers && (
+              <ActionIcon
+                variant="subtle"
+                size="lg"
+                color="gray"
+                onClick={openLeftoversTransfer}
+                aria-label="Transfer leftovers"
+                title="Transfer leftovers"
+              >
+                <IconArrowsRightLeft size={18} />
+              </ActionIcon>
+            )}
+          </Group>
         </Stack>
       </Card>
       <Outlet />

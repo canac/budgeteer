@@ -100,4 +100,12 @@ describe("editTransfer", () => {
       "No record was found for a query",
     );
   });
+
+  it("rejects leftovers transfers", async () => {
+    await prisma.transfer.update({ where: { id: transferId }, data: { sourceCategoryId: null } });
+
+    await expect(() => editTransfer({ data: { id: transferId, amount: 7500 } })).rejects.toThrow(
+      "Leftovers transfers may not be edited",
+    );
+  });
 });
