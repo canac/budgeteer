@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
 import { ensureValid, validateTransactionDate } from "~/lib/validation";
 
@@ -15,6 +15,7 @@ export const editTransaction = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, categories, ...attributes } }) => {
+    const prisma = getPrisma();
     ensureValid(await validateTransactionDate(attributes.date, pluck(categories, "categoryId")));
 
     const existing = await prisma.transaction.findUniqueOrThrow({

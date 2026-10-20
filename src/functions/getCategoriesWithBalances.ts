@@ -2,12 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
 import { find } from "~/lib/collections";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export const getCategoriesWithBalances = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
-    const categories = await prisma.category.findMany({
+    const categories = await getPrisma().category.findMany({
       orderBy: { sortOrder: "asc" },
     });
 

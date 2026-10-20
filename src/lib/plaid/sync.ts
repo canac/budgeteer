@@ -1,6 +1,6 @@
 import { parseISO } from "date-fns";
 import type { ExternalAccount, ExternalConnection } from "~/prisma/client";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import type { PlaidSyncPage, PlaidTransaction } from "./types";
 import { find, pluck } from "../collections";
 import { dollarsToPennies } from "../currencyConversion";
@@ -17,7 +17,7 @@ type ConnectionWithAccounts = ExternalConnection & { accounts: ExternalAccount[]
  * Find the start date of the oldest budget.
  **/
 async function getOldestBudgetDate(): Promise<Date> {
-  const oldestBudget = await prisma.budget.findFirstOrThrow({
+  const oldestBudget = await getPrisma().budget.findFirstOrThrow({
     select: { month: true },
     orderBy: { month: "asc" },
   });
@@ -50,7 +50,7 @@ export async function refreshAccounts(
   connection: ConnectionWithAccounts,
 ): Promise<ExternalAccount[]> {
   const remote = await client.getAccounts(connection.accessToken);
-  const created = await prisma.externalAccount.createManyAndReturn({
+  const created = await getPrisma().externalAccount.createManyAndReturn({
     data: remote.map((account) => ({
       id: account.account_id,
       name: account.name,
@@ -68,6 +68,7 @@ async function applyAdded(
   enabledAccountIds: Set<string>,
   oldestIso: string,
 ): Promise<number> {
+  const prisma = getPrisma();
   const toInsert = added.filter(
     (tx) => !tx.pending && enabledAccountIds.has(tx.account_id) && extractDate(tx) >= oldestIso,
   );
@@ -93,6 +94,7 @@ async function applyAdded(
 }
 
 async function applyModified(modified: PlaidTransaction[]): Promise<void> {
+  const prisma = getPrisma();
   const existingTransactions = await prisma.externalTransaction.findMany({
     where: { id: { in: pluck(modified, "transaction_id") } },
     include: { transaction: true },
@@ -125,6 +127,7 @@ async function applyModified(modified: PlaidTransaction[]): Promise<void> {
 }
 
 async function applyRemoved(removed: { transaction_id: string }[]): Promise<void> {
+  const prisma = getPrisma();
   const existingTransactions = await prisma.externalTransaction.findMany({
     where: { id: { in: pluck(removed, "transaction_id") }, removedAt: null },
     include: { transaction: true },
@@ -145,6 +148,7 @@ async function applyRemoved(removed: { transaction_id: string }[]): Promise<void
 }
 
 export async function syncConnection(connection: ConnectionWithAccounts): Promise<SyncCount> {
+  const prisma = getPrisma();
   const client = new PlaidClient();
 
   try {

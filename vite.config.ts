@@ -1,9 +1,19 @@
-import "./loadEnv.ts";
-import netlify from "@netlify/vite-plugin-tanstack-start";
+import { cloudflare } from "@cloudflare/vite-plugin";
 import transformImports from "@rolldown/plugin-transform-imports";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import path from "node:path";
+import { defineConfig, type Plugin } from "vite";
+import "./loadEnv.ts";
+
+if (process.env.DATABASE_URL) {
+  const localDatabaseUrl = new URL(process.env.DATABASE_URL);
+  // Local Hyperdrive rejects URLs without a password or port
+  localDatabaseUrl.password ||= "local";
+  localDatabaseUrl.port ||= "5432";
+  process.env.CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE ??=
+    localDatabaseUrl.toString();
+}
 
 const tablerImports = transformImports({
   "@tabler/icons-react": {
@@ -16,6 +26,25 @@ if (typeof transform === "object" && transform.filter && !Array.isArray(transfor
   transform.filter.id = /\.[jt]sx?(\?.*)?$/;
 }
 
+const prismaDir = path.resolve("src/prisma") + path.sep;
+const workerdPrismaDir = path.resolve("src/prisma-workerd") + path.sep;
+
+// Swap out the Prisma client for workerd
+const workerdPrisma: Plugin = {
+  name: "workerd-prisma",
+  enforce: "pre",
+  async resolveId(source, importer, options) {
+    if (this.environment.name !== "ssr") {
+      return null;
+    }
+    const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+    if (resolved?.id.startsWith(prismaDir)) {
+      return { ...resolved, id: workerdPrismaDir + resolved.id.slice(prismaDir.length) };
+    }
+    return resolved;
+  },
+};
+
 export default defineConfig({
   server: {
     port: parseInt(process.env.PORT ?? "", 10) || 3000,
@@ -27,10 +56,10 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   plugins: [
+    workerdPrisma,
     tablerImports,
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart(),
     react(),
-    // Edge functions dev server is broken with Deno 2.9 https://github.com/netlify/framework-adapters/issues/67
-    netlify({ dev: { edgeFunctions: { enabled: false } } }),
   ],
 });

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { array, discriminatedUnion, int, literal, number, strictObject, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import {
   assertRuleSplits,
   writeAlias,
@@ -41,6 +41,7 @@ export const updateRule = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data }) => {
+    const prisma = getPrisma();
     if (data.scope === "vendor") {
       const { externalVendor, outcome } = data;
       await prisma.$transaction(async (tx) => {

@@ -6,6 +6,7 @@ allowBuilds:
   msw: false
   prisma: true
   sharp: false
+  workerd: true
 
 autoDedupe: true
 

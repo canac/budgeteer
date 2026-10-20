@@ -4,12 +4,13 @@ import type { BudgetInclude } from "~/prisma/models";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 /**
  * Find the current month's budget, creating it if necessary.
  */
 export const getCurrentBudget = createServerOnlyFn(async () => {
+  const prisma = getPrisma();
   const month = toISOMonthString(new Date());
   const include = {
     budgetCategories: {
@@ -51,6 +52,7 @@ export const getCurrentBudget = createServerOnlyFn(async () => {
 export const getOverview = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
+    const prisma = getPrisma();
     const budget = await getCurrentBudget();
     const filteredBudgetCategories = budget.budgetCategories.filter(
       (budgetCategory) => budgetCategory.category.flexible,

@@ -3,12 +3,12 @@ import { subMonths } from "date-fns";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
 import { toISODateString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export const getTopCategories = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
-    const transactionCounts = await prisma.transactionCategory.groupBy({
+    const transactionCounts = await getPrisma().transactionCategory.groupBy({
       by: ["categoryId"],
       where: {
         transaction: {

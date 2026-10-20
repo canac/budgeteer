@@ -1,6 +1,6 @@
 import { startOfMonth } from "date-fns";
 import { toISODateString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export async function applyBalanceAdjustment({
   categoryId,
@@ -11,6 +11,7 @@ export async function applyBalanceAdjustment({
   month: Date;
   amount: number;
 }): Promise<void> {
+  const prisma = getPrisma();
   if (amount === 0) {
     return;
   }

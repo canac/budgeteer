@@ -6,11 +6,12 @@ import { boolean, object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateBalances } from "~/lib/calculateBalance";
 import { toISOMonthString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 import { getFirstMonth } from "./getFirstMonth";
 
 async function getBudget(requestedMonth: Date) {
+  const prisma = getPrisma();
   const currentMonth = startOfMonth(new Date());
   const currentMonthString = toISOMonthString(currentMonth);
   if (isAfter(requestedMonth, currentMonth)) {

@@ -1,9 +1,11 @@
 .DS_Store
 /node_modules/
-/.netlify/
 /.tanstack/
+/.wrangler/
 /dist/
 /src/prisma/
+/src/prisma-workerd/
 /src/routeTree.gen.ts
+/worker-configuration.d.ts
 /.env.local
 /fnox.local.toml

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { enum as enumType, number, object, optional, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { TransactionType } from "~/prisma/enums.ts";
 
 const inputSchema = object({
@@ -22,6 +22,7 @@ export const searchTransactions = createServerFn()
   .middleware([requireAuth])
   .handler(
     async ({ data: { fromDate, toDate, categoryId, vendor, accountId, type, page, pageSize } }) => {
+      const prisma = getPrisma();
       const where = {
         type: type ?? { not: "BALANCE_ADJUSTMENT" as const },
         ...((!!fromDate || !!toDate) && { date: { gte: fromDate, lte: toDate } }),

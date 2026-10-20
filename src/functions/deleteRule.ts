@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { discriminatedUnion, literal, strictObject, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = discriminatedUnion("scope", [
   strictObject({ scope: literal("vendor"), externalVendor: string() }),
@@ -12,6 +12,7 @@ export const deleteRule = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data }) => {
+    const prisma = getPrisma();
     if (data.scope === "amount") {
       await prisma.amountRule.delete({ where: { id: data.id } });
       return;

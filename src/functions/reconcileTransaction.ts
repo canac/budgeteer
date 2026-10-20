@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { array, number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = object({
   id: string(),
@@ -19,6 +19,7 @@ export const reconcileTransaction = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, categories } }) => {
+    const prisma = getPrisma();
     const externalTransaction = await prisma.externalTransaction.findUniqueOrThrow({
       where: { id },
       include: { transaction: { include: { transactionCategories: true } } },

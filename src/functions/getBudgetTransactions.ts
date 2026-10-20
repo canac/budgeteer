@@ -3,7 +3,7 @@ import { endOfMonth, startOfMonth } from "date-fns";
 import { boolean, object } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { toISODateString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
@@ -18,7 +18,7 @@ export const getBudgetTransactions = createServerFn()
     const startDate = toISODateString(startOfMonth(month));
     const endDate = toISODateString(endOfMonth(month));
 
-    const transactions = await prisma.transaction.findMany({
+    const transactions = await getPrisma().transaction.findMany({
       where: {
         date: { gte: startDate, lte: endDate },
         type: { not: "BALANCE_ADJUSTMENT" },

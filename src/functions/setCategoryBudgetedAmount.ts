@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = object({
   budgetCategoryId: string(),
@@ -12,7 +12,7 @@ export const setCategoryBudgetedAmount = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { budgetCategoryId, budgetedAmount } }) => {
-    await prisma.budgetCategory.update({
+    await getPrisma().budgetCategory.update({
       where: {
         id: budgetCategoryId,
       },

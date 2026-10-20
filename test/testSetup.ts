@@ -28,7 +28,7 @@ vi.mock("@tanstack/react-start", async (importOriginal) => ({
 }));
 
 vi.mock("~/lib/prisma", () => ({
-  prisma: getPrisma(),
+  getPrisma,
 }));
 
 beforeAll(async () => {

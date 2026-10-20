@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = object({
   id: string(),
@@ -13,6 +13,7 @@ export const editTransfer = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, amount, description } }) => {
+    const prisma = getPrisma();
     const { transactionId, sourceCategoryId, destinationCategoryId } =
       await prisma.transfer.findUniqueOrThrow({ where: { id } });
 

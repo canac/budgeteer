@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { monthString } from "src/lib/zod";
 import { literal, object, string, union } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = object({
   month: monthString(),
@@ -15,6 +15,7 @@ export const reorderCategory = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, categoryId, targetId, direction } }) => {
+    const prisma = getPrisma();
     const [target, neighbor] = await prisma.category.findMany({
       cursor: { id: targetId },
       where: {

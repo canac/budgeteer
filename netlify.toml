@@ -1,3 +1,0 @@
-[build]
-command = "pnpm db:deploy && pnpm build"
-publish = "dist/client"

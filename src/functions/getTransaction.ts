@@ -2,7 +2,7 @@ import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = object({
   id: string(),
@@ -12,7 +12,7 @@ export const getTransaction = createServerFn()
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id } }) => {
-    const transaction = await prisma.transaction.findUnique({
+    const transaction = await getPrisma().transaction.findUnique({
       where: { id },
       include: {
         transactionCategories: {

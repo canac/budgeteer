@@ -1,8 +1,9 @@
 import repl from "node:repl";
 import "./loadEnv.ts";
-import { prisma } from "./src/lib/prisma.ts";
+import { getPrisma } from "./src/lib/prisma.ts";
 
 const r = repl.start();
+const prisma = getPrisma();
 
 r.context.prisma = prisma;
 Object.entries(prisma)

@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export const getCategories = createServerFn()
   .middleware([requireAuth])
   .handler(() =>
-    prisma.category.findMany({
+    getPrisma().category.findMany({
       where: {
         deletedMonth: null,
       },

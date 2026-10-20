@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { boolean, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = object({
   id: string().min(1),
@@ -12,7 +12,7 @@ export const setExternalAccountEnabled = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, enabled } }) => {
-    return prisma.$transaction(async (tx) => {
+    return getPrisma().$transaction(async (tx) => {
       const account = await tx.externalAccount.update({ where: { id }, data: { enabled } });
       if (enabled) {
         // Reset the connection cursor so the next import re-fetches full history

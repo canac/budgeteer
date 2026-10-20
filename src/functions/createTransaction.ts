@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { transactionSchema } from "~/lib/transactionSchema";
 import { ensureValid, validateTransactionDate } from "~/lib/validation";
 
@@ -11,7 +11,7 @@ export const createTransaction = createServerFn({ method: "POST" })
   .handler(async ({ data: { categories, ...attributes } }) => {
     ensureValid(await validateTransactionDate(attributes.date, pluck(categories, "categoryId")));
 
-    return prisma.transaction.create({
+    return getPrisma().transaction.create({
       data: {
         ...attributes,
         transactionCategories: {

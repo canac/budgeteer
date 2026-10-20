@@ -3,12 +3,12 @@ import { differenceInMonths, parseISO, startOfMonth, subMonths } from "date-fns"
 import { requireAuth } from "~/lib/authMiddleware";
 import { range } from "~/lib/collections";
 import { toISOMonthString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export const getBudgetMonths = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
-    const oldestBudget = await prisma.budget.findFirst({
+    const oldestBudget = await getPrisma().budget.findFirst({
       select: {
         month: true,
       },

@@ -4,7 +4,7 @@ import { number, object, optional } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { pluck } from "~/lib/collections";
 import { toISODateString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = optional(
   object({
@@ -17,7 +17,7 @@ export const getVendors = createServerFn()
   .middleware([requireAuth])
   .handler(async ({ data }) => {
     const months = data?.months;
-    const vendors = await prisma.transaction.findMany({
+    const vendors = await getPrisma().transaction.findMany({
       where: {
         date:
           months === undefined

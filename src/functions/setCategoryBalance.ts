@@ -4,7 +4,7 @@ import { applyBalanceAdjustment } from "~/lib/applyBalanceAdjustment";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance } from "~/lib/calculateBalance";
 import { toISOMonthString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { monthDate } from "~/lib/zod";
 
 const inputSchema = object({
@@ -18,7 +18,7 @@ export const setCategoryBalance = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .handler(async ({ data: { categoryId, month, targetBalance } }) => {
     const monthString = toISOMonthString(month);
-    const category = await prisma.category.findUniqueOrThrow({
+    const category = await getPrisma().category.findUniqueOrThrow({
       where: {
         id: categoryId,
         accumulating: true,

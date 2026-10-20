@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export const getExternalAccounts = createServerFn()
   .middleware([requireAuth])
   .handler(() =>
-    prisma.externalAccount.findMany({
+    getPrisma().externalAccount.findMany({
       orderBy: [{ archived: "asc" }, { institution: "asc" }, { name: "asc" }],
     }),
   );

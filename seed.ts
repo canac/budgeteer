@@ -1,5 +1,7 @@
 import "./loadEnv.ts";
-import { prisma } from "./src/lib/prisma.ts";
+import { getPrisma } from "./src/lib/prisma.ts";
+
+const prisma = getPrisma();
 
 // Delete all existing data
 await prisma.transactionCategory.deleteMany();

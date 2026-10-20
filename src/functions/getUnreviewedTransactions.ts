@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { literal, number, object, optional, string, union } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { find, pluck } from "~/lib/collections";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { loadRules, type RuleOutcome, type VendorRules } from "~/lib/ruleLookup";
 
 interface Suggestion {
@@ -51,6 +51,7 @@ export const getUnreviewedTransactions = createServerFn()
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { page, pageSize, view, accountId } }) => {
+    const prisma = getPrisma();
     const viewWhere =
       view === "dismissed"
         ? { reviewed: true, transaction: { is: null }, removedAt: null }

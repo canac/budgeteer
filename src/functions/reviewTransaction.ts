@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { array, boolean, discriminatedUnion, int, literal, number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { ruleScopeSchema, saveRule } from "~/lib/saveRule";
 
 const inputSchema = object({
@@ -28,6 +28,7 @@ export const reviewTransaction = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { id, ruleScope, decision } }) => {
+    const prisma = getPrisma();
     const externalTransaction = await prisma.externalTransaction.findUniqueOrThrow({
       where: { id },
     });

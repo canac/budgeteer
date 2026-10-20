@@ -11,6 +11,15 @@ generator client {
   engineType   = "client"
 }
 
+// Cloudflare Workers can't compile wasm at runtime and must use this client
+generator workerdClient {
+  provider     = "prisma-client"
+  output       = "../src/prisma-workerd"
+  moduleFormat = "esm"
+  engineType   = "client"
+  runtime      = "workerd"
+}
+
 datasource db {
   provider = "postgresql"
 }

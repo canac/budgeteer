@@ -1,4 +1,4 @@
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export interface RuleCategory {
   id: string;
@@ -38,6 +38,7 @@ function toOutcome<Split>(splits: Split[]): RuleOutcome<Split> {
 
 /** Stored rules keyed by bank vendor, for `externalVendors` or for every vendor when omitted */
 export async function loadRules(externalVendors?: string[]): Promise<Map<string, VendorRules>> {
+  const prisma = getPrisma();
   const where = externalVendors && { externalVendor: { in: externalVendors } };
   const [aliases, vendorRules, amountRules] = await Promise.all([
     prisma.vendorAlias.findMany({ where }),

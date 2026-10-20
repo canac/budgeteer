@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { syncConnection } from "src/lib/plaid/sync";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 export const importTransactions = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .handler(async () => {
-    const connections = await prisma.externalConnection.findMany({
+    const connections = await getPrisma().externalConnection.findMany({
       where: { OR: [{ accounts: { none: {} } }, { accounts: { some: { enabled: true } } }] },
       include: { accounts: true },
     });

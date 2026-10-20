@@ -5,7 +5,7 @@ import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
 import { calculateCategoryBalance, calculateCategoryStartingBalance } from "~/lib/calculateBalance";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { validateCategoryDeletion } from "~/lib/validation";
 import { monthDate } from "~/lib/zod";
 
@@ -18,6 +18,7 @@ export const getBudgetCategory = createServerFn()
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, categoryId } }) => {
+    const prisma = getPrisma();
     const monthString = toISOMonthString(month);
     const category = await prisma.category.findUnique({
       where: {

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { boolean, number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 import { monthString } from "~/lib/zod";
 
 const inputSchema = object({
@@ -16,6 +16,7 @@ export const createCategory = createServerFn({ method: "POST" })
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { month, name, budgetedAmount, accumulating, flexible } }) => {
+    const prisma = getPrisma();
     const budget = await prisma.budget.findFirstOrThrow({
       where: { month },
     });

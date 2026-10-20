@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const inputSchema = object({
   vendor: string(),
@@ -19,7 +19,7 @@ export const getVendorCategorySuggestions = createServerFn()
   .validator(inputSchema)
   .middleware([requireAuth])
   .handler(async ({ data: { vendor } }): Promise<CategorySuggestion[]> => {
-    const history = await prisma.transactionCategory.findMany({
+    const history = await getPrisma().transactionCategory.findMany({
       where: {
         transaction: { vendor, type: "TRANSACTION" },
       },

@@ -318,7 +318,7 @@ describe("reviewTransaction", () => {
         reviewTransaction({
           data: { id: "missing", ruleScope: "vendor", decision: { type: "dismiss" } },
         }),
-      ).rejects.toThrow(/Invalid `prisma.externalTransaction/);
+      ).rejects.toThrow(/externalTransaction\.findUniqueOrThrow/);
 
       expect(await prisma.vendorRule.count()).toBe(0);
     });

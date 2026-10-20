@@ -22,8 +22,7 @@ export class PlaidError extends Error {
 }
 
 function baseUrl(): string {
-  const env = process.env.PLAID_ENV ?? "sandbox";
-  return `https://${env}.plaid.com`;
+  return `https://${process.env.PLAID_ENV}.plaid.com`;
 }
 
 function credentials(): { client_id: string; secret: string } {

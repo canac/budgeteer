@@ -3,7 +3,7 @@ import { endOfMonth, startOfMonth } from "date-fns";
 import type { BudgetCategory, Category } from "~/prisma/client";
 import { find, pluck } from "~/lib/collections";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 type BudgetCategoryWithCategory = Pick<BudgetCategory, "categoryId"> & {
   category: Pick<Category, "accumulating">;
@@ -19,6 +19,7 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
   budgetCategories: BC[],
   month: Date,
 ): Promise<Array<BC & BalanceFields>> {
+  const prisma = getPrisma();
   const monthString = toISOMonthString(month);
   const startDate = toISODateString(startOfMonth(month));
   const endDate = toISODateString(endOfMonth(month));
@@ -98,7 +99,7 @@ async function getTotalBudgetedAmount({
   month: string;
   category: Pick<Category, "id" | "accumulating">;
 }): Promise<number> {
-  const aggregateBudgetCategories = await prisma.budgetCategory.aggregate({
+  const aggregateBudgetCategories = await getPrisma().budgetCategory.aggregate({
     _sum: { budgetedAmount: true },
     where: {
       categoryId: category.id,
@@ -115,7 +116,7 @@ export async function calculateCategoryBalance({
   month: Date;
   category: Pick<Category, "id" | "accumulating">;
 }): Promise<number> {
-  const aggregateTransactions = await prisma.transactionCategory.aggregate({
+  const aggregateTransactions = await getPrisma().transactionCategory.aggregate({
     _sum: { amount: true },
     where: {
       categoryId: category.id,
@@ -151,7 +152,7 @@ export async function calculateCategoryStartingBalance({
     return totalBudgetedAmount;
   }
 
-  const aggregateTransactions = await prisma.transactionCategory.aggregate({
+  const aggregateTransactions = await getPrisma().transactionCategory.aggregate({
     _sum: { amount: true },
     where: {
       categoryId: category.id,

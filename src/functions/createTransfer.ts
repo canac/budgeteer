@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { number, object, string } from "zod";
 import { requireAuth } from "~/lib/authMiddleware";
-import { prisma } from "~/lib/prisma";
+import { getPrisma } from "~/lib/prisma";
 
 const transferSchema = object({
   amount: number().int().positive(),
@@ -16,7 +16,7 @@ export const createTransfer = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .handler(
     async ({ data: { amount, date, sourceCategoryId, destinationCategoryId, description } }) => {
-      const transaction = await prisma.transaction.create({
+      const transaction = await getPrisma().transaction.create({
         data: {
           type: "TRANSFER",
           amount: 0,

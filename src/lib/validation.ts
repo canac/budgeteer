@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { getPrisma } from "./prisma";
 
 type ValidationResult = { valid: true } | { valid: false; message: string };
 
@@ -19,6 +19,7 @@ export async function validateCategoryDeletion(
   categoryId: string,
   month: string,
 ): Promise<ValidationResult> {
+  const prisma = getPrisma();
   const results = await Promise.all([
     prisma.transactionCategory
       .findFirst({
@@ -60,7 +61,7 @@ export async function validateTransactionDate(
   categoryIds: string[],
 ): Promise<ValidationResult> {
   const transactionMonth = date.slice(0, 7);
-  const invalidCategory = await prisma.category.findFirst({
+  const invalidCategory = await getPrisma().category.findFirst({
     where: {
       id: { in: categoryIds },
       OR: [{ createdMonth: { gt: transactionMonth } }, { deletedMonth: { lte: transactionMonth } }],

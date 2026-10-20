@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "budgeteer",
+  "main": "@tanstack/react-start/server-entry",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "secrets": {
+    "required": ["JWT_SECRET", "AUTH_PASSWORD", "PLAID_ENV", "PLAID_CLIENT_ID", "PLAID_SECRET"],
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "24f69baaed3942cfaa9114f7f60cd99b",
+    },
+  ],
+}
