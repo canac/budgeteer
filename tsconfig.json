@@ -5,7 +5,7 @@
     "types": ["vite/client"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["DOM", "DOM.Iterable", "ES2024"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "isolatedModules": true,
     "resolveJsonModule": true,
     "noUncheckedIndexedAccess": true,

@@ -6,7 +6,8 @@ export const getImportRules = createServerFn()
   .middleware([requireAuth])
   .handler(async () => {
     const rules = await loadRules();
-    return Array.from(rules.values()).toSorted((a, b) =>
-      a.externalVendor.localeCompare(b.externalVendor),
-    );
+    return rules
+      .values()
+      .toArray()
+      .toSorted((a, b) => a.externalVendor.localeCompare(b.externalVendor));
   });

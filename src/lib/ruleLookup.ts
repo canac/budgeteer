@@ -59,14 +59,13 @@ export async function loadRules(externalVendors?: string[]): Promise<Map<string,
   ]);
 
   const rules = new Map<string, VendorRules>();
-  const getVendor = (externalVendor: string) => {
-    let vendor = rules.get(externalVendor);
-    if (!vendor) {
-      vendor = { externalVendor, vendorAlias: null, vendorRule: null, amountRules: [] };
-      rules.set(externalVendor, vendor);
-    }
-    return vendor;
-  };
+  const getVendor = (externalVendor: string) =>
+    rules.getOrInsertComputed(externalVendor, () => ({
+      externalVendor,
+      vendorAlias: null,
+      vendorRule: null,
+      amountRules: [],
+    }));
 
   for (const { externalVendor, vendor } of aliases) {
     getVendor(externalVendor).vendorAlias = vendor;
