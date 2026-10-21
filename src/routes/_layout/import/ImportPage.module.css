@@ -1,0 +1,9 @@
+.root {
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.header {
+  min-width: min(100%, max-content);
+}

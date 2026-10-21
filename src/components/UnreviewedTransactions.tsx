@@ -14,6 +14,7 @@ import { DynamicReviewTransactionModal } from "~/components/DynamicReviewTransac
 import { List, ListRow } from "~/components/List";
 import { RuleBadges } from "~/components/RuleBadges";
 import { formatSignedCurrency, shortDateFormatter } from "~/lib/formatters";
+import classes from "./UnreviewedTransactions.module.css";
 
 interface UnreviewedTransactionsProps {
   transactions: UnreviewedTransaction[];
@@ -62,7 +63,7 @@ export function UnreviewedTransactions({
           return (
             <ListRow
               key={transaction.id}
-              className={outcome?.type === "dismiss" ? "dismiss-suggested" : undefined}
+              className={outcome?.type === "dismiss" ? classes.dismissSuggested : undefined}
               title={
                 suggestion?.vendorAlias ? (
                   vendor

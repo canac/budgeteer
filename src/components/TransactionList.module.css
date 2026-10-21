@@ -1,11 +1,11 @@
-.TransactionList {
-  .mantine-ThemeIcon-root.transaction-type {
+.root {
+  :global(.mantine-ThemeIcon-root).transactionType {
     --ti-bg: var(--mantine-color-blue-filled);
     --ti-size: var(--ti-size-sm);
     border-radius: 100%;
   }
 
-  .category-badge {
+  .categoryBadge {
     cursor: pointer;
   }
 }

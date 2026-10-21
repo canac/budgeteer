@@ -12,7 +12,7 @@ import { List, ListRow } from "~/components/List";
 import { RuleBadges } from "~/components/RuleBadges";
 import { deleteRule as deleteRuleFn } from "~/functions/deleteRule";
 import { formatSignedCurrency } from "~/lib/formatters";
-import "./ImportRules.css";
+import classes from "./ImportRules.module.css";
 
 interface ImportRulesProps {
   rules: VendorRules[];
@@ -45,10 +45,11 @@ export function ImportRules({ rules }: ImportRulesProps) {
 
   return (
     <>
-      <List className="ImportRules">
+      <List className={classes.root}>
         {rules.flatMap((rule) => [
           <ListRow
             key={rule.externalVendor}
+            className={classes.row}
             title={rule.vendorAlias ?? rule.externalVendor}
             meta={rule.externalVendor}
             actions={
@@ -77,11 +78,14 @@ export function ImportRules({ rules }: ImportRulesProps) {
           ...rule.amountRules.map((amountRule) => (
             <ListRow
               key={amountRule.id}
+              className={classes.row}
               title={
                 <>
                   {rule.vendorAlias ?? rule.externalVendor}
-                  <span className="rule-separator">•</span>
-                  <span className="rule-amount">{formatSignedCurrency(amountRule.amount)}</span>
+                  <span className={classes.ruleSeparator}>•</span>
+                  <span className={classes.ruleAmount}>
+                    {formatSignedCurrency(amountRule.amount)}
+                  </span>
                 </>
               }
               meta={rule.externalVendor}

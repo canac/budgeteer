@@ -1,0 +1,39 @@
+.categoryItem {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  padding-bottom: var(--mantine-spacing-xs);
+  border-radius: var(--mantine-radius-sm);
+
+  .progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  &:has(.dragHandle:hover) {
+    background-color: var(--mantine-color-gray-0);
+  }
+
+  &.dragging {
+    opacity: 0.5;
+  }
+
+  a {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  color: var(--mantine-color-gray-5);
+
+  &:active {
+    cursor: grabbing;
+  }
+}

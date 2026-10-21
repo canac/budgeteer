@@ -23,7 +23,7 @@ import {
   monthFormatter,
   monthOnlyFormatter,
 } from "~/lib/formatters";
-import "./CategoryDetailsPage.css";
+import classes from "./CategoryDetailsPage.module.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/categories/$category")({
   component: CategoryDetailsPage,
@@ -92,7 +92,7 @@ function CategoryDetailsPage() {
   const transactionRows = (
     <>
       <ListRow
-        className="starting-balance"
+        className={classes.startingBalance}
         title="Budgeted this month"
         value={
           <EditableAmount
@@ -118,7 +118,7 @@ function CategoryDetailsPage() {
   );
 
   return (
-    <Drawer.Root className="CategoryDetailsPage" {...modalProps} position="right" size="xl">
+    <Drawer.Root className={classes.root} {...modalProps} position="right" size="xl">
       <Drawer.Overlay />
       <Drawer.Content>
         <Drawer.Header>
@@ -152,7 +152,10 @@ function CategoryDetailsPage() {
                 Current Balance
               </Text>
               <EditableAmount
-                className={clsx(["balance", amountSignClassname(budgetCategory.currentBalance)])}
+                className={clsx(
+                  classes.balance,
+                  amountSignClassname(budgetCategory.currentBalance),
+                )}
                 editable={budgetCategory.category.accumulating}
                 amount={budgetCategory.currentBalance}
                 saveAmount={handleSaveBalance}
@@ -199,6 +202,7 @@ function CategoryDetailsPage() {
                 </Group>
               </Title>
               <TransactionList
+                className={classes.transactionList}
                 transactions={budgetCategory.transactions}
                 extraRows={transactionRows}
               />

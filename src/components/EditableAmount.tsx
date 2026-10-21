@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useState } from "react";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatters";
-import "./EditableAmount.css";
+import classes from "./EditableAmount.module.css";
 
 interface EditableAmountProps {
   className?: string;
@@ -31,7 +31,7 @@ export function EditableAmount({
   };
 
   return (
-    <span className="EditableAmount">
+    <span className={classes.root}>
       {editing && editable ? (
         <form
           onSubmit={async (event) => {
@@ -40,7 +40,7 @@ export function EditableAmount({
           }}
         >
           <input
-            className={clsx("input", className)}
+            className={clsx(classes.input, className)}
             ref={(input) => input?.focus()}
             inputMode="decimal"
             pattern="-?[0-9]*(\.[0-9]{0,2})?"
@@ -60,7 +60,7 @@ export function EditableAmount({
       ) : (
         <button
           type="button"
-          className={clsx("text", className)}
+          className={clsx(classes.text, className)}
           aria-label="Edit amount"
           onClick={handleEditClick}
         >

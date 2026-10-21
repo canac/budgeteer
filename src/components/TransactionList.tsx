@@ -7,6 +7,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { createLink, linkOptions, useRouter } from "@tanstack/react-router";
+import clsx from "clsx";
 import { parseISO } from "date-fns";
 import { forwardRef, type ReactNode, useState } from "react";
 import invariant from "tiny-invariant";
@@ -20,7 +21,7 @@ import { List, ListRow } from "~/components/List";
 import { TransferModal, type TransferModalProps } from "~/components/TransferModal";
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
-import "./TransactionList.css";
+import classes from "./TransactionList.module.css";
 import { TransactionModal, type TransactionModalProps } from "./TransactionModal";
 
 type BaseTransaction = Awaited<ReturnType<typeof getBudgetCategory>>["transactions"][number];
@@ -37,6 +38,7 @@ type ListTransaction = Omit<BaseTransaction, "transfer"> & {
 };
 
 interface TransactionListProps {
+  className?: string;
   transactions: ListTransaction[];
   extraRows?: ReactNode;
   showCategories?: boolean;
@@ -46,7 +48,7 @@ interface TransactionListProps {
 const CategoryBadgeLink = createLink(
   forwardRef<HTMLAnchorElement, BadgeProps>((props, ref) => (
     <Badge
-      className="category-badge"
+      className={classes.categoryBadge}
       ref={ref}
       component="a"
       variant="light"
@@ -92,7 +94,13 @@ function TransferSourceBadge({
   }
 
   return (
-    <Badge className="category-badge" variant="light" color={props.color} size="lg" tt="none">
+    <Badge
+      className={classes.categoryBadge}
+      variant="light"
+      color={props.color}
+      size="lg"
+      tt="none"
+    >
       Leftovers
     </Badge>
   );
@@ -120,7 +128,7 @@ interface TransactionTypeIconProps {
 function TransactionTypeIcon({ transaction }: TransactionTypeIconProps) {
   if (transaction.type === "TRANSFER") {
     return (
-      <ThemeIcon className="transaction-type">
+      <ThemeIcon className={classes.transactionType}>
         <IconArrowsRightLeft />
       </ThemeIcon>
     );
@@ -128,7 +136,7 @@ function TransactionTypeIcon({ transaction }: TransactionTypeIconProps) {
 
   if (transaction.type === "BALANCE_ADJUSTMENT") {
     return (
-      <ThemeIcon className="transaction-type">
+      <ThemeIcon className={classes.transactionType}>
         <IconPencilDollar />
       </ThemeIcon>
     );
@@ -163,6 +171,7 @@ function TransactionCategories({
 }
 
 export function TransactionList({
+  className,
   transactions,
   extraRows,
   showCategories,
@@ -226,7 +235,7 @@ export function TransactionList({
           onSave={handleUpdate}
         />
       )}
-      <List className="TransactionList">
+      <List className={clsx(classes.root, className)}>
         {transactions.map((transaction) => {
           const income = transaction.type !== "TRANSFER" && transaction.amount >= 0;
           const uneditableMessage = uneditableReason(transaction);

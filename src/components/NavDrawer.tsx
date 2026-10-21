@@ -13,7 +13,7 @@ import { logout as logoutServerFn } from "~/functions/logout";
 import { BudgetMonthSelector } from "./BudgetMonthSelector";
 import { CategorySelector } from "./CategorySelector";
 import { MantineNavLink } from "./MantineNavLink";
-import "./NavDrawer.css";
+import classes from "./NavDrawer.module.css";
 
 const routeApi = getRouteApi("/_layout");
 
@@ -43,7 +43,7 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
       onClose={onClose}
       title="Budgeteer"
       position="left"
-      classNames={{ content: "NavDrawer" }}
+      classNames={{ content: classes.root }}
       styles={{
         content: {
           backgroundColor: "#2b8a3e",

@@ -12,7 +12,7 @@ import { useToday } from "~/hooks/useToday";
 import { range as makeRange } from "~/lib/collections";
 import { formatCurrency, monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
-import "./CategoryHistoryPage.css";
+import classes from "./CategoryHistoryPage.module.css";
 
 const ranges = ["current", "last1", "last3", "last6", "last12"] as const;
 type Range = (typeof ranges)[number];
@@ -103,7 +103,7 @@ function CategoryHistoryPage() {
   const percentageUsed = (totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted) * 100;
 
   return (
-    <PageContainer className="CategoryHistoryPage" size="xl">
+    <PageContainer size="xl">
       <Stack gap="xl">
         <Group justify="space-between" align="flex-start">
           <div>
@@ -177,7 +177,8 @@ function CategoryHistoryPage() {
         </Stack>
 
         <Grid
-          className="stats"
+          className={classes.stats}
+          gap="lg"
           columns={30}
           type="container"
           breakpoints={{ xs: "36rem", sm: "48rem", md: "62rem", lg: "80rem", xl: "88rem" }}
@@ -185,16 +186,16 @@ function CategoryHistoryPage() {
           <Grid.Col span={statSpan}>
             <Card>
               <Stack>
-                <Text className="label">Total Budgeted</Text>
-                <Text className="value">{formatCurrency(totalBudgeted)}</Text>
+                <Text className={classes.label}>Total Budgeted</Text>
+                <Text className={classes.value}>{formatCurrency(totalBudgeted)}</Text>
               </Stack>
             </Card>
           </Grid.Col>
           <Grid.Col span={statSpan}>
             <Card>
               <Stack>
-                <Text className="label">Total Spent</Text>
-                <Text className="value" c={totalSpent > totalBudgeted ? "red" : undefined}>
+                <Text className={classes.label}>Total Spent</Text>
+                <Text className={classes.value} c={totalSpent > totalBudgeted ? "red" : undefined}>
                   {formatCurrency(totalSpent)}
                 </Text>
               </Stack>
@@ -203,8 +204,8 @@ function CategoryHistoryPage() {
           <Grid.Col span={statSpan}>
             <Card>
               <Stack>
-                <Text className="label">Percentage Used</Text>
-                <Text className="value" c={percentageUsed > 100 ? "red" : undefined}>
+                <Text className={classes.label}>Percentage Used</Text>
+                <Text className={classes.value} c={percentageUsed > 100 ? "red" : undefined}>
                   {percentageUsed.toFixed(1)}%
                 </Text>
               </Stack>
@@ -213,16 +214,16 @@ function CategoryHistoryPage() {
           <Grid.Col span={wideStatSpan}>
             <Card>
               <Stack>
-                <Text className="label">Spent per Month</Text>
-                <Text className="value">{formatCurrency(totalSpent / monthCount)}</Text>
+                <Text className={classes.label}>Spent per Month</Text>
+                <Text className={classes.value}>{formatCurrency(totalSpent / monthCount)}</Text>
               </Stack>
             </Card>
           </Grid.Col>
           <Grid.Col span={wideStatSpan}>
             <Card>
               <Stack>
-                <Text className="label">Transactions per Month</Text>
-                <Text className="value">{(totalTransactions / monthCount).toFixed(1)}</Text>
+                <Text className={classes.label}>Transactions per Month</Text>
+                <Text className={classes.value}>{(totalTransactions / monthCount).toFixed(1)}</Text>
               </Stack>
             </Card>
           </Grid.Col>

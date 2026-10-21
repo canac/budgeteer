@@ -1,0 +1,12 @@
+.balance {
+  font-size: 2.25rem;
+  font-weight: bold;
+}
+
+.root .transactionList {
+  max-width: none;
+}
+
+.startingBalance {
+  border-top: 2px solid;
+}

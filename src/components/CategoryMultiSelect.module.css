@@ -1,0 +1,23 @@
+.checkIcon {
+  width: 0.8em;
+  height: 0.8em;
+  opacity: 0.4;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  width: 100%;
+}
+
+.optionDate {
+  margin-left: auto;
+  padding-left: 1em;
+  color: var(--mantine-color-dimmed);
+  white-space: nowrap;
+}
+
+.groupLabel {
+  text-transform: uppercase;
+}

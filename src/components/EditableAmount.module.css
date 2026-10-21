@@ -1,0 +1,32 @@
+.root form {
+  display: inline;
+}
+
+.text {
+  /* Reset button user-agent styles */
+  border: none;
+  background: none;
+  padding: 0;
+
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.input {
+  padding: 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: unset;
+
+  field-sizing: content;
+  text-align: right;
+
+  &:focus-visible {
+    outline: none;
+    border-bottom-color: var(--mantine-color-blue-6);
+  }
+
+  &:invalid {
+    color: var(--mantine-color-red-5);
+  }
+}

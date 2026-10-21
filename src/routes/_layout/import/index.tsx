@@ -19,7 +19,7 @@ import { reconcileTransaction as reconcileTransactionFn } from "~/functions/reco
 import { restoreTransaction as restoreTransactionFn } from "~/functions/restoreTransaction";
 import { reviewTransaction as reviewTransactionFn } from "~/functions/reviewTransaction";
 import { useSyncedState } from "~/hooks/useSyncedState";
-import "./ImportPage.css";
+import classes from "./ImportPage.module.css";
 
 const PAGE_SIZE = 25;
 
@@ -186,9 +186,9 @@ function ImportTransactionsPage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <Stack className="ImportPage" gap="md">
+    <Stack className={classes.root} gap="md">
       <Group justify="space-between">
-        <Text className="header">{header(currentView, total)}</Text>
+        <Text className={classes.header}>{header(currentView, total)}</Text>
         <Button leftSection={<IconDownload />} onClick={handleImport} loading={importing}>
           Import
         </Button>

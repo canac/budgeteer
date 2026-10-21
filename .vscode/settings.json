@@ -2,5 +2,7 @@
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
-  }
+  },
+  "js/ts.experimental.useTsgo": true,
+  "js/ts.tsdk.path": "node_modules/typescript"
 }

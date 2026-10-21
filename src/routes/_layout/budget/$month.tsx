@@ -8,6 +8,7 @@ import {
   IconFilterOff,
 } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/react-router";
+import clsx from "clsx";
 import { addMonths, parseISO, startOfMonth, subMonths } from "date-fns";
 import { boolean, object, optional, catch as zCatch } from "zod/mini";
 import { DynamicLeftoversTransferModal } from "~/components/DynamicLeftoversTransferModal";
@@ -20,7 +21,7 @@ import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { useToday } from "~/hooks/useToday";
 import { amountSignClassname, formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
-import "./BudgetPage.css";
+import classes from "./BudgetPage.module.css";
 
 const searchSchema = object({
   leftover: zCatch(optional(boolean()), undefined),
@@ -86,7 +87,7 @@ function BudgetLayout() {
   };
 
   return (
-    <Stack className="BudgetPage" align="center">
+    <Stack className={classes.root} align="center">
       {leftoversTransferOpened && (
         <DynamicLeftoversTransferModal
           month={budget.month}
@@ -159,7 +160,7 @@ function BudgetLayout() {
           <Group justify="space-between">
             <Title order={2}>Income</Title>
             <EditableAmount
-              className={leftToBudget === 0 ? "positive" : undefined}
+              className={clsx(classes.income, { positive: leftToBudget === 0 })}
               amount={budget.income}
               saveAmount={handleSaveIncome}
             />
@@ -172,7 +173,7 @@ function BudgetLayout() {
               </Text>
             </Group>
           )}
-          <Group className="leftover-row" gap={0} wrap="nowrap">
+          <Group className={classes.leftoverRow} gap={0} wrap="nowrap">
             <MantineButtonLink
               to={tabLink}
               params={{ month: budget.month }}
@@ -186,15 +187,15 @@ function BudgetLayout() {
                 </Text>
               }
               aria-label={leftover ? "Show all categories" : "Show only leftover categories"}
-              className="leftover-toggle"
+              className={classes.leftoverToggle}
             >
               <Group gap="xs" wrap="nowrap">
                 Leftover
-                {leftover && <IconFilter className="icon" size={18} />}
+                {leftover && <IconFilter className={classes.icon} size={18} />}
                 {leftover ? (
-                  <IconFilterOff className="hover-icon" size={18} />
+                  <IconFilterOff className={classes.hoverIcon} size={18} />
                 ) : (
-                  <IconFilter className="hover-icon" size={18} />
+                  <IconFilter className={classes.hoverIcon} size={18} />
                 )}
               </Group>
             </MantineButtonLink>

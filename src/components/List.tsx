@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Text } from "@mantine/core";
 import clsx from "clsx";
-import "./List.css";
+import classes from "./List.module.css";
 
 interface ListProps {
   children: ReactNode;
@@ -10,7 +10,7 @@ interface ListProps {
 
 /** Vertical list of rows, laid out for narrow screens. */
 export function List({ children, className }: ListProps) {
-  return <div className={clsx("List", className)}>{children}</div>;
+  return <div className={clsx(classes.root, className)}>{children}</div>;
 }
 
 export interface ListRowProps {
@@ -32,19 +32,19 @@ export function ListRow({ icon, title, value, actions, meta, tags, className }: 
   const hasBottom = Boolean(meta) || Boolean(tags);
 
   return (
-    <div className={clsx("list-row", className)}>
-      <div className="cell-title">
+    <div className={clsx(classes.row, className)}>
+      <div className={classes.cellTitle}>
         <Text component="span" lineClamp={1}>
           {title}
         </Text>
         {icon}
       </div>
-      {value && <div className="cell-value">{value}</div>}
-      <div className="cell-actions">{actions}</div>
+      {value && <div className={classes.cellValue}>{value}</div>}
+      <div className={classes.cellActions}>{actions}</div>
       {hasBottom && (
-        <div className="cell-bottom">
+        <div className={classes.cellBottom}>
           {meta && (
-            <Text component="span" className="row-meta" c="dimmed" size="sm">
+            <Text component="span" className={classes.rowMeta} c="dimmed" size="sm">
               {meta}
             </Text>
           )}

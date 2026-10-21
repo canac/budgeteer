@@ -7,7 +7,7 @@ import { useSortedCategories } from "~/hooks/useSortedCategories";
 import { find } from "~/lib/collections";
 import { formatCurrency, formatRelativeDate } from "~/lib/formatters";
 import type { CategorySplitFormValues } from "./CategorySplitFields";
-import "./TransactionModal.css";
+import classes from "./CategoryMultiSelect.module.css";
 
 const toOption = (category: CategoryWithBalance) => ({
   value: category.id,
@@ -83,21 +83,20 @@ export function CategoryMultiSelect({
           close();
         }
       }}
-      classNames={{
-        dropdown: "TransactionModal-dropdown",
-        groupLabel: "TransactionModal-groupLabel",
-      }}
+      classNames={{ groupLabel: classes.groupLabel }}
       renderOption={({ option, checked }) => {
         const category = find(categories, "id", option.value);
         const date = suggestedDates.get(option.value);
         return (
           category && (
-            <div className="option-row">
-              {checked && <CheckIcon className="check-icon" />}
+            <div className={classes.optionRow}>
+              {checked && <CheckIcon className={classes.checkIcon} />}
               <span>
                 {option.label} ({formatCurrency(category.balance)})
               </span>
-              {date && <span className="option-date">{formatRelativeDate(parseISO(date))}</span>}
+              {date && (
+                <span className={classes.optionDate}>{formatRelativeDate(parseISO(date))}</span>
+              )}
             </div>
           )
         );

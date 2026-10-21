@@ -34,6 +34,7 @@ import { reorderCategory } from "~/functions/reorderCategory";
 import { useSyncedState } from "~/hooks/useSyncedState";
 import { pluck } from "~/lib/collections";
 import { formatCurrency } from "~/lib/formatters";
+import classes from "./CategoriesPage.module.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/categories")({
   component: CategoriesPage,
@@ -69,13 +70,13 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
 
   return (
     <div
-      className={clsx("CategoryItem", { dragging: isDragging })}
+      className={clsx(classes.categoryItem, isDragging && classes.dragging)}
       ref={setNodeRef}
       style={style}
       {...attributes}
     >
       {reordering && (
-        <div className="drag-handle" {...listeners}>
+        <div className={classes.dragHandle} {...listeners}>
           <IconGripVertical size={18} stroke={1.5} />
         </div>
       )}
@@ -106,7 +107,7 @@ function CategoryItem({ budgetCategory, viewMode, reordering }: CategoryItemProp
         </Text>
       </MantineLink>
       <Progress
-        className="progress"
+        className={classes.progress}
         value={spentRatio * 100}
         color={spentRatio > 1 ? "red" : "green"}
         size="sm"
