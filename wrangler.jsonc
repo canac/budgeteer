@@ -1,10 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "budgeteer",
-  "main": "@tanstack/react-start/server-entry",
+  "main": "./src/server.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  "triggers": { "crons": ["0 */3 * * *"] },
   "secrets": {
     "required": ["JWT_SECRET", "AUTH_PASSWORD", "PLAID_ENV", "PLAID_CLIENT_ID", "PLAID_SECRET"],
   },
