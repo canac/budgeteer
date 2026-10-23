@@ -64,15 +64,7 @@ export function UnreviewedTransactions({
             <ListRow
               key={transaction.id}
               className={outcome?.type === "dismiss" ? classes.dismissSuggested : undefined}
-              title={
-                suggestion?.vendorAlias ? (
-                  vendor
-                ) : (
-                  <Text span fs="italic">
-                    {vendor}
-                  </Text>
-                )
-              }
+              title={vendor}
               meta={
                 <>
                   {shortDateFormatter.format(parseISO(transaction.date))}
