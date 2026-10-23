@@ -20,7 +20,10 @@ const inputSchema = object({
         }),
       ).min(1),
     }),
-    object({ type: literal("dismiss") }),
+    object({
+      type: literal("dismiss"),
+      vendorAlias: string().min(1).optional(),
+    }),
   ]),
 });
 
@@ -45,7 +48,12 @@ export const reviewTransaction = createServerFn({ method: "POST" })
       await saveRule({
         tx,
         externalTransaction,
-        newVendorAlias: accept?.updateAlias ? accept.vendor : null,
+        newVendorAlias:
+          decision.type === "dismiss"
+            ? (decision.vendorAlias ?? null)
+            : decision.updateAlias
+              ? decision.vendor
+              : null,
         scope: ruleScope,
         splits: accept?.splits ?? [],
       });

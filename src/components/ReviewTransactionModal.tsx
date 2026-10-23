@@ -109,7 +109,15 @@ export function ReviewTransactionModal({
       remember: suggestedRemember,
       amountOnly: suggestion?.amountRule ?? false,
     },
-    validate: (values) => (values.outcome === "dismiss" ? {} : validateCategorize(values)),
+    validate: (values) => {
+      if (values.outcome !== "dismiss") {
+        return validateCategorize(values);
+      }
+      if (values.updateAlias && !values.vendor.trim()) {
+        return { vendor: "Vendor is required" };
+      }
+      return {};
+    },
   });
 
   const { categorySelect, splitFields } = useCategorySplit({
@@ -142,7 +150,10 @@ export function ReviewTransactionModal({
         ruleScope,
         decision:
           values.outcome === "dismiss"
-            ? { type: "dismiss" }
+            ? {
+                type: "dismiss",
+                vendorAlias: values.updateAlias ? values.vendor.trim() : undefined,
+              }
             : {
                 type: "accept",
                 vendor: values.vendor.trim(),
@@ -159,7 +170,7 @@ export function ReviewTransactionModal({
     onSave();
   });
 
-  const { outcome, selectedCategoryIds, remember } = form.getValues();
+  const { outcome, selectedCategoryIds, remember, updateAlias } = form.getValues();
   const dismissing = outcome === "dismiss";
   const splitAcrossCategories = !dismissing && selectedCategoryIds.length > 1;
 
@@ -203,22 +214,22 @@ export function ReviewTransactionModal({
               form.setFieldValue("remember", keepSuggestion && suggestedRemember);
             }}
           />
+          <Stack gap="xs">
+            <Autocomplete
+              label="Vendor"
+              required={!dismissing || updateAlias}
+              key={form.key("vendor")}
+              {...form.getInputProps("vendor")}
+              data={vendors}
+            />
+            <Checkbox
+              label="Remember this vendor name"
+              key={form.key("updateAlias")}
+              {...form.getInputProps("updateAlias", { type: "checkbox" })}
+            />
+          </Stack>
           {!dismissing && (
             <>
-              <Stack gap="xs">
-                <Autocomplete
-                  label="Vendor"
-                  required
-                  key={form.key("vendor")}
-                  {...form.getInputProps("vendor")}
-                  data={vendors}
-                />
-                <Checkbox
-                  label="Remember this vendor name"
-                  key={form.key("updateAlias")}
-                  {...form.getInputProps("updateAlias", { type: "checkbox" })}
-                />
-              </Stack>
               <TextInput
                 label="Description"
                 key={form.key("description")}

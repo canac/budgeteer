@@ -40,9 +40,13 @@ describe("reviewTransaction", () => {
       },
     });
 
-  const dismiss = (ruleScope?: RuleScope) =>
+  const dismiss = (ruleScope?: RuleScope, decision: { vendorAlias?: string } = {}) =>
     reviewTransaction({
-      data: { id: external.id, ...(ruleScope ? { ruleScope } : {}), decision: { type: "dismiss" } },
+      data: {
+        id: external.id,
+        ...(ruleScope ? { ruleScope } : {}),
+        decision: { type: "dismiss", ...decision },
+      },
     });
 
   const alias = (vendor: string) => createVendorAlias({ externalVendor: external.vendor, vendor });
@@ -300,6 +304,30 @@ describe("reviewTransaction", () => {
       await dismiss("amount");
 
       expect(await savedAlias()).toMatchObject({ vendor: "Amazon" });
+    });
+
+    it("saves an alias with a dismissing vendor rule", async () => {
+      await dismiss("vendor", { vendorAlias: "Amazon" });
+
+      expect(await savedAlias()).toMatchObject({ vendor: "Amazon" });
+      expect(await savedVendorRule()).toMatchObject({ categoryId: null });
+    });
+
+    it("replaces an existing alias with a dismissing amount rule", async () => {
+      await alias("Amazon");
+
+      await dismiss("amount", { vendorAlias: "Amazon Marketplace" });
+
+      expect(await savedAlias()).toMatchObject({ vendor: "Amazon Marketplace" });
+      expect(await savedAmountRules()).toMatchObject([{ amount: -1000, splits: [] }]);
+    });
+
+    it("clears an existing alias when dismissing with the bank vendor as the alias", async () => {
+      await alias("Amazon");
+
+      await dismiss("vendor", { vendorAlias: external.vendor });
+
+      expect(await savedAlias()).toBeNull();
     });
 
     it("deletes the splits of an amount rule that starts dismissing", async () => {
