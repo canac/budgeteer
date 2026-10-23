@@ -68,8 +68,9 @@ export function ReviewTransactionModal({
   const totalDollars = penniesToDollars(totalPennies);
   const suggested = suggestion?.outcome;
 
-  const initialOutcome: Outcome = suggested?.type === "dismiss" ? "dismiss" : "categorize";
+  const initialOutcome: Outcome = suggested?.type ?? "categorize";
   const suggestedSplits = suggested?.type === "categorize" ? suggested.splits : [];
+  const suggestedCategoryIds = suggestedSplits.map(({ category }) => category.id);
   const suggestedRemember = !suggestion || suggested !== null;
 
   const formSchema = object({
@@ -99,7 +100,7 @@ export function ReviewTransactionModal({
       outcome: initialOutcome,
       vendor,
       description: "",
-      selectedCategoryIds: suggestedSplits.map(({ category }) => category.id),
+      selectedCategoryIds: suggestedCategoryIds,
       categoryAmounts: suggestedSplits.map(({ category, amount }) => ({
         categoryId: category.id,
         amount: penniesToDollars(Math.abs(amount)),
@@ -116,6 +117,16 @@ export function ReviewTransactionModal({
     categories: availableCategories,
     total: totalDollars,
     suggestions,
+  });
+
+  const matchesSuggestedCategories = (categoryIds: string[]) =>
+    categoryIds.length === suggestedCategoryIds.length &&
+    categoryIds.every((id) => suggestedCategoryIds.includes(id));
+
+  form.watch("selectedCategoryIds", ({ value }) => {
+    if (suggestedCategoryIds.length > 0) {
+      form.setFieldValue("remember", matchesSuggestedCategories(value) && suggestedRemember);
+    }
   });
 
   const handleSubmit = form.onSubmit(async (values) => {
@@ -180,7 +191,16 @@ export function ReviewTransactionModal({
             onChange={(value) => {
               const chosen: Outcome = value === "dismiss" ? "dismiss" : "categorize";
               form.setFieldValue("outcome", chosen);
-              form.setFieldValue("remember", chosen === initialOutcome && suggestedRemember);
+
+              let keepSuggestion: boolean;
+              if (chosen !== initialOutcome) {
+                keepSuggestion = false;
+              } else if (chosen === "dismiss" || suggestedCategoryIds.length === 0) {
+                keepSuggestion = true;
+              } else {
+                keepSuggestion = matchesSuggestedCategories(form.getValues().selectedCategoryIds);
+              }
+              form.setFieldValue("remember", keepSuggestion && suggestedRemember);
             }}
           />
           {!dismissing && (
