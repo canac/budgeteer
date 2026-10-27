@@ -138,6 +138,7 @@ export function ReviewTransactionModal({
   });
 
   const handleSubmit = form.onSubmit(async (values) => {
+    const updateAlias = values.updateAlias && values.vendor !== vendor;
     const ruleScope: RuleScope = !values.remember
       ? "none"
       : values.amountOnly
@@ -152,13 +153,13 @@ export function ReviewTransactionModal({
           values.outcome === "dismiss"
             ? {
                 type: "dismiss",
-                vendorAlias: values.updateAlias ? values.vendor.trim() : undefined,
+                vendorAlias: updateAlias ? values.vendor.trim() : undefined,
               }
             : {
                 type: "accept",
                 vendor: values.vendor.trim(),
                 description: values.description.trim() || undefined,
-                updateAlias: values.updateAlias,
+                updateAlias,
                 splits: values.categoryAmounts.map(({ categoryId, amount }) => ({
                   categoryId,
                   amount: sign * dollarsToPennies(amount),
@@ -170,7 +171,14 @@ export function ReviewTransactionModal({
     onSave();
   });
 
-  const { outcome, selectedCategoryIds, remember, updateAlias } = form.getValues();
+  const {
+    outcome,
+    vendor: vendorInput,
+    selectedCategoryIds,
+    remember,
+    updateAlias,
+  } = form.getValues();
+  const vendorChanged = vendorInput !== vendor;
   const dismissing = outcome === "dismiss";
   const splitAcrossCategories = !dismissing && selectedCategoryIds.length > 1;
 
@@ -223,9 +231,11 @@ export function ReviewTransactionModal({
               data={vendors}
             />
             <Checkbox
-              label="Remember this vendor name"
+              label="Remember this vendor rename"
               key={form.key("updateAlias")}
               {...form.getInputProps("updateAlias", { type: "checkbox" })}
+              checked={updateAlias && vendorChanged}
+              disabled={!vendorChanged}
             />
           </Stack>
           {!dismissing && (
