@@ -8,3 +8,6 @@ fnox = "1.39"
 node = "26.11.1"
 
 [secrets.fnox]
+
+[tasks.dev-secrets]
+run = 'echo "JWT_SECRET=$(openssl rand -hex 32)"'
