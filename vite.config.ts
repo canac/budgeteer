@@ -20,11 +20,16 @@ const tablerImports = transformImports({
     transform: "@tabler/icons-react/dist/esm/icons/{{member}}.mjs",
   },
 });
-// The default id filter rejects TanStack Router's split route modules like `route.tsx?tsr-split=component`
 const { transform } = tablerImports;
-if (typeof transform === "object" && transform.filter && !Array.isArray(transform.filter)) {
-  transform.filter.id = /\.[jt]sx?(\?.*)?$/;
-}
+const tablerImportsPlugin = {
+  ...tablerImports,
+  apply: "build" as const,
+  // The default id filter rejects TanStack Router's split route modules like `route.tsx?tsr-split=component`
+  transform:
+    typeof transform === "object" && transform.filter && !Array.isArray(transform.filter)
+      ? { ...transform, filter: { ...transform.filter, id: /\.[jt]sx?(\?.*)?$/ } }
+      : transform,
+};
 
 const prismaDir = path.resolve("src/prisma") + path.sep;
 const workerdPrismaDir = path.resolve("src/prisma-workerd") + path.sep;
@@ -57,7 +62,7 @@ export default defineConfig({
   },
   plugins: [
     workerdPrisma,
-    tablerImports,
+    tablerImportsPlugin,
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart(),
     react(),
