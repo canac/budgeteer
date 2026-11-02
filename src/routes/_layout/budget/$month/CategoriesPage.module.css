@@ -13,7 +13,7 @@
   }
 
   &:has(.dragHandle:hover) {
-    background-color: var(--mantine-color-gray-0);
+    background-color: var(--mantine-color-default-hover);
   }
 
   &.dragging {
@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   cursor: grab;
-  color: var(--mantine-color-gray-5);
+  color: var(--mantine-color-dimmed);
 
   &:active {
     cursor: grabbing;

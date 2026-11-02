@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import mantineChartsCss from "@mantine/charts/styles.css?url";
-import { createTheme, mantineHtmlProps, MantineProvider } from "@mantine/core";
+import { ColorSchemeScript, createTheme, mantineHtmlProps, MantineProvider } from "@mantine/core";
 import mantineCss from "@mantine/core/styles.css?url";
 import { Notifications } from "@mantine/notifications";
 import mantineNotificationsCss from "@mantine/notifications/styles.css?url";
@@ -82,10 +82,11 @@ function RootComponent() {
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
+        <ColorSchemeScript defaultColorScheme="auto" />
         <HeadContent />
       </head>
       <body>
-        <MantineProvider theme={theme}>
+        <MantineProvider theme={theme} defaultColorScheme="auto">
           <Notifications />
           <Outlet />
         </MantineProvider>

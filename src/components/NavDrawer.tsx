@@ -6,6 +6,7 @@ import {
   IconFileImport,
   IconLogout,
   IconSearch,
+  IconSettings,
 } from "@tabler/icons-react";
 import { getRouteApi, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -21,9 +22,10 @@ interface NavDrawerProps {
   opened: boolean;
   onClose: () => void;
   currentMonth: string | null;
+  onOpenPreferences: () => void;
 }
 
-export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
+export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: NavDrawerProps) {
   const { budgetMonths, categories, unreviewedCount } = routeApi.useLoaderData();
   const category = useParams({
     from: "/_layout/category/$category",
@@ -103,6 +105,15 @@ export function NavDrawer({ opened, onClose, currentMonth }: NavDrawerProps) {
           )
         }
         onClick={onClose}
+      />
+      <NavLink
+        component="button"
+        label="Preferences"
+        leftSection={<IconSettings size={18} />}
+        onClick={() => {
+          onClose();
+          onOpenPreferences();
+        }}
       />
       <NavLink
         component="button"

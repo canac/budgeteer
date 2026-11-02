@@ -8,6 +8,7 @@ import {
   useRouter,
   useRouterState,
 } from "@tanstack/react-router";
+import { DynamicPreferencesModal } from "~/components/DynamicPreferencesModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { DynamicTransferModal } from "~/components/DynamicTransferModal";
 import { MantineLink } from "~/components/MantineLink";
@@ -34,6 +35,8 @@ function LayoutRoute() {
     useDisclosure(false);
   const [transferOpened, { open: openTransfer, close: closeTransfer }] = useDisclosure(false);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
+  const [preferencesOpened, { open: openPreferences, close: closePreferences }] =
+    useDisclosure(false);
   const month = useParams({
     from: "/_layout/budget/$month",
     shouldThrow: false,
@@ -54,8 +57,14 @@ function LayoutRoute() {
         <DynamicTransactionModal onClose={closeTransaction} onSave={handleUpdate} />
       )}
       {transferOpened && <DynamicTransferModal onClose={closeTransfer} onSave={handleUpdate} />}
+      {preferencesOpened && <DynamicPreferencesModal onClose={closePreferences} />}
 
-      <NavDrawer opened={drawerOpened} onClose={closeDrawer} currentMonth={month ?? null} />
+      <NavDrawer
+        opened={drawerOpened}
+        onClose={closeDrawer}
+        currentMonth={month ?? null}
+        onOpenPreferences={openPreferences}
+      />
 
       <AppShell header={{ height: 60 }} padding="md">
         <AppShell.Header

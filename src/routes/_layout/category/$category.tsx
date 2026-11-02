@@ -120,7 +120,7 @@ function CategoryHistoryPage() {
                 onDelete={() => navigate({ to: "/budget/$month", params: { month: currentMonth } })}
               />
             </Group>
-            <Text size="lg" c="gray.6">
+            <Text size="lg" c="dimmed">
               {startMonth === endMonth
                 ? startMonthFormatted
                 : `${startMonthFormatted} - ${endMonthFormatted}`}
