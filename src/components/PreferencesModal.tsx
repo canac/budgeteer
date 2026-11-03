@@ -1,6 +1,7 @@
 import { Modal, Stack, Switch, Text } from "@mantine/core";
 import { useDarkMode } from "~/hooks/useDarkMode";
 import { useOpened } from "~/hooks/useOpened";
+import { useReduceMotion } from "~/hooks/useReduceMotion";
 
 export interface PreferencesModalProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ export interface PreferencesModalProps {
 export function PreferencesModal({ onClose }: PreferencesModalProps) {
   const { modalProps } = useOpened({ onClose });
   const darkMode = useDarkMode();
+  const reduceMotion = useReduceMotion();
 
   return (
     <Modal {...modalProps} title={<Text fw="bold">Preferences</Text>}>
@@ -18,6 +20,12 @@ export function PreferencesModal({ onClose }: PreferencesModalProps) {
           checked={darkMode.darkMode}
           followsDevice={darkMode.followsDevice}
           onChange={darkMode.toggleDarkMode}
+        />
+        <DevicePreferenceSwitch
+          label="Reduce motion"
+          checked={reduceMotion.reduceMotion}
+          followsDevice={reduceMotion.followsDevice}
+          onChange={reduceMotion.toggleReduceMotion}
         />
       </Stack>
     </Modal>

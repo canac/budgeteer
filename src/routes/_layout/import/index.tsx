@@ -82,11 +82,13 @@ function ImportTransactionsPage() {
   const [reconciling, setReconciling] = useState<UnreviewedTransaction | null>(null);
 
   const [transactions, setTransactions] = useSyncedState(loaderData.transactions);
-  const [total, setTotal] = useSyncedState(loaderData.total);
+  const total = Math.max(
+    0,
+    loaderData.total - (loaderData.transactions.length - transactions.length),
+  );
 
   const removeTransaction = (id: string) => {
     setTransactions((prev) => prev.filter((tx) => tx.id !== id));
-    setTotal((prev) => Math.max(0, prev - 1));
   };
 
   const handleImport = async () => {
@@ -210,25 +212,20 @@ function ImportTransactionsPage() {
           onChange={handleAccountChange}
         />
       )}
-      {total === 0 ? (
-        <Text c="dimmed">{empty(currentView, !!account)}</Text>
-      ) : (
-        <>
-          <UnreviewedTransactions
-            transactions={transactions}
-            onAccept={handleAccept}
-            onDismissed={handleDismissed}
-            onAcknowledge={handleAcknowledge}
-            onReconcile={handleReconcile}
-            onReviewed={handleReviewed}
-            onRestore={handleRestore}
-          />
-          {totalPages > 1 && (
-            <Group justify="center">
-              <Pagination total={totalPages} value={page} onChange={handlePageChange} />
-            </Group>
-          )}
-        </>
+      {total === 0 && <Text c="dimmed">{empty(currentView, !!account)}</Text>}
+      <UnreviewedTransactions
+        transactions={transactions}
+        onAccept={handleAccept}
+        onDismissed={handleDismissed}
+        onAcknowledge={handleAcknowledge}
+        onReconcile={handleReconcile}
+        onReviewed={handleReviewed}
+        onRestore={handleRestore}
+      />
+      {totalPages > 1 && (
+        <Group justify="center">
+          <Pagination total={totalPages} value={page} onChange={handlePageChange} />
+        </Group>
       )}
       {reconciling && (
         <DynamicReconcileTransactionModal

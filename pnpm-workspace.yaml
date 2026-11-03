@@ -16,6 +16,9 @@ lockfile:
 minimumReleaseAgeExclude:
   - "@canac/oxc-config"
 
+patchedDependencies:
+  "@tanstack/router-core@1.171.37": patches/@tanstack__router-core@1.171.37.patch
+
 permissions:
   "@tanstack/react-start":
     skills: true

@@ -1,0 +1,38 @@
+.scroller {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Trackpads and mice keep the buttons so a sideways scroll can't trigger an action */
+  @media (pointer: fine) {
+    overflow-x: hidden;
+  }
+}
+
+.content,
+.action {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: var(--mantine-spacing-xs);
+  padding-inline: var(--mantine-spacing-md);
+  color: var(--mantine-color-white);
+  font-weight: 500;
+
+  /* Keep the label next to the content so it shows as soon as the swipe starts */
+  &[data-side="start"] {
+    flex-direction: row-reverse;
+  }
+}

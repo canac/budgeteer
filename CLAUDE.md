@@ -21,3 +21,7 @@ Use helpers in `test/mocks.ts` to generate test data.
 ## Package Manager
 
 Use `pnpm` to manage dependencies and run scripts.
+
+## Scroll Restoration
+
+`@tanstack/router-core` is patched (`patches/`) so the router skips scroll restoration for anything inside `data-scroll-restoration="off"`. Put it on horizontal swipe scrollers, since the router restores positions by DOM position and writes them onto the wrong element.

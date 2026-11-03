@@ -1,0 +1,26 @@
+diff --git a/dist/cjs/scroll-restoration.cjs b/dist/cjs/scroll-restoration.cjs
+index 14df57f1b41e619b7be4a86cc11be9eebf625d4d..c3208c046c86c6c67b5f3241b25e667bbe4ffa04 100644
+--- a/dist/cjs/scroll-restoration.cjs
++++ b/dist/cjs/scroll-restoration.cjs
+@@ -91,7 +91,7 @@ function setupScrollRestoration(router, force) {
+ 		ignoreScroll = false;
+ 		history.scrollRestoration = "manual";
+ 		document.addEventListener("scroll", (event) => {
+-			if (ignoreScroll) return;
++			if (ignoreScroll || event.target.closest?.("[data-scroll-restoration=\"off\"]")) return;
+ 			trackedScrollTargets.add(event.target);
+ 		}, true);
+ 		router.subscribe("onBeforeLoad", (event) => {
+diff --git a/dist/esm/scroll-restoration.js b/dist/esm/scroll-restoration.js
+index f06f710c4a9987fcdb4b430e75127112c684fcf7..fcd48de7ebfdb8ffa44f95458eac8c226a47329c 100644
+--- a/dist/esm/scroll-restoration.js
++++ b/dist/esm/scroll-restoration.js
+@@ -91,7 +91,7 @@ function setupScrollRestoration(router, force) {
+ 		ignoreScroll = false;
+ 		history.scrollRestoration = "manual";
+ 		document.addEventListener("scroll", (event) => {
+-			if (ignoreScroll) return;
++			if (ignoreScroll || event.target.closest?.("[data-scroll-restoration=\"off\"]")) return;
+ 			trackedScrollTargets.add(event.target);
+ 		}, true);
+ 		router.subscribe("onBeforeLoad", (event) => {

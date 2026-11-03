@@ -1,13 +1,8 @@
 import { ActionIcon, AppShell, Box, Burger, Container, Group, Loader } from "@mantine/core";
 import { useDisclosure, useMounted } from "@mantine/hooks";
 import { IconArrowsExchange, IconPlus } from "@tabler/icons-react";
-import {
-  createFileRoute,
-  Outlet,
-  useParams,
-  useRouter,
-  useRouterState,
-} from "@tanstack/react-router";
+import { createFileRoute, Outlet, useParams, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { DynamicPreferencesModal } from "~/components/DynamicPreferencesModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { DynamicTransferModal } from "~/components/DynamicTransferModal";
@@ -16,6 +11,8 @@ import { NavDrawer } from "~/components/NavDrawer";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { getCategories } from "~/functions/getCategories";
 import { getUnreviewedTransactionCount } from "~/functions/getUnreviewedTransactionCount";
+import { useReduceMotion } from "~/hooks/useReduceMotion";
+import { useRouterLoading } from "~/hooks/useRouterLoading";
 
 export const Route = createFileRoute("/_layout")({
   component: LayoutRoute,
@@ -42,10 +39,13 @@ function LayoutRoute() {
     shouldThrow: false,
     select: (params) => params.month,
   });
-  const loading = useRouterState({
-    select: (state) => state.isLoading || state.status === "pending",
-  });
+  const loading = useRouterLoading();
   const mounted = useMounted();
+  const { reduceMotion } = useReduceMotion();
+
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-reduce-motion", reduceMotion);
+  }, [reduceMotion]);
 
   const handleUpdate = async () => {
     await router.invalidate();

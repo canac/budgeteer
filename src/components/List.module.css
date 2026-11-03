@@ -17,10 +17,13 @@
   grid-template-areas:
     "title value actions"
     "bottom bottom bottom";
+}
 
-  &:last-child {
-    border-bottom: none;
-  }
+/* Rows may be wrapped, such as by SwipeActions. A last row that's animating out doesn't count. */
+.root > :last-child,
+.root > :last-child .row,
+.root > :has(+ [data-exiting]:last-child) .row {
+  border-bottom: none;
 }
 
 .cellTitle {

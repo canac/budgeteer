@@ -7,12 +7,19 @@ import {
   IconEdit,
   IconX,
 } from "@tabler/icons-react";
+import clsx from "clsx";
 import { parseISO } from "date-fns";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
-import { DynamicReviewTransactionModal } from "~/components/DynamicReviewTransactionModal";
+import {
+  DynamicReviewTransactionModal,
+  preloadReviewTransactionModal,
+} from "~/components/DynamicReviewTransactionModal";
 import { List, ListRow } from "~/components/List";
 import { RuleBadges } from "~/components/RuleBadges";
+import { type SwipeAction, SwipeActions } from "~/components/SwipeActions";
+import { useExitingItems } from "~/hooks/useExitingItems";
+import { usePreloadWhenIdle } from "~/hooks/usePreloadWhenIdle";
 import { formatSignedCurrency, shortDateFormatter } from "~/lib/formatters";
 import classes from "./UnreviewedTransactions.module.css";
 
@@ -35,14 +42,31 @@ export function UnreviewedTransactions({
   onReviewed,
   onRestore,
 }: UnreviewedTransactionsProps) {
+  const [renderedTransactions, onExited] = useExitingItems(transactions, "id");
   const [modalOpen, { open, close }] = useDisclosure(false);
   const [reviewingTransaction, setReviewingTransaction] = useState<
     UnreviewedTransaction | undefined
   >(undefined);
+  usePreloadWhenIdle(preloadReviewTransactionModal);
+
+  const resolveReviewClosedRef = useRef<() => void>(undefined);
 
   const openReview = (transaction: UnreviewedTransaction) => {
     setReviewingTransaction(transaction);
     open();
+  };
+
+  /** Resolves once the review modal closes. */
+  const swipeToReview = (transaction: UnreviewedTransaction) =>
+    new Promise<void>((resolve) => {
+      resolveReviewClosedRef.current = resolve;
+      openReview(transaction);
+    });
+
+  const handleClose = () => {
+    close();
+    resolveReviewClosedRef.current?.();
+    resolveReviewClosedRef.current = undefined;
   };
 
   const handleReviewed = () => {
@@ -54,15 +78,14 @@ export function UnreviewedTransactions({
   return (
     <>
       <List>
-        {transactions.map((transaction) => {
+        {renderedTransactions.map(({ item: transaction, exiting, generation }) => {
           const { suggestion } = transaction;
           const vendor = suggestion?.vendorAlias ?? transaction.vendor;
           const suggested = suggestion?.outcome ?? null;
           const outcome = transaction.reviewed && suggested?.type === "dismiss" ? null : suggested;
 
-          return (
+          const row = (
             <ListRow
-              key={transaction.id}
               className={outcome?.type === "dismiss" ? classes.dismissSuggested : undefined}
               title={vendor}
               meta={
@@ -150,11 +173,73 @@ export function UnreviewedTransactions({
               }
             />
           );
+
+          const restore: SwipeAction | undefined = onRestore && {
+            label: "Restore",
+            icon: <IconArrowBackUp />,
+            color: "blue",
+            onTrigger: () => {
+              onRestore(transaction.id);
+            },
+          };
+          const content = transaction.changedAt ? (
+            row
+          ) : transaction.reviewed ? (
+            <SwipeActions swipeRight={restore} swipeLeft={restore}>
+              {row}
+            </SwipeActions>
+          ) : (
+            <SwipeActions
+              swipeRight={{
+                label: "Dismiss",
+                icon: <IconX />,
+                color: "red",
+                onTrigger: () => {
+                  onDismissed(transaction.id);
+                },
+              }}
+              swipeLeft={
+                outcome?.type === "categorize"
+                  ? {
+                      label: "Accept",
+                      icon: <IconCheck />,
+                      color: "green",
+                      onTrigger: () => {
+                        onAccept(transaction);
+                      },
+                    }
+                  : {
+                      label: "Review",
+                      icon: <IconEdit />,
+                      color: "blue",
+                      onTrigger: () => swipeToReview(transaction),
+                    }
+              }
+            >
+              {row}
+            </SwipeActions>
+          );
+
+          return (
+            <div
+              key={`${transaction.id}:${generation}`}
+              className={clsx(classes.item, exiting && classes.exiting)}
+              data-exiting={exiting || undefined}
+              inert={exiting}
+              onAnimationEnd={(event) => {
+                if (exiting && event.target === event.currentTarget) {
+                  onExited(transaction.id);
+                }
+              }}
+            >
+              <div className={classes.itemContent}>{content}</div>
+            </div>
+          );
         })}
       </List>
       {modalOpen && reviewingTransaction && (
         <DynamicReviewTransactionModal
-          onClose={close}
+          onClose={handleClose}
           onSave={handleReviewed}
           transaction={reviewingTransaction}
         />
