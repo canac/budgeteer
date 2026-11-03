@@ -1,0 +1,23 @@
+.scroller {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Only touch swipes change months, so trackpads and mice don't scroll it */
+  @media (pointer: fine) {
+    overflow-x: hidden;
+  }
+}
+
+.page {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}

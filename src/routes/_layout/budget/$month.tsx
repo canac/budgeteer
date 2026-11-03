@@ -15,6 +15,7 @@ import { DynamicLeftoversTransferModal } from "~/components/DynamicLeftoversTran
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineButtonLink } from "~/components/MantineButtonLink";
+import { MonthSwiper } from "~/components/MonthSwiper";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
@@ -87,134 +88,150 @@ function BudgetLayout() {
   };
 
   return (
-    <Stack className={classes.root} align="center">
-      {leftoversTransferOpened && (
-        <DynamicLeftoversTransferModal
-          month={budget.month}
-          leftovers={leftovers}
-          funds={funds}
-          existingDestinationIds={leftoversDestinationIds}
-          onClose={closeLeftoversTransfer}
-          onSave={() => router.invalidate()}
-        />
-      )}
-      <Group gap="xs">
-        {previousMonth ? (
-          <MantineActionIconLink
-            to={tabLink}
-            params={{ month: previousMonth }}
-            search
-            variant="subtle"
-            size="lg"
-            color="gray"
-            aria-label="Previous month"
-          >
-            <IconChevronLeft />
-          </MantineActionIconLink>
-        ) : (
-          <ActionIcon variant="subtle" size="lg" color="gray" disabled aria-label="Previous month">
-            <IconChevronLeft />
-          </ActionIcon>
+    <MonthSwiper
+      month={budget.month}
+      firstMonth={budgetMonths.at(-1) ?? budget.month}
+      lastMonth={toISOMonthString(today)}
+      preload={(month) => {
+        void router.preloadRoute({ to: tabLink, params: { month }, search: true });
+      }}
+      onSwipe={(month) => router.navigate({ to: tabLink, params: { month }, search: true })}
+    >
+      <Stack className={classes.root} align="center">
+        {leftoversTransferOpened && (
+          <DynamicLeftoversTransferModal
+            month={budget.month}
+            leftovers={leftovers}
+            funds={funds}
+            existingDestinationIds={leftoversDestinationIds}
+            onClose={closeLeftoversTransfer}
+            onSave={() => router.invalidate()}
+          />
         )}
-        <Title order={1}>{monthFormatter.format(parseISO(budget.month))}</Title>
-        {nextMonth ? (
-          <MantineActionIconLink
-            to={tabLink}
-            params={{ month: nextMonth }}
-            search={true}
-            variant="subtle"
-            size="lg"
-            color="gray"
-            aria-label="Next month"
-          >
-            <IconChevronRight />
-          </MantineActionIconLink>
-        ) : (
-          <ActionIcon variant="subtle" size="lg" color="gray" disabled aria-label="Next month">
-            <IconChevronRight />
-          </ActionIcon>
-        )}
-      </Group>
-      <SegmentedControl
-        w="100%"
-        maw="36rem"
-        fullWidth
-        value={onTransactions ? "transactions" : "categories"}
-        onChange={(value) =>
-          router.navigate({
-            to:
-              value === "transactions"
-                ? "/budget/$month/transactions"
-                : "/budget/$month/categories",
-            params: { month: budget.month },
-            search: (prev) => prev,
-          })
-        }
-        data={[
-          { label: "Categories", value: "categories" },
-          { label: "Transactions", value: "transactions" },
-        ]}
-      />
-      <Card shadow="sm">
-        <Stack gap="xs">
-          <Group justify="space-between">
-            <Title order={2}>Income</Title>
-            <EditableAmount
-              className={clsx(classes.income, { positive: leftToBudget === 0 })}
-              amount={budget.income}
-              saveAmount={handleSaveIncome}
-            />
-          </Group>
-          {leftToBudget !== 0 && (
-            <Group justify="space-between">
-              <Text>Left to budget</Text>
-              <Text className={amountSignClassname(leftToBudget)}>
-                {formatCurrency(leftToBudget)}
-              </Text>
-            </Group>
-          )}
-          <Group className={classes.leftoverRow} gap={0} wrap="nowrap">
-            <MantineButtonLink
+        <Group gap="xs">
+          {previousMonth ? (
+            <MantineActionIconLink
               to={tabLink}
-              params={{ month: budget.month }}
-              search={(prev) => ({ ...prev, leftover: leftover ? undefined : true })}
+              params={{ month: previousMonth }}
+              search
               variant="subtle"
+              size="lg"
               color="gray"
-              justify="space-between"
-              rightSection={
-                <Text className={amountSignClassname(leftoverRemaining)}>
-                  {formatCurrency(leftoverRemaining)}
-                </Text>
-              }
-              aria-label={leftover ? "Show all categories" : "Show only leftover categories"}
-              className={classes.leftoverToggle}
+              aria-label="Previous month"
             >
-              <Group gap="xs" wrap="nowrap">
-                Leftover
-                {leftover && <IconFilter className={classes.icon} size={18} />}
-                {leftover ? (
-                  <IconFilterOff className={classes.hoverIcon} size={18} />
-                ) : (
-                  <IconFilter className={classes.hoverIcon} size={18} />
-                )}
+              <IconChevronLeft />
+            </MantineActionIconLink>
+          ) : (
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              color="gray"
+              disabled
+              aria-label="Previous month"
+            >
+              <IconChevronLeft />
+            </ActionIcon>
+          )}
+          <Title order={1}>{monthFormatter.format(parseISO(budget.month))}</Title>
+          {nextMonth ? (
+            <MantineActionIconLink
+              to={tabLink}
+              params={{ month: nextMonth }}
+              search={true}
+              variant="subtle"
+              size="lg"
+              color="gray"
+              aria-label="Next month"
+            >
+              <IconChevronRight />
+            </MantineActionIconLink>
+          ) : (
+            <ActionIcon variant="subtle" size="lg" color="gray" disabled aria-label="Next month">
+              <IconChevronRight />
+            </ActionIcon>
+          )}
+        </Group>
+        <SegmentedControl
+          w="100%"
+          maw="36rem"
+          fullWidth
+          value={onTransactions ? "transactions" : "categories"}
+          onChange={(value) =>
+            router.navigate({
+              to:
+                value === "transactions"
+                  ? "/budget/$month/transactions"
+                  : "/budget/$month/categories",
+              params: { month: budget.month },
+              search: (prev) => prev,
+            })
+          }
+          data={[
+            { label: "Categories", value: "categories" },
+            { label: "Transactions", value: "transactions" },
+          ]}
+        />
+        <Card shadow="sm">
+          <Stack gap="xs">
+            <Group justify="space-between">
+              <Title order={2}>Income</Title>
+              <EditableAmount
+                className={clsx(classes.income, { positive: leftToBudget === 0 })}
+                amount={budget.income}
+                saveAmount={handleSaveIncome}
+              />
+            </Group>
+            {leftToBudget !== 0 && (
+              <Group justify="space-between">
+                <Text>Left to budget</Text>
+                <Text className={amountSignClassname(leftToBudget)}>
+                  {formatCurrency(leftToBudget)}
+                </Text>
               </Group>
-            </MantineButtonLink>
-            {canTransferLeftovers && (
-              <ActionIcon
-                variant="subtle"
-                size="lg"
-                color="gray"
-                onClick={openLeftoversTransfer}
-                aria-label="Transfer leftovers"
-                title="Transfer leftovers"
-              >
-                <IconArrowsRightLeft size={18} />
-              </ActionIcon>
             )}
-          </Group>
-        </Stack>
-      </Card>
-      <Outlet />
-    </Stack>
+            <Group className={classes.leftoverRow} gap={0} wrap="nowrap">
+              <MantineButtonLink
+                to={tabLink}
+                params={{ month: budget.month }}
+                search={(prev) => ({ ...prev, leftover: leftover ? undefined : true })}
+                variant="subtle"
+                color="gray"
+                justify="space-between"
+                rightSection={
+                  <Text className={amountSignClassname(leftoverRemaining)}>
+                    {formatCurrency(leftoverRemaining)}
+                  </Text>
+                }
+                aria-label={leftover ? "Show all categories" : "Show only leftover categories"}
+                className={classes.leftoverToggle}
+              >
+                <Group gap="xs" wrap="nowrap">
+                  Leftover
+                  {leftover && <IconFilter className={classes.icon} size={18} />}
+                  {leftover ? (
+                    <IconFilterOff className={classes.hoverIcon} size={18} />
+                  ) : (
+                    <IconFilter className={classes.hoverIcon} size={18} />
+                  )}
+                </Group>
+              </MantineButtonLink>
+              {canTransferLeftovers && (
+                <ActionIcon
+                  variant="subtle"
+                  size="lg"
+                  color="gray"
+                  onClick={openLeftoversTransfer}
+                  aria-label="Transfer leftovers"
+                  title="Transfer leftovers"
+                >
+                  <IconArrowsRightLeft size={18} />
+                </ActionIcon>
+              )}
+            </Group>
+          </Stack>
+        </Card>
+        <Outlet />
+      </Stack>
+    </MonthSwiper>
   );
 }
