@@ -2,7 +2,7 @@ import { ActionIcon } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconArrowsRightLeft } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
-import { TransferModal } from "~/components/TransferModal";
+import { DynamicTransferModal } from "~/components/DynamicTransferModal";
 
 export interface AddTransferButtonProps {
   sourceCategoryId?: string;
@@ -22,7 +22,11 @@ export function AddTransferButton({ sourceCategoryId }: AddTransferButtonProps) 
         <IconArrowsRightLeft />
       </ActionIcon>
       {transferModalOpen && (
-        <TransferModal onClose={close} onSave={handleSave} sourceCategoryId={sourceCategoryId} />
+        <DynamicTransferModal
+          onClose={close}
+          onSave={handleSave}
+          sourceCategoryId={sourceCategoryId}
+        />
       )}
     </>
   );

@@ -11,18 +11,18 @@ import clsx from "clsx";
 import { parseISO } from "date-fns";
 import { forwardRef, type ReactNode, useState } from "react";
 import invariant from "tiny-invariant";
+import type { DeleteTransactionModalProps } from "~/components/DeleteTransactionModal";
+import type { TransferModalProps } from "~/components/TransferModal";
 import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import type { Category } from "~/prisma/client";
-import {
-  DeleteTransactionModal,
-  type DeleteTransactionModalProps,
-} from "~/components/DeleteTransactionModal";
+import { DynamicDeleteTransactionModal } from "~/components/DynamicDeleteTransactionModal";
+import { DynamicTransferModal } from "~/components/DynamicTransferModal";
 import { List, ListRow } from "~/components/List";
-import { TransferModal, type TransferModalProps } from "~/components/TransferModal";
 import { getTransaction } from "~/functions/getTransaction";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
+import type { TransactionModalProps } from "./TransactionModal";
+import { DynamicTransactionModal } from "./DynamicTransactionModal";
 import classes from "./TransactionList.module.css";
-import { TransactionModal, type TransactionModalProps } from "./TransactionModal";
 
 type BaseTransaction = Awaited<ReturnType<typeof getBudgetCategory>>["transactions"][number];
 type CategoryRef = Pick<Category, "id" | "name">;
@@ -215,21 +215,21 @@ export function TransactionList({
   return (
     <>
       {deletingTransaction && (
-        <DeleteTransactionModal
+        <DynamicDeleteTransactionModal
           onClose={() => setDeletingTransaction(null)}
           transaction={deletingTransaction}
           onDelete={handleUpdate}
         />
       )}
       {editingTransaction && (
-        <TransactionModal
+        <DynamicTransactionModal
           onClose={() => setEditingTransaction(null)}
           editingTransaction={editingTransaction}
           onSave={handleUpdate}
         />
       )}
       {editingTransfer && (
-        <TransferModal
+        <DynamicTransferModal
           onClose={() => setEditingTransfer(null)}
           editingTransfer={editingTransfer}
           onSave={handleUpdate}
