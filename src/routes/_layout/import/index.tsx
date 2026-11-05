@@ -1,5 +1,4 @@
 import { Button, Group, Pagination, SegmentedControl, Stack, Text } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { IconDownload } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,6 +6,7 @@ import { useState } from "react";
 import { coerce, literal, object, optional, string, union } from "zod/mini";
 import { DynamicReconcileTransactionModal } from "~/components/DynamicReconcileTransactionModal";
 import { ExternalAccountSelect } from "~/components/ExternalAccountSelect";
+import { showNotification } from "~/components/LazyNotifications";
 import { UnreviewedTransactions } from "~/components/UnreviewedTransactions";
 import { acknowledgeTransactionChange as acknowledgeTransactionChangeFn } from "~/functions/acknowledgeTransactionChange";
 import { getExternalAccounts } from "~/functions/getExternalAccounts";
@@ -95,7 +95,7 @@ function ImportTransactionsPage() {
     setImporting(true);
     await importTransactions()
       .then(async ({ imported, failed }) => {
-        notifications.show({
+        void showNotification({
           title: failed ? "Import finished with errors" : "Import completed",
           message:
             `Imported ${imported} new transaction${imported === 1 ? "" : "s"}.` +

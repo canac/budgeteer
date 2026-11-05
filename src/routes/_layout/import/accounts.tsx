@@ -1,5 +1,4 @@
 import { ActionIcon, Alert, Button, Group, Stack, Switch, Table, Text } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import {
   IconAlertTriangle,
   IconArchive,
@@ -12,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import { usePlaidLink, type PlaidLinkOnExit, type PlaidLinkOnSuccess } from "react-plaid-link";
 import { extractErrorMessage } from "src/lib/error";
 import invariant from "tiny-invariant";
+import { showNotification } from "~/components/LazyNotifications";
 import { createLinkToken as createLinkTokenFn } from "~/functions/createLinkToken";
 import { createUpdateLinkToken as createUpdateLinkTokenFn } from "~/functions/createUpdateLinkToken";
 import { exchangePublicToken as exchangePublicTokenFn } from "~/functions/exchangePublicToken";
@@ -60,7 +60,7 @@ function AccountsPage() {
             data: { publicToken, institution: metadata.institution?.name ?? "Unknown" },
           });
         }
-        notifications.show({
+        void showNotification({
           title: reconnectId ? "Reconnected" : "Account connected",
           message: `Linked ${metadata.institution?.name ?? "your bank"}.`,
           color: "green",
@@ -68,7 +68,7 @@ function AccountsPage() {
         reset();
         await router.invalidate();
       } catch (error: unknown) {
-        notifications.show({
+        void showNotification({
           title: "Failed to save connection",
           message: extractErrorMessage(error),
           color: "red",
@@ -81,7 +81,7 @@ function AccountsPage() {
   const onExit = useCallback<PlaidLinkOnExit>(
     (error) => {
       if (error) {
-        notifications.show({
+        void showNotification({
           title: "Connection error",
           message: error.display_message ?? error.error_message,
           color: "red",
@@ -114,7 +114,7 @@ function AccountsPage() {
       })
       .catch((error: unknown) => {
         setReconnectId(null);
-        notifications.show({
+        void showNotification({
           title: "Could not start Plaid Link",
           message: extractErrorMessage(error),
           color: "red",
