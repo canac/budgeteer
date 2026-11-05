@@ -9,9 +9,9 @@ interface Category {
 
 export function useSortedCategories(categories: Category[]) {
   const topCategoryIds = useServerFnData(getTopCategories) ?? [];
-  return categories.toSorted((a, b) => {
-    const aTopIndex = topCategoryIds.indexOf(a.id);
-    const bTopIndex = topCategoryIds.indexOf(b.id);
-    return aTopIndex - bTopIndex;
+  return categories.toSorted((category1, category2) => {
+    const topIndex1 = topCategoryIds.indexOf(category1.id);
+    const topIndex2 = topCategoryIds.indexOf(category2.id);
+    return topIndex1 - topIndex2;
   });
 }

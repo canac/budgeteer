@@ -9,5 +9,5 @@ export const getImportRules = createServerFn()
     return rules
       .values()
       .toArray()
-      .toSorted((a, b) => a.externalVendor.localeCompare(b.externalVendor));
+      .toSorted((rule1, rule2) => rule1.externalVendor.localeCompare(rule2.externalVendor));
   });

@@ -12,8 +12,8 @@ vi.mock("@tanstack/react-start", async (importOriginal) => ({
   createServerFn: () => {
     let validator: ZodType | null = null;
     const builder = {
-      validator: (v: unknown) => {
-        validator = v instanceof ZodType ? v : null;
+      validator: (schema: unknown) => {
+        validator = schema instanceof ZodType ? schema : null;
         return builder;
       },
       middleware: () => builder,

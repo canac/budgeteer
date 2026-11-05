@@ -164,7 +164,9 @@ describe("searchTransactions", () => {
 
   it("returns the total count alongside the page of transactions", async () => {
     await Promise.all(
-      range(5).map((i) => createTransaction({ date: `2025-02-0${i + 1}`, vendor: "Costco" })),
+      range(5).map((index) =>
+        createTransaction({ date: `2025-02-0${index + 1}`, vendor: "Costco" }),
+      ),
     );
 
     const result = await searchTransactions({ data: { pageSize: 2, vendor: "Costco" } });
@@ -175,7 +177,9 @@ describe("searchTransactions", () => {
 
   it("paginates", async () => {
     await Promise.all(
-      range(5).map((i) => createTransaction({ date: `2025-02-0${i + 1}`, vendor: `V${i}` })),
+      range(5).map((index) =>
+        createTransaction({ date: `2025-02-0${index + 1}`, vendor: `V${index}` }),
+      ),
     );
 
     const [page1, page2, page3] = await Promise.all([

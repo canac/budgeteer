@@ -50,9 +50,9 @@ function mergeExiting<T>(rendered: ExitingItem<T>[], items: T[], key: keyof T): 
     return next;
   }
 
-  rendered.forEach((entry, i) => {
+  rendered.forEach((entry, index) => {
     if (!keys.has(entry.item[key])) {
-      next.splice(Math.min(i, next.length), 0, { ...entry, exiting: true });
+      next.splice(Math.min(index, next.length), 0, { ...entry, exiting: true });
     }
   });
   return next;

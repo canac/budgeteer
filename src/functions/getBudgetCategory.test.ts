@@ -43,7 +43,10 @@ describe("getBudgetCategory", () => {
     expect(result.category.id).toBe(categoryId);
     expect(result.budgetCategory.budgetedAmount).toBe(5000);
     expect(result.transactionTotal).toBe(-1500);
-    expect(result.transactions.map((t) => t.date)).toEqual(["2025-01-20", "2025-01-15"]);
+    expect(result.transactions.map((transaction) => transaction.date)).toEqual([
+      "2025-01-20",
+      "2025-01-15",
+    ]);
     expect(result.deletable).toMatchObject({ valid: false });
   });
 

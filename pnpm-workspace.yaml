@@ -14,7 +14,7 @@ lockfile:
   includeResolutionSettings: true
 
 minimumReleaseAgeExclude:
-  - "@canac/oxc-config"
+  - "@canac/*"
 
 patchedDependencies:
   "@tanstack/router-core@1.171.37": patches/@tanstack__router-core@1.171.37.patch

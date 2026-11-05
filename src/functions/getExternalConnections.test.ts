@@ -11,7 +11,9 @@ describe("getExternalConnections", () => {
 
     const connections = await getExternalConnections();
 
-    expect(connections.map((c) => [c.institution, c.loginRequired])).toEqual([
+    expect(
+      connections.map((connection) => [connection.institution, connection.loginRequired]),
+    ).toEqual([
       ["Capital One", false],
       ["Citi", true],
     ]);
