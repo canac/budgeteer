@@ -193,7 +193,7 @@ function ImportTransactionsPage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <Stack className={classes.root} gap="md">
+    <Stack className={classes.root}>
       <Group justify="space-between">
         <Text className={classes.header}>{header(currentView, total)}</Text>
         <Button leftSection={<IconDownload />} onClick={handleImport} loading={importing}>

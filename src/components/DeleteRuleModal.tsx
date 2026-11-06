@@ -27,7 +27,7 @@ export function DeleteRuleModal({
 
   return (
     <Modal {...modalProps} title={<Text fw="bold">Delete Rule</Text>}>
-      <Stack gap="md">
+      <Stack>
         <Text>
           Are you sure you want to delete the rule for "{vendor}"
           {amount === undefined ? "" : ` at ${formatSignedCurrency(amount)}`}?

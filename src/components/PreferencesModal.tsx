@@ -14,7 +14,7 @@ export function PreferencesModal({ onClose }: PreferencesModalProps) {
 
   return (
     <Modal {...modalProps} title={<Text fw="bold">Preferences</Text>}>
-      <Stack gap="md">
+      <Stack>
         <DevicePreferenceSwitch
           label="Dark mode"
           checked={darkMode.darkMode}

@@ -186,7 +186,7 @@ export function ReviewTransactionModal({
   return (
     <Modal {...modalProps} title={<Text fw="bold">Review Transaction</Text>}>
       <form onSubmit={handleSubmit}>
-        <Stack gap="md">
+        <Stack>
           <div>
             <Text fw="bold">{vendor}</Text>
             <Group justify="space-between" wrap="nowrap">

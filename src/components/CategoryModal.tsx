@@ -98,7 +98,7 @@ export function CategoryModal({ onClose, onSave, month, editingCategory }: Categ
       title={<Text fw="bold">{isEditing ? "Edit Category" : "New Category"}</Text>}
     >
       <form onSubmit={handleSubmit}>
-        <Stack gap="md">
+        <Stack>
           <TextInput
             label="Name"
             data-autofocus

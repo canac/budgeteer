@@ -176,7 +176,7 @@ export function TransactionModal({
       title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
     >
       <form onSubmit={handleSubmit}>
-        <Stack gap="md">
+        <Stack>
           <Switch
             label="Income"
             key={form.key("isIncome")}

@@ -182,7 +182,7 @@ function CategoryDetailsPage() {
 
             <div>
               <Title order={3}>
-                <Group align="center" gap="xs">
+                <Group gap="xs">
                   Transactions
                   {budgetCategory.category.deletedMonth === null && (
                     <>

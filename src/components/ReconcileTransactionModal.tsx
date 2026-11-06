@@ -78,7 +78,7 @@ export function ReconcileTransactionModal({
   return (
     <Modal {...modalProps} title={<Text fw="bold">Reconcile Transaction</Text>}>
       <form onSubmit={handleSubmit}>
-        <Stack gap="md">
+        <Stack>
           <Text size="sm">
             The bank now reports{" "}
             <Text span fw={700}>

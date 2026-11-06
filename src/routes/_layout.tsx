@@ -79,7 +79,7 @@ function LayoutRoute() {
           }}
         >
           <Container size="xl" h="100%">
-            <Group align="center" h="100%" gap="sm">
+            <Group h="100%" gap="sm">
               <Burger
                 opened={drawerOpened}
                 onClick={openDrawer}

@@ -131,7 +131,7 @@ export function RuleModal({ onClose, onSave, draft }: RuleModalProps) {
       title={<Text fw="bold">{amountDraft ? "Edit Amount Rule" : "Edit Rule"}</Text>}
     >
       <form onSubmit={handleSubmit}>
-        <Stack gap="md">
+        <Stack>
           <TextInput label="Bank Vendor" value={externalVendor} disabled />
           {amountDraft ? (
             <TextInput

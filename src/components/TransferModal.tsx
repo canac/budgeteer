@@ -142,7 +142,7 @@ export function TransferModal({
       title={<Text fw="bold">{isEditing ? "Edit Transfer" : "New Transfer"}</Text>}
     >
       <form onSubmit={handleSubmit}>
-        <Stack gap="md">
+        <Stack>
           <NumberInput
             label="Amount"
             key={form.key("amount")}

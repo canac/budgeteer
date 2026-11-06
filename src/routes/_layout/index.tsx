@@ -142,7 +142,7 @@ function OverviewPage() {
         </SimpleGrid>
 
         <Card shadow="sm">
-          <Stack gap="md">
+          <Stack>
             <Title order={3}>Spending by category</Title>
             <BarChart
               h={Math.max(300, chartData.length * 40)}

@@ -58,7 +58,7 @@ function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <Stack gap="md">
+            <Stack>
               <PasswordInput
                 label="Password"
                 key={form.key("password")}

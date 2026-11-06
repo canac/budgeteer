@@ -61,7 +61,7 @@ export function LeftoversTransferModal({
       title={<Text fw="bold">{updating ? "Update Leftovers Transfer" : "Transfer Leftovers"}</Text>}
     >
       <form onSubmit={handleSubmit}>
-        <Stack gap="md">
+        <Stack>
           <Stack gap={4}>
             {leftovers.map(({ categoryId, name, balance }) => (
               <Group key={categoryId} justify="space-between">

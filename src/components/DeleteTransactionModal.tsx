@@ -29,7 +29,7 @@ export function DeleteTransactionModal({
 
   return (
     <Modal {...modalProps} title={<Text fw="bold">Delete Transaction</Text>}>
-      <Stack gap="md">
+      <Stack>
         <Text>
           Are you sure you want to delete the transaction "{transaction.vendor}" from{" "}
           {fullDateFormatter.format(parseISO(transaction.date))}?

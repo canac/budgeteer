@@ -29,7 +29,7 @@ export function DeleteCategoryModal({
 
   return (
     <Modal {...modalProps} title={<Text fw="bold">Delete Category</Text>}>
-      <Stack gap="md">
+      <Stack>
         <Text>Are you sure you want to delete the "{category.name}" category?</Text>
         <ModalFooter>
           <Button variant="default" onClick={close}>

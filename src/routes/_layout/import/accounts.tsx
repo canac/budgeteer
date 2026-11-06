@@ -140,7 +140,7 @@ function AccountsPage() {
   const needsReconnect = connections.filter((connection) => connection.loginRequired);
 
   return (
-    <Stack gap="md">
+    <Stack>
       {needsReconnect.map((connection) => (
         <Alert
           key={connection.id}

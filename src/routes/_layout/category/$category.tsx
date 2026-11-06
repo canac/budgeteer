@@ -108,7 +108,7 @@ function CategoryHistoryPage() {
       <Stack gap="xl">
         <Group justify="space-between" align="flex-start">
           <div>
-            <Group gap="sm" align="center">
+            <Group gap="sm">
               <Title order={1} size="2.5rem" fw="bold">
                 {categoryHistory.category.name}
               </Title>
@@ -129,7 +129,7 @@ function CategoryHistoryPage() {
           </div>
         </Group>
 
-        <Stack gap="md">
+        <Stack>
           <Group gap="xs">
             {rangeOptions.map((option) => (
               <Button
@@ -231,7 +231,7 @@ function CategoryHistoryPage() {
         </Grid>
 
         <Card>
-          <Stack gap="md">
+          <Stack>
             <Title order={3}>Monthly Breakdown</Title>
             <CategoryHistoryChart monthlyData={categoryHistory.monthlyBreakdown} />
           </Stack>
