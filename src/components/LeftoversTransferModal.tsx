@@ -2,6 +2,7 @@ import { Button, Group, Modal, Select, Stack, Text } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
 import { endOfMonth, parseISO } from "date-fns";
 import { object, string } from "zod/mini";
+import { ModalFooter } from "~/components/ModalFooter";
 import { transferLeftovers } from "~/functions/transferLeftovers";
 import { useOpened } from "~/hooks/useOpened";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
@@ -83,14 +84,14 @@ export function LeftoversTransferModal({
             required
             searchable
           />
-          <Group justify="space-between">
+          <ModalFooter>
             <Text size="sm" c="dimmed">
               Transfer Date: {fullDateFormatter.format(endOfMonth(parseISO(month)))}
             </Text>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               {updating ? "Update" : "Save"}
             </Button>
-          </Group>
+          </ModalFooter>
         </Stack>
       </form>
     </Modal>

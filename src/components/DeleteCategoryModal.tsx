@@ -1,5 +1,6 @@
-import { Button, Group, Modal, Stack, Text } from "@mantine/core";
+import { Button, Modal, Stack, Text } from "@mantine/core";
 import type { Category } from "~/prisma/client";
+import { ModalFooter } from "~/components/ModalFooter";
 import { deleteCategory } from "~/functions/deleteCategory";
 import { useOpened } from "~/hooks/useOpened";
 
@@ -30,14 +31,14 @@ export function DeleteCategoryModal({
     <Modal {...modalProps} title={<Text fw="bold">Delete Category</Text>}>
       <Stack gap="md">
         <Text>Are you sure you want to delete the "{category.name}" category?</Text>
-        <Group justify="flex-end" gap="sm">
+        <ModalFooter>
           <Button variant="default" onClick={close}>
             Cancel
           </Button>
           <Button color="red" onClick={handleDeleteConfirm}>
             Delete
           </Button>
-        </Group>
+        </ModalFooter>
       </Stack>
     </Modal>
   );

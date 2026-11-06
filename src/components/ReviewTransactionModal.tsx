@@ -16,6 +16,7 @@ import { useCallback } from "react";
 import { boolean, enum as enum_, minLength, object, refine, string } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
 import type { RuleScope } from "~/lib/saveRule";
+import { ModalFooter } from "~/components/ModalFooter";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { getVendorCategorySuggestions } from "~/functions/getVendorCategorySuggestions";
 import { getVendors } from "~/functions/getVendors";
@@ -270,7 +271,7 @@ export function ReviewTransactionModal({
             )}
           </Stack>
           {!dismissing && splitFields}
-          <Group justify="flex-end">
+          <ModalFooter>
             <Button
               type="submit"
               color={dismissing ? "red" : undefined}
@@ -279,7 +280,7 @@ export function ReviewTransactionModal({
             >
               {dismissing ? "Dismiss" : "Accept"}
             </Button>
-          </Group>
+          </ModalFooter>
         </Stack>
       </form>
     </Modal>

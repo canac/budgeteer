@@ -1,4 +1,5 @@
-import { Button, Group, Modal, Stack, Text } from "@mantine/core";
+import { Button, Modal, Stack, Text } from "@mantine/core";
+import { ModalFooter } from "~/components/ModalFooter";
 import { useOpened } from "~/hooks/useOpened";
 import { formatSignedCurrency } from "~/lib/formatters";
 
@@ -36,14 +37,14 @@ export function DeleteRuleModal({
             Its {amountRuleCount} amount rule{amountRuleCount === 1 ? "" : "s"} will be deleted too.
           </Text>
         )}
-        <Group justify="flex-end" gap="sm">
+        <ModalFooter>
           <Button variant="default" onClick={close}>
             Cancel
           </Button>
           <Button color="red" onClick={handleDeleteConfirm}>
             Delete
           </Button>
-        </Group>
+        </ModalFooter>
       </Stack>
     </Modal>
   );

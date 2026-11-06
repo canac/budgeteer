@@ -1,7 +1,8 @@
-import { Button, Group, Modal, Radio, Select, Stack, Text, TextInput } from "@mantine/core";
+import { Button, Modal, Radio, Select, Stack, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import invariant from "tiny-invariant";
 import type { AmountRule, RuleOutcome, VendorRules } from "~/lib/ruleLookup";
+import { ModalFooter } from "~/components/ModalFooter";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { updateRule } from "~/functions/updateRule";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
@@ -171,11 +172,11 @@ export function RuleModal({ onClose, onSave, draft }: RuleModalProps) {
                 {...form.getInputProps("categoryId")}
               />
             ))}
-          <Group justify="flex-end">
+          <ModalFooter>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               Update
             </Button>
-          </Group>
+          </ModalFooter>
         </Stack>
       </form>
     </Modal>

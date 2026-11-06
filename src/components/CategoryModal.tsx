@@ -14,6 +14,7 @@ import { IconPigMoney, IconWallet } from "@tabler/icons-react";
 import { useState } from "react";
 import { extractErrorMessage } from "src/lib/error";
 import { boolean, minLength, object, string } from "zod/mini";
+import { ModalFooter } from "~/components/ModalFooter";
 import { createCategory } from "~/functions/createCategory";
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
@@ -137,14 +138,14 @@ export function CategoryModal({ onClose, onSave, month, editingCategory }: Categ
             </Stack>
           </Fieldset>
           {errorMessage !== null && <Alert color="red">{errorMessage}</Alert>}
-          <Group justify="flex-end" gap="sm">
+          <ModalFooter>
             <Button variant="default" onClick={close}>
               Cancel
             </Button>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               {isEditing ? "Update" : "Save"}
             </Button>
-          </Group>
+          </ModalFooter>
         </Stack>
       </form>
     </Modal>

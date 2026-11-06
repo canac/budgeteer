@@ -14,6 +14,7 @@ import { IconSwitch } from "@tabler/icons-react";
 import { useParams } from "@tanstack/react-router";
 import { endOfMonth, parseISO } from "date-fns";
 import { number, object, positive, refine, string } from "zod/mini";
+import { ModalFooter } from "~/components/ModalFooter";
 import { createTransfer } from "~/functions/createTransfer";
 import { editTransfer } from "~/functions/editTransfer";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
@@ -187,14 +188,14 @@ export function TransferModal({
             key={form.key("description")}
             {...form.getInputProps("description")}
           />
-          <Group justify="space-between">
+          <ModalFooter>
             <Text size="sm" c="dimmed">
               Transfer Date: {fullDateFormatter.format(transferDate)}
             </Text>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               {isEditing ? "Update" : "Save"}
             </Button>
-          </Group>
+          </ModalFooter>
         </Stack>
       </form>
     </Modal>

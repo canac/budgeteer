@@ -2,7 +2,6 @@ import {
   Alert,
   Autocomplete,
   Button,
-  Group,
   Modal,
   NumberInput,
   Stack,
@@ -14,6 +13,7 @@ import { schemaResolver, useForm } from "@mantine/form";
 import { useState } from "react";
 import { extractErrorMessage } from "src/lib/error";
 import { boolean, minLength, number, object, positive, refine, string } from "zod/mini";
+import { ModalFooter } from "~/components/ModalFooter";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
@@ -215,11 +215,11 @@ export function TransactionModal({
           {categorySelect}
           {splitFields}
           {errorMessage !== null && <Alert color="red">{errorMessage}</Alert>}
-          <Group justify="flex-end">
+          <ModalFooter>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               {isEditing ? "Update" : "Save"}
             </Button>
-          </Group>
+          </ModalFooter>
         </Stack>
       </form>
     </Modal>

@@ -1,7 +1,8 @@
-import { Button, Group, Modal, Stack, Text } from "@mantine/core";
+import { Button, Modal, Stack, Text } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
 import { object, refine } from "zod/mini";
 import type { UnreviewedTransaction } from "~/functions/getUnreviewedTransactions";
+import { ModalFooter } from "~/components/ModalFooter";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { reconcileTransaction } from "~/functions/reconcileTransaction";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
@@ -87,11 +88,11 @@ export function ReconcileTransactionModal({
           </Text>
           {categorySelect}
           {splitFields}
-          <Group justify="flex-end">
+          <ModalFooter>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               Reconcile
             </Button>
-          </Group>
+          </ModalFooter>
         </Stack>
       </form>
     </Modal>

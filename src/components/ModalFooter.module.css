@@ -1,0 +1,16 @@
+.footer {
+  justify-content: space-between;
+  gap: var(--mantine-spacing-sm);
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background-color: var(--mantine-color-body);
+  margin-block: calc(-1 * var(--mantine-spacing-md))
+    calc(-1 * var(--mb-padding, var(--mantine-spacing-md)));
+  padding-block: var(--mantine-spacing-md) var(--mb-padding, var(--mantine-spacing-md));
+
+  /* Place a lone button on the right */
+  > :only-child {
+    margin-inline-start: auto;
+  }
+}
