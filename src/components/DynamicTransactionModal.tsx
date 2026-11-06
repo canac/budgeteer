@@ -1,8 +1,10 @@
 import { lazy, Suspense } from "react";
 import type { TransactionModalProps } from "~/components/TransactionModal";
 
+export const preloadTransactionModal = () => import("~/components/TransactionModal");
+
 const TransactionModal = lazy(() =>
-  import("~/components/TransactionModal").then(({ TransactionModal }) => ({
+  preloadTransactionModal().then(({ TransactionModal }) => ({
     default: TransactionModal,
   })),
 );

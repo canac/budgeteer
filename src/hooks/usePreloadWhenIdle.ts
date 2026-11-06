@@ -2,13 +2,15 @@ import { useEffect, useEffectEvent } from "react";
 import { useRouterLoading } from "~/hooks/useRouterLoading";
 
 /**
- * Calls `preload` whenever the router finishes loading and the browser is idle. `preload` must be
+ * Calls each of `preloads` whenever the router finishes loading and the browser is idle. Each must be
  * safe to call repeatedly, like a dynamic `import()`.
  */
-export function usePreloadWhenIdle(preload: () => unknown): void {
+export function usePreloadWhenIdle(...preloads: Array<() => unknown>): void {
   const loading = useRouterLoading();
   const runPreload = useEffectEvent(() => {
-    void preload();
+    for (const preload of preloads) {
+      void preload();
+    }
   });
 
   useEffect(() => {

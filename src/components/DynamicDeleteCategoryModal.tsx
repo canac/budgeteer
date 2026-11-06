@@ -1,8 +1,10 @@
 import { lazy, Suspense } from "react";
 import type { DeleteCategoryModalProps } from "~/components/DeleteCategoryModal";
 
+export const preloadDeleteCategoryModal = () => import("~/components/DeleteCategoryModal");
+
 const DeleteCategoryModal = lazy(() =>
-  import("~/components/DeleteCategoryModal").then(({ DeleteCategoryModal }) => ({
+  preloadDeleteCategoryModal().then(({ DeleteCategoryModal }) => ({
     default: DeleteCategoryModal,
   })),
 );

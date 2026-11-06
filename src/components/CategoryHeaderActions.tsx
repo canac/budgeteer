@@ -2,8 +2,12 @@ import type { Category } from "src/prisma/client";
 import { ActionIcon, Menu, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDots, IconPencil, IconTrash } from "@tabler/icons-react";
-import { DynamicCategoryModal } from "~/components/DynamicCategoryModal";
-import { DynamicDeleteCategoryModal } from "~/components/DynamicDeleteCategoryModal";
+import { DynamicCategoryModal, preloadCategoryModal } from "~/components/DynamicCategoryModal";
+import {
+  DynamicDeleteCategoryModal,
+  preloadDeleteCategoryModal,
+} from "~/components/DynamicDeleteCategoryModal";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 
 type Deletable = { valid: true } | { valid: false; message: string };
 
@@ -30,7 +34,13 @@ export function CategoryHeaderActions({
     <>
       <Menu position="bottom-end">
         <Menu.Target>
-          <ActionIcon variant="subtle" size="lg" color="gray" aria-label="Category actions">
+          <ActionIcon
+            variant="subtle"
+            size="lg"
+            color="gray"
+            aria-label="Category actions"
+            {...preloadOnHover([preloadCategoryModal, preloadDeleteCategoryModal])}
+          >
             <IconDots />
           </ActionIcon>
         </Menu.Target>

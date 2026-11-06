@@ -1,8 +1,10 @@
 import { lazy, Suspense } from "react";
 import type { LeftoversTransferModalProps } from "~/components/LeftoversTransferModal";
 
+export const preloadLeftoversTransferModal = () => import("~/components/LeftoversTransferModal");
+
 const LeftoversTransferModal = lazy(() =>
-  import("~/components/LeftoversTransferModal").then(({ LeftoversTransferModal }) => ({
+  preloadLeftoversTransferModal().then(({ LeftoversTransferModal }) => ({
     default: LeftoversTransferModal,
   })),
 );

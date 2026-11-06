@@ -1,8 +1,10 @@
 import { lazy, Suspense } from "react";
 import type { CategoryModalProps } from "~/components/CategoryModal";
 
+export const preloadCategoryModal = () => import("~/components/CategoryModal");
+
 const CategoryModal = lazy(() =>
-  import("~/components/CategoryModal").then(({ CategoryModal }) => ({
+  preloadCategoryModal().then(({ CategoryModal }) => ({
     default: CategoryModal,
   })),
 );

@@ -10,7 +10,9 @@ import {
 } from "@tabler/icons-react";
 import { getRouteApi, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { preloadPreferencesModal } from "~/components/DynamicPreferencesModal";
 import { logout as logoutServerFn } from "~/functions/logout";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 import { BudgetMonthSelector } from "./BudgetMonthSelector";
 import { CategorySelector } from "./CategorySelector";
 import { MantineNavLink } from "./MantineNavLink";
@@ -110,6 +112,7 @@ export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: 
         component="button"
         label="Preferences"
         leftSection={<IconSettings size={18} />}
+        {...preloadOnHover(preloadPreferencesModal)}
         onClick={() => {
           onClose();
           onOpenPreferences();

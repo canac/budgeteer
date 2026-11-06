@@ -6,12 +6,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import type { RuleDraft } from "~/components/RuleModal";
 import type { AmountRule, VendorRules } from "~/lib/ruleLookup";
-import { DynamicDeleteRuleModal } from "~/components/DynamicDeleteRuleModal";
-import { DynamicRuleModal } from "~/components/DynamicRuleModal";
+import {
+  DynamicDeleteRuleModal,
+  preloadDeleteRuleModal,
+} from "~/components/DynamicDeleteRuleModal";
+import { DynamicRuleModal, preloadRuleModal } from "~/components/DynamicRuleModal";
 import { List, ListRow } from "~/components/List";
 import { RuleBadges } from "~/components/RuleBadges";
 import { deleteRule as deleteRuleFn } from "~/functions/deleteRule";
 import { formatSignedCurrency } from "~/lib/formatters";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 import classes from "./ImportRules.module.css";
 
 interface ImportRulesProps {
@@ -59,6 +63,7 @@ export function ImportRules({ rules }: ImportRulesProps) {
                   variant="subtle"
                   size="lg"
                   aria-label="Edit"
+                  {...preloadOnHover(preloadRuleModal)}
                   onClick={() => openEdit({ scope: "vendor", rule })}
                 >
                   <IconPencil />
@@ -68,6 +73,7 @@ export function ImportRules({ rules }: ImportRulesProps) {
                   size="lg"
                   color="red"
                   aria-label="Delete"
+                  {...preloadOnHover(preloadDeleteRuleModal)}
                   onClick={() => setDeleting({ scope: "vendor", rule })}
                 >
                   <IconTrash />
@@ -96,6 +102,7 @@ export function ImportRules({ rules }: ImportRulesProps) {
                     variant="subtle"
                     size="lg"
                     aria-label="Edit"
+                    {...preloadOnHover(preloadRuleModal)}
                     onClick={() =>
                       openEdit({
                         scope: "amount",
@@ -111,6 +118,7 @@ export function ImportRules({ rules }: ImportRulesProps) {
                     size="lg"
                     color="red"
                     aria-label="Delete"
+                    {...preloadOnHover(preloadDeleteRuleModal)}
                     onClick={() =>
                       setDeleting({ scope: "amount", vendorRules: rule, rule: amountRule })
                     }

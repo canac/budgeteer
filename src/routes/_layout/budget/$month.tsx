@@ -11,7 +11,10 @@ import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/rea
 import clsx from "clsx";
 import { addMonths, parseISO, startOfMonth, subMonths } from "date-fns";
 import { boolean, object, optional, catch as zCatch } from "zod/mini";
-import { DynamicLeftoversTransferModal } from "~/components/DynamicLeftoversTransferModal";
+import {
+  DynamicLeftoversTransferModal,
+  preloadLeftoversTransferModal,
+} from "~/components/DynamicLeftoversTransferModal";
 import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineButtonLink } from "~/components/MantineButtonLink";
@@ -22,6 +25,7 @@ import { setBudgetIncome } from "~/functions/setBudgetIncome";
 import { useToday } from "~/hooks/useToday";
 import { amountSignClassname, formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 import classes from "./BudgetPage.module.css";
 
 const searchSchema = object({
@@ -220,6 +224,7 @@ function BudgetLayout() {
                   variant="subtle"
                   size="lg"
                   color="gray"
+                  {...preloadOnHover(preloadLeftoversTransferModal)}
                   onClick={openLeftoversTransfer}
                   aria-label="Transfer leftovers"
                   title="Transfer leftovers"

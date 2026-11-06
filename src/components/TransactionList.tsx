@@ -15,10 +15,14 @@ import type { DeleteTransactionModalProps } from "~/components/DeleteTransaction
 import type { TransferModalProps } from "~/components/TransferModal";
 import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import type { Category } from "~/prisma/client";
-import { DynamicDeleteTransactionModal } from "~/components/DynamicDeleteTransactionModal";
+import {
+  DynamicDeleteTransactionModal,
+  preloadDeleteTransactionModal,
+} from "~/components/DynamicDeleteTransactionModal";
 import { DynamicTransferModal } from "~/components/DynamicTransferModal";
 import { List, ListRow } from "~/components/List";
 import { getTransaction } from "~/functions/getTransaction";
+import { usePreloadWhenIdle } from "~/hooks/usePreloadWhenIdle";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
 import type { TransactionModalProps } from "./TransactionModal";
 import { DynamicTransactionModal } from "./DynamicTransactionModal";
@@ -187,6 +191,7 @@ export function TransactionList({
   const [editingTransfer, setEditingTransfer] = useState<
     TransferModalProps["editingTransfer"] | null
   >(null);
+  usePreloadWhenIdle(preloadDeleteTransactionModal);
 
   const handleUpdate = () => router.invalidate();
 

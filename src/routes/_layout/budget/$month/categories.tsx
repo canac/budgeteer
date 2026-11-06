@@ -28,12 +28,13 @@ import {
 import clsx from "clsx";
 import { useId, useState } from "react";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
-import { DynamicCategoryModal } from "~/components/DynamicCategoryModal";
+import { DynamicCategoryModal, preloadCategoryModal } from "~/components/DynamicCategoryModal";
 import { MantineLink } from "~/components/MantineLink";
 import { reorderCategory } from "~/functions/reorderCategory";
 import { useSyncedState } from "~/hooks/useSyncedState";
 import { pluck } from "~/lib/collections";
 import { formatCurrency } from "~/lib/formatters";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 import classes from "./CategoriesPage.module.css";
 
 export const Route = createFileRoute("/_layout/budget/$month/categories")({
@@ -208,7 +209,12 @@ function CategoriesPage() {
             </SortableContext>
           </DndContext>
           <Group justify="space-evenly">
-            <Button variant="subtle" leftSection={<IconPlus />} onClick={() => openCreateModal()}>
+            <Button
+              variant="subtle"
+              leftSection={<IconPlus />}
+              {...preloadOnHover(preloadCategoryModal)}
+              onClick={() => openCreateModal()}
+            >
               Add Category
             </Button>
 

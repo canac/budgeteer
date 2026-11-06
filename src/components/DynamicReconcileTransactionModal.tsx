@@ -1,8 +1,11 @@
 import { lazy, Suspense } from "react";
 import type { ReconcileTransactionModalProps } from "~/components/ReconcileTransactionModal";
 
+export const preloadReconcileTransactionModal = () =>
+  import("~/components/ReconcileTransactionModal");
+
 const ReconcileTransactionModal = lazy(() =>
-  import("~/components/ReconcileTransactionModal").then(({ ReconcileTransactionModal }) => ({
+  preloadReconcileTransactionModal().then(({ ReconcileTransactionModal }) => ({
     default: ReconcileTransactionModal,
   })),
 );

@@ -1,8 +1,10 @@
 import { lazy, Suspense } from "react";
 import type { DeleteTransactionModalProps } from "~/components/DeleteTransactionModal";
 
+export const preloadDeleteTransactionModal = () => import("~/components/DeleteTransactionModal");
+
 const DeleteTransactionModal = lazy(() =>
-  import("~/components/DeleteTransactionModal").then(({ DeleteTransactionModal }) => ({
+  preloadDeleteTransactionModal().then(({ DeleteTransactionModal }) => ({
     default: DeleteTransactionModal,
   })),
 );

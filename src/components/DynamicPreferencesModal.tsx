@@ -1,8 +1,10 @@
 import { lazy, Suspense } from "react";
 import type { PreferencesModalProps } from "~/components/PreferencesModal";
 
+export const preloadPreferencesModal = () => import("~/components/PreferencesModal");
+
 const PreferencesModal = lazy(() =>
-  import("~/components/PreferencesModal").then(({ PreferencesModal }) => ({
+  preloadPreferencesModal().then(({ PreferencesModal }) => ({
     default: PreferencesModal,
   })),
 );

@@ -4,7 +4,10 @@ import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { coerce, literal, object, optional, string, union } from "zod/mini";
-import { DynamicReconcileTransactionModal } from "~/components/DynamicReconcileTransactionModal";
+import {
+  DynamicReconcileTransactionModal,
+  preloadReconcileTransactionModal,
+} from "~/components/DynamicReconcileTransactionModal";
 import { ExternalAccountSelect } from "~/components/ExternalAccountSelect";
 import { showNotification } from "~/components/LazyNotifications";
 import { UnreviewedTransactions } from "~/components/UnreviewedTransactions";
@@ -18,6 +21,7 @@ import { importTransactions as importTransactionsFn } from "~/functions/importTr
 import { reconcileTransaction as reconcileTransactionFn } from "~/functions/reconcileTransaction";
 import { restoreTransaction as restoreTransactionFn } from "~/functions/restoreTransaction";
 import { reviewTransaction as reviewTransactionFn } from "~/functions/reviewTransaction";
+import { usePreloadWhenIdle } from "~/hooks/usePreloadWhenIdle";
 import { useSyncedState } from "~/hooks/useSyncedState";
 import classes from "./ImportPage.module.css";
 
@@ -80,8 +84,9 @@ function ImportTransactionsPage() {
   const restoreTransaction = useServerFn(restoreTransactionFn);
   const [importing, setImporting] = useState(false);
   const [reconciling, setReconciling] = useState<UnreviewedTransaction | null>(null);
-
   const [transactions, setTransactions] = useSyncedState(loaderData.transactions);
+  usePreloadWhenIdle(preloadReconcileTransactionModal);
+
   const total = Math.max(
     0,
     loaderData.total - (loaderData.transactions.length - transactions.length),
