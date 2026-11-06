@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useState } from "react";
-import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
+import { dollarsToPennies } from "~/lib/currencyConversion";
 import { formatCurrency } from "~/lib/formatters";
 import classes from "./useEditableAmount.module.css";
 
@@ -31,12 +31,12 @@ export function useEditableAmount({
     if (editing) {
       return;
     }
-    setValue(penniesToDollars(amount).toString());
+    setValue(formatCurrency(amount));
     setEditing(true);
   };
 
   const handleSave = async () => {
-    await saveAmount(dollarsToPennies(Number(value)));
+    await saveAmount(dollarsToPennies(Number(value.replaceAll(/[$,]/g, ""))));
     setEditing(false);
   };
 
@@ -52,7 +52,7 @@ export function useEditableAmount({
         className={clsx(classes.input, className)}
         ref={(input) => input?.focus()}
         inputMode="decimal"
-        pattern="-?[0-9]*(\.[0-9]{0,2})?"
+        pattern="-?\$?[0-9,]*(\.[0-9]{0,2})?"
         aria-label="Edit amount"
         data-mantine-stop-propagation="true"
         value={value}
