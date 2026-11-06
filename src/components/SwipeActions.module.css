@@ -8,11 +8,6 @@
   &::-webkit-scrollbar {
     display: none;
   }
-
-  /* Trackpads and mice keep the buttons so a sideways scroll can't trigger an action */
-  @media (pointer: fine) {
-    overflow-x: hidden;
-  }
 }
 
 .content,

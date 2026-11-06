@@ -1,7 +1,7 @@
 import type { MantineColor } from "@mantine/core";
 import type { ReactNode, TouchEvent, UIEvent } from "react";
 import { useLayoutEffect, useRef } from "react";
-import { useHydrated } from "~/hooks/useHydrated";
+import { useTouchscreen } from "~/hooks/useTouchscreen";
 import classes from "./SwipeActions.module.css";
 
 export interface SwipeAction {
@@ -22,14 +22,13 @@ interface SwipeActionsProps {
 
 /**
  * Lets touch users swipe the content sideways to reveal an action, which triggers once the
- * content is swiped more than halfway.
+ * content is swiped more than halfway. Renders only the content on non-touch displays.
  */
 export function SwipeActions({ swipeRight, swipeLeft, children }: SwipeActionsProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  // Actions are added after hydration so the server render doesn't show the left action
-  const hydrated = useHydrated();
-  const showSwipeRight = hydrated && swipeRight !== undefined;
-  const showSwipeLeft = hydrated && swipeLeft !== undefined;
+  const touchscreen = useTouchscreen();
+  const showSwipeRight = touchscreen && swipeRight !== undefined;
+  const showSwipeLeft = touchscreen && swipeLeft !== undefined;
   const contentIndex = showSwipeRight ? 1 : 0;
 
   const touchingRef = useRef(false);
