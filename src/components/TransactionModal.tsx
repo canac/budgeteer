@@ -2,6 +2,7 @@ import {
   Alert,
   Autocomplete,
   Button,
+  Group,
   Modal,
   NumberInput,
   Stack,
@@ -177,20 +178,24 @@ export function TransactionModal({
     >
       <form onSubmit={handleSubmit}>
         <Stack>
-          <Switch
-            label="Income"
-            key={form.key("isIncome")}
-            {...form.getInputProps("isIncome", { type: "checkbox" })}
-            disabled={external}
-          />
-          <NumberInput
-            label="Amount"
-            key={form.key("amount")}
-            {...form.getInputProps("amount")}
-            min={0}
-            required
-            disabled={external}
-          />
+          <Group align="flex-end" wrap="nowrap">
+            <NumberInput
+              label="Amount"
+              key={form.key("amount")}
+              {...form.getInputProps("amount")}
+              min={0}
+              required
+              disabled={external}
+              style={{ flex: 1 }}
+            />
+            <Switch
+              label="Income"
+              key={form.key("isIncome")}
+              {...form.getInputProps("isIncome", { type: "checkbox" })}
+              disabled={external}
+              mb={8}
+            />
+          </Group>
           <Autocomplete
             label="Vendor"
             key={form.key("vendor")}
