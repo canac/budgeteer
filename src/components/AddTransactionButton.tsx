@@ -18,7 +18,7 @@ export function AddTransactionButton({ initialCategoryId }: AddTransactionButton
 
   return (
     <>
-      <ActionIcon variant="subtle" size="lg" onClick={open} title="Add Transaction">
+      <ActionIcon variant="subtle" size="lg" onClick={open} title="New Transaction">
         <IconPlus />
       </ActionIcon>
       {transactionModalOpen && (

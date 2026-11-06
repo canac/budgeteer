@@ -1,20 +1,16 @@
-import { ActionIcon, AppShell, Box, Burger, Container, Group, Loader } from "@mantine/core";
+import { AppShell, Box, Burger, Container, Group, Loader } from "@mantine/core";
 import { useDisclosure, useMounted } from "@mantine/hooks";
-import { IconArrowsExchange, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useParams, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { DynamicCreateMenu } from "~/components/DynamicCreateMenu";
 import { DynamicPreferencesModal } from "~/components/DynamicPreferencesModal";
-import {
-  DynamicTransactionModal,
-  preloadTransactionModal,
-} from "~/components/DynamicTransactionModal";
-import { DynamicTransferModal, preloadTransferModal } from "~/components/DynamicTransferModal";
+import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
+import { DynamicTransferModal } from "~/components/DynamicTransferModal";
 import { MantineLink } from "~/components/MantineLink";
 import { NavDrawer } from "~/components/NavDrawer";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { getCategories } from "~/functions/getCategories";
 import { getUnreviewedTransactionCount } from "~/functions/getUnreviewedTransactionCount";
-import { usePreloadWhenIdle } from "~/hooks/usePreloadWhenIdle";
 import { useReduceMotion } from "~/hooks/useReduceMotion";
 import { useRouterLoading } from "~/hooks/useRouterLoading";
 
@@ -46,7 +42,6 @@ function LayoutRoute() {
   const loading = useRouterLoading();
   const mounted = useMounted();
   const { reduceMotion } = useReduceMotion();
-  usePreloadWhenIdle(preloadTransactionModal, preloadTransferModal);
 
   useEffect(() => {
     document.documentElement.toggleAttribute("data-reduce-motion", reduceMotion);
@@ -92,14 +87,7 @@ function LayoutRoute() {
               </MantineLink>
               {mounted && loading && <Loader size="sm" color="white" />}
               <Box flex={1} />
-              <Group gap="xs">
-                <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransfer}>
-                  <IconArrowsExchange />
-                </ActionIcon>
-                <ActionIcon variant="subtle" c="white" size="xl" onClick={openTransaction}>
-                  <IconPlus />
-                </ActionIcon>
-              </Group>
+              <DynamicCreateMenu onNewTransaction={openTransaction} onNewTransfer={openTransfer} />
             </Group>
           </Container>
         </AppShell.Header>
