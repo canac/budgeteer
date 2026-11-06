@@ -16,6 +16,7 @@ import classes from "./CategoryHistoryPage.module.css";
 
 const ranges = ["current", "last1", "last3", "last6", "last12"] as const;
 type Range = (typeof ranges)[number];
+const DEFAULT_RANGE: Range = "last12";
 
 const searchSchema = object({
   range: optional(enumType(ranges)),
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/_layout/category/$category")({
     month,
     transfers,
   }),
-  loader: ({ params: { category }, deps: { range = "current", month, transfers = false } }) => {
+  loader: ({ params: { category }, deps: { range = DEFAULT_RANGE, month, transfers = false } }) => {
     const { startMonth, endMonth } = month
       ? { startMonth: month, endMonth: month }
       : getRangeMonths(range);
@@ -89,7 +90,7 @@ function getMonthOptions(
 
 function CategoryHistoryPage() {
   const categoryHistory = Route.useLoaderData();
-  const { range = "current", month, transfers = false } = Route.useSearch();
+  const { range = DEFAULT_RANGE, month, transfers = false } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
   const today = useToday();
@@ -139,7 +140,7 @@ function CategoryHistoryPage() {
                   navigate({
                     search: (prev) => ({
                       ...prev,
-                      range: option.value === "current" ? undefined : option.value,
+                      range: option.value === DEFAULT_RANGE ? undefined : option.value,
                       month: undefined,
                     }),
                   })
