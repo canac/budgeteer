@@ -2,17 +2,19 @@ import { AppShell, Box, Burger, Container, Group, Loader } from "@mantine/core";
 import { useDisclosure, useMounted } from "@mantine/hooks";
 import { createFileRoute, Outlet, useParams, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { usePreloadWhenIdle } from "src/hooks/usePreloadWhenIdle";
 import { DynamicCreateMenu } from "~/components/DynamicCreateMenu";
+import { DynamicNavDrawer, preloadNavDrawer } from "~/components/DynamicNavDrawer";
 import { DynamicPreferencesModal } from "~/components/DynamicPreferencesModal";
 import { DynamicTransactionModal } from "~/components/DynamicTransactionModal";
 import { DynamicTransferModal } from "~/components/DynamicTransferModal";
 import { MantineLink } from "~/components/MantineLink";
-import { NavDrawer } from "~/components/NavDrawer";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { getCategories } from "~/functions/getCategories";
 import { getUnreviewedTransactionCount } from "~/functions/getUnreviewedTransactionCount";
 import { useReduceMotion } from "~/hooks/useReduceMotion";
 import { useRouterLoading } from "~/hooks/useRouterLoading";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 
 export const Route = createFileRoute("/_layout")({
   component: LayoutRoute,
@@ -42,6 +44,7 @@ function LayoutRoute() {
   const loading = useRouterLoading();
   const mounted = useMounted();
   const { reduceMotion } = useReduceMotion();
+  usePreloadWhenIdle(preloadNavDrawer);
 
   useEffect(() => {
     document.documentElement.toggleAttribute("data-reduce-motion", reduceMotion);
@@ -59,12 +62,13 @@ function LayoutRoute() {
       {transferOpened && <DynamicTransferModal onClose={closeTransfer} onSave={handleUpdate} />}
       {preferencesOpened && <DynamicPreferencesModal onClose={closePreferences} />}
 
-      <NavDrawer
-        opened={drawerOpened}
-        onClose={closeDrawer}
-        currentMonth={month ?? null}
-        onOpenPreferences={openPreferences}
-      />
+      {drawerOpened && (
+        <DynamicNavDrawer
+          onClose={closeDrawer}
+          currentMonth={month ?? null}
+          onOpenPreferences={openPreferences}
+        />
+      )}
 
       <AppShell header={{ height: 60 }} padding="md">
         <AppShell.Header
@@ -76,7 +80,7 @@ function LayoutRoute() {
           <Container size="xl" h="100%">
             <Group h="100%" gap="sm">
               <Burger
-                opened={drawerOpened}
+                {...preloadOnHover(preloadNavDrawer)}
                 onClick={openDrawer}
                 color="white"
                 size="md"

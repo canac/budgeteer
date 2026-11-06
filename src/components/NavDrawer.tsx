@@ -12,6 +12,7 @@ import { getRouteApi, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { preloadPreferencesModal } from "~/components/DynamicPreferencesModal";
 import { logout as logoutServerFn } from "~/functions/logout";
+import { useOpened } from "~/hooks/useOpened";
 import { preloadOnHover } from "~/lib/preloadOnHover";
 import { BudgetMonthSelector } from "./BudgetMonthSelector";
 import { CategorySelector } from "./CategorySelector";
@@ -20,14 +21,13 @@ import classes from "./NavDrawer.module.css";
 
 const routeApi = getRouteApi("/_layout");
 
-interface NavDrawerProps {
-  opened: boolean;
+export interface NavDrawerProps {
   onClose: () => void;
   currentMonth: string | null;
   onOpenPreferences: () => void;
 }
 
-export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: NavDrawerProps) {
+export function NavDrawer({ onClose, currentMonth, onOpenPreferences }: NavDrawerProps) {
   const { budgetMonths, categories, unreviewedCount } = routeApi.useLoaderData();
   const category = useParams({
     from: "/_layout/category/$category",
@@ -35,16 +35,16 @@ export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: 
     select: (params) => params.category,
   });
   const logout = useServerFn(logoutServerFn);
+  const { close, modalProps } = useOpened({ onClose });
 
   const handleLogout = async () => {
-    onClose();
+    close();
     await logout();
   };
 
   return (
     <Drawer
-      opened={opened}
-      onClose={onClose}
+      {...modalProps}
       title="Budgeteer"
       position="left"
       classNames={{ content: classes.root }}
@@ -61,13 +61,13 @@ export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: 
         to="/"
         label="Overview"
         leftSection={<IconChartBar size={18} />}
-        onClick={onClose}
+        onClick={close}
       />
       <MantineNavLink
         to="/search"
         label="Search"
         leftSection={<IconSearch size={18} />}
-        onClick={onClose}
+        onClick={close}
       />
       <NavLink
         key={`months-${currentMonth ?? "none"}`}
@@ -79,7 +79,7 @@ export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: 
         <BudgetMonthSelector
           budgetMonths={budgetMonths}
           currentMonth={currentMonth}
-          onNavigate={onClose}
+          onNavigate={close}
         />
       </NavLink>
       <NavLink
@@ -92,7 +92,7 @@ export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: 
         <CategorySelector
           categories={categories}
           currentCategory={category ?? null}
-          onNavigate={onClose}
+          onNavigate={close}
         />
       </NavLink>
       <MantineNavLink
@@ -106,7 +106,7 @@ export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: 
             </Badge>
           )
         }
-        onClick={onClose}
+        onClick={close}
       />
       <NavLink
         component="button"
@@ -114,7 +114,7 @@ export function NavDrawer({ opened, onClose, currentMonth, onOpenPreferences }: 
         leftSection={<IconSettings size={18} />}
         {...preloadOnHover(preloadPreferencesModal)}
         onClick={() => {
-          onClose();
+          close();
           onOpenPreferences();
         }}
       />
