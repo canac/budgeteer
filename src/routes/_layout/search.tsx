@@ -194,7 +194,7 @@ function SearchPage() {
           (transactions.length === 0 ? (
             <Text c="dimmed">No transactions found</Text>
           ) : (
-            <Stack>
+            <Stack className="list-column">
               <TransactionList transactions={transactions} showCategories />
               {totalPages > 1 && (
                 <Group justify="center">

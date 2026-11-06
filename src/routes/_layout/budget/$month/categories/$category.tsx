@@ -124,7 +124,7 @@ function CategoryDetailsPage() {
   );
 
   return (
-    <Drawer.Root className={classes.root} {...modalProps} position="right" size="xl">
+    <Drawer.Root {...modalProps} position="right" size="xl">
       <Drawer.Overlay />
       <Drawer.Content>
         <Drawer.Header>
@@ -190,7 +190,6 @@ function CategoryDetailsPage() {
                 </Group>
               </Title>
               <TransactionList
-                className={classes.transactionList}
                 transactions={budgetCategory.transactions}
                 extraRows={transactionRows}
               />

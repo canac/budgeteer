@@ -31,7 +31,7 @@ function ImportRulesPage() {
   const filteredRules = search ? rules.filter((rule) => matchesSearch(rule, search)) : rules;
 
   return (
-    <Stack>
+    <Stack className="list-column">
       <TextInput
         placeholder="Search rules"
         aria-label="Search rules"

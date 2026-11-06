@@ -2,6 +2,7 @@ import { Badge, Button, Group, Pagination, SegmentedControl, Stack, Text } from 
 import { IconDownload } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import clsx from "clsx";
 import { useState } from "react";
 import { coerce, literal, object, optional, string, union } from "zod/mini";
 import {
@@ -202,7 +203,7 @@ function ImportTransactionsPage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <Stack className={classes.root}>
+    <Stack className={clsx(classes.root, "list-column")}>
       <Group>
         <SegmentedControl
           className={classes.views}

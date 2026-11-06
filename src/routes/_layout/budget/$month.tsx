@@ -8,6 +8,7 @@ import {
   IconFilterOff,
 } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/react-router";
+import clsx from "clsx";
 import { addMonths, parseISO, startOfMonth, subMonths } from "date-fns";
 import { boolean, object, optional, catch as zCatch } from "zod/mini";
 import { Clickable } from "~/components/Clickable";
@@ -107,7 +108,7 @@ function BudgetLayout() {
       }}
       onSwipe={(month) => router.navigate({ to: tabLink, params: { month }, search: true })}
     >
-      <Stack className={classes.root} align="center">
+      <Stack className={clsx(classes.root, "list-column")}>
         {leftoversTransferOpened && (
           <DynamicLeftoversTransferModal
             month={budget.month}
@@ -118,7 +119,7 @@ function BudgetLayout() {
             onSave={() => router.invalidate()}
           />
         )}
-        <Group gap="xs">
+        <Group gap="xs" justify="center">
           {previousMonth ? (
             <MantineActionIconLink
               to={tabLink}
@@ -162,8 +163,6 @@ function BudgetLayout() {
           )}
         </Group>
         <SegmentedControl
-          w="100%"
-          maw="36rem"
           fullWidth
           value={onTransactions ? "transactions" : "categories"}
           onChange={(value) =>

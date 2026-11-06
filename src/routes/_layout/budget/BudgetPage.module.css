@@ -1,11 +1,6 @@
 .root {
-  :global(.mantine-Card-root) {
-    width: 100%;
-    max-width: 36rem;
-
-    h2 {
-      font-size: var(--mantine-font-size-lg);
-    }
+  :global(.mantine-Card-root) h2 {
+    font-size: var(--mantine-font-size-lg);
   }
 
   .leftoverRow .leftoverToggle {

@@ -235,7 +235,7 @@ function CategoryHistoryPage() {
           </Stack>
         </Card>
 
-        <div>
+        <div className="list-column">
           <Title order={3} mb="md">
             Transaction History
           </Title>
