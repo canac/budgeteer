@@ -6,7 +6,7 @@
 }
 
 .ruleSeparator {
-  margin-inline: var(--mantine-spacing-xs);
+  margin-inline: 0.25ch;
   color: var(--mantine-color-dimmed);
 }
 
