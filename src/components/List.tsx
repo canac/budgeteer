@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentProps, KeyboardEvent, ReactNode } from "react";
 import { Text } from "@mantine/core";
 import clsx from "clsx";
 import classes from "./List.module.css";
@@ -13,7 +13,10 @@ export function List({ children, className }: ListProps) {
   return <div className={clsx(classes.root, className)}>{children}</div>;
 }
 
-export interface ListRowProps {
+export interface ListRowProps extends Pick<
+  ComponentProps<"div">,
+  "onClick" | "onPointerEnter" | "onFocus"
+> {
   title: ReactNode;
   className?: string;
   /** Rendered after the title. */
@@ -28,11 +31,37 @@ export interface ListRowProps {
   tags?: ReactNode;
 }
 
-export function ListRow({ icon, title, value, actions, meta, tags, className }: ListRowProps) {
+function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+  if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) {
+    event.preventDefault();
+    event.currentTarget.click();
+  }
+}
+
+export function ListRow({
+  icon,
+  title,
+  value,
+  actions,
+  meta,
+  tags,
+  className,
+  onClick,
+  ...props
+}: ListRowProps) {
   const hasBottom = Boolean(meta) || Boolean(tags);
 
   return (
-    <div className={clsx(classes.row, className)}>
+    <div
+      className={clsx(classes.row, onClick && classes.clickable, className)}
+      {...(onClick && {
+        role: "button",
+        tabIndex: 0,
+        onClick,
+        onKeyDown: handleKeyDown,
+      })}
+      {...props}
+    >
       <div className={classes.cellTitle}>
         <Text component="span" lineClamp={1}>
           {title}

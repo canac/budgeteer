@@ -1,7 +1,12 @@
 import { Button, Modal, Radio, Select, Stack, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useState } from "react";
 import invariant from "tiny-invariant";
 import type { AmountRule, RuleOutcome, VendorRules } from "~/lib/ruleLookup";
+import {
+  DynamicDeleteRuleModal,
+  preloadDeleteRuleModal,
+} from "~/components/DynamicDeleteRuleModal";
 import { ModalFooter } from "~/components/ModalFooter";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
 import { updateRule } from "~/functions/updateRule";
@@ -14,20 +19,23 @@ import { CATEGORY_TOTAL_MISMATCH, splitTotalPennies } from "~/lib/categorySplit"
 import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatSignedCurrency } from "~/lib/formatters";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 
 export type RuleDraft =
   | { scope: "vendor"; rule: VendorRules }
-  | { scope: "amount"; externalVendor: string; rule: AmountRule };
+  | { scope: "amount"; externalVendor: string; vendor: string; rule: AmountRule };
 
 export interface RuleModalProps {
   onClose: () => void;
   onSave: () => void;
+  onDelete: () => Promise<void>;
   draft: RuleDraft;
 }
 
-export function RuleModal({ onClose, onSave, draft }: RuleModalProps) {
+export function RuleModal({ onClose, onSave, onDelete, draft }: RuleModalProps) {
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
   const { close, modalProps } = useOpened({ onClose });
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const amountDraft = draft.scope === "amount" ? draft : null;
   const externalVendor =
@@ -122,12 +130,19 @@ export function RuleModal({ onClose, onSave, draft }: RuleModalProps) {
     onSave();
   });
 
+  const handleDelete = () => {
+    close();
+    return onDelete();
+  };
+
   const { outcome } = form.getValues();
   const categorizing = outcome === "categorize";
 
   return (
     <Modal
       {...modalProps}
+      closeOnEscape={!confirmingDelete}
+      trapFocus={!confirmingDelete}
       title={<Text fw="bold">{amountDraft ? "Edit Amount Rule" : "Edit Rule"}</Text>}
     >
       <form onSubmit={handleSubmit}>
@@ -173,12 +188,32 @@ export function RuleModal({ onClose, onSave, draft }: RuleModalProps) {
               />
             ))}
           <ModalFooter>
+            <Button
+              color="red"
+              {...preloadOnHover(preloadDeleteRuleModal)}
+              onClick={() => setConfirmingDelete(true)}
+            >
+              Delete
+            </Button>
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               Update
             </Button>
           </ModalFooter>
         </Stack>
       </form>
+      {confirmingDelete && (
+        <DynamicDeleteRuleModal
+          vendor={
+            draft.scope === "vendor"
+              ? (draft.rule.vendorAlias ?? draft.rule.externalVendor)
+              : draft.vendor
+          }
+          amount={amountDraft?.rule.amount}
+          amountRuleCount={draft.scope === "vendor" ? draft.rule.amountRules.length : 0}
+          onClose={() => setConfirmingDelete(false)}
+          onDelete={handleDelete}
+        />
+      )}
     </Modal>
   );
 }

@@ -8,6 +8,11 @@
   height: calc(var(--ti-size) / 1.5);
 }
 
+/* Badges force the default cursor */
+.mantine-Badge-root {
+  cursor: inherit;
+}
+
 .mantine-Modal-close,
 .mantine-Drawer-close {
   min-width: 34px;
@@ -19,4 +24,9 @@
 }
 .negative {
   color: var(--mantine-color-red-text);
+}
+
+/* Put the focus ring above positioned neighbors, like clickable list rows */
+:where(:focus-visible) {
+  z-index: 1;
 }
