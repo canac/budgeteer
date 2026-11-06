@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import type { Category } from "src/prisma/client";
 import { Group, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconPencil } from "@tabler/icons-react";
 import type { Deletable } from "~/components/CategoryModal";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { DynamicCategoryModal, preloadCategoryModal } from "~/components/DynamicCategoryModal";
+import { EditPencil } from "~/components/EditPencil";
 import { preloadOnHover } from "~/lib/preloadOnHover";
 import classes from "./CategoryHeading.module.css";
 
@@ -40,7 +40,7 @@ export function CategoryHeading({
           onClick={openEditModal}
         >
           {category.name}
-          <IconPencil className={classes.pencil} stroke={1.5} aria-hidden />
+          <EditPencil size={28} />
         </UnstyledButton>,
       )}
       <CategoryTypeIcons className={classes.typeIcons} category={category} size={28} />

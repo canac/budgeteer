@@ -15,6 +15,7 @@ import {
   DynamicLeftoversTransferModal,
   preloadLeftoversTransferModal,
 } from "~/components/DynamicLeftoversTransferModal";
+import { EditPencil } from "~/components/EditPencil";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineButtonLink } from "~/components/MantineButtonLink";
 import { MonthSwiper } from "~/components/MonthSwiper";
@@ -184,7 +185,10 @@ function BudgetLayout() {
           <Stack gap="xs">
             <Clickable onClick={income.edit}>
               <Group justify="space-between">
-                <Title order={2}>Income</Title>
+                <Title order={2}>
+                  Income
+                  <EditPencil />
+                </Title>
                 {income.field}
               </Group>
             </Clickable>

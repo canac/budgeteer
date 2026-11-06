@@ -16,34 +16,6 @@
   }
 }
 
-.pencil {
-  --pencil-size: 28px;
-
-  flex-shrink: 0;
-  width: 0;
-  height: var(--pencil-size);
-  color: var(--mantine-color-dimmed);
-  opacity: 0;
-  transition:
-    width 150ms ease,
-    margin-left 150ms ease,
-    opacity 150ms ease;
-
-  .button:hover &,
-  .button:focus-visible & {
-    width: var(--pencil-size);
-    margin-left: 0.35em;
-    opacity: 1;
-  }
-
-  /* Touch screens can't hover, so hint that the name is tappable */
-  @media (hover: none) {
-    width: var(--pencil-size);
-    margin-left: 0.35em;
-    opacity: 0.6;
-  }
-}
-
 /* The pencil takes the type icons' place while it shows */
 @media (hover: hover) {
   .typeIcons {

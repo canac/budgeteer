@@ -70,5 +70,9 @@ export function useEditableAmount({
     <span className={clsx(classes.text, className)}>{formatCurrency(amount)}</span>
   );
 
-  return { edit: editable ? edit : undefined, field };
+  return {
+    edit: editable ? edit : undefined,
+    editing,
+    field,
+  };
 }
