@@ -2,8 +2,20 @@
   width: 100%;
   max-width: 36rem;
   margin-inline: auto;
+  container-type: inline-size;
 }
 
-.header {
-  min-width: min(100%, max-content);
+.views {
+  flex: 1;
+}
+
+@container (width < 36rem) {
+  .views,
+  .import {
+    flex-basis: 100%;
+  }
+}
+
+.badge {
+  flex-shrink: 0;
 }

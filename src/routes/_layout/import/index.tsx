@@ -1,4 +1,4 @@
-import { Button, Group, Pagination, SegmentedControl, Stack, Text } from "@mantine/core";
+import { Badge, Button, Group, Pagination, SegmentedControl, Stack, Text } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -35,14 +35,22 @@ const searchSchema = object({
   account: optional(string()),
 });
 
-function header(view: View, total: number): string {
-  const plural = total === 1 ? "" : "s";
-  const headers: Record<View, string> = {
-    unreviewed: `You have ${total} transaction${plural} pending review`,
-    changed: `${total} accepted transaction${plural} changed at the bank`,
-    dismissed: `${total} dismissed transaction${plural}`,
-  };
-  return headers[view];
+interface ViewLabelProps {
+  label: string;
+  count?: number;
+}
+
+function ViewLabel({ label, count }: ViewLabelProps) {
+  return (
+    <Group gap={6} justify="center" wrap="nowrap">
+      {label}
+      {count && (
+        <Badge className={classes.badge} color="red" size="sm" radius="xl">
+          {count > 99 ? "99+" : count}
+        </Badge>
+      )}
+    </Group>
+  );
 }
 
 function empty(view: View, filteredByAccount: boolean): string {
@@ -59,14 +67,14 @@ export const Route = createFileRoute("/_layout/import/")({
   validateSearch: searchSchema,
   loaderDeps: ({ search: { page, view, account } }) => ({ page, view, account }),
   loader: async ({ deps: { page, view, account } }) => {
-    const [{ transactions, total }, allAccounts] = await Promise.all([
+    const [{ transactions, total, counts }, allAccounts] = await Promise.all([
       getUnreviewedTransactions({
         data: { page, pageSize: PAGE_SIZE, view: view ?? "unreviewed", accountId: account },
       }),
       getExternalAccounts(),
     ]);
     const accounts = allAccounts.filter((account) => !account.archived);
-    return { transactions, total, accounts };
+    return { transactions, total, counts, accounts };
   },
   head: () => ({ meta: [{ title: "Import Transactions | Budgeteer" }] }),
 });
@@ -91,6 +99,7 @@ function ImportTransactionsPage() {
     0,
     loaderData.total - (loaderData.transactions.length - transactions.length),
   );
+  const counts = { ...loaderData.counts, [currentView]: total };
 
   const removeTransaction = (id: string) => {
     setTransactions((prev) => prev.filter((tx) => tx.id !== id));
@@ -194,22 +203,29 @@ function ImportTransactionsPage() {
 
   return (
     <Stack className={classes.root}>
-      <Group justify="space-between">
-        <Text className={classes.header}>{header(currentView, total)}</Text>
-        <Button leftSection={<IconDownload />} onClick={handleImport} loading={importing}>
+      <Group>
+        <SegmentedControl
+          className={classes.views}
+          value={currentView}
+          onChange={handleViewChange}
+          data={[
+            {
+              label: <ViewLabel label="Unreviewed" count={counts.unreviewed} />,
+              value: "unreviewed",
+            },
+            { label: <ViewLabel label="Changed" count={counts.changed} />, value: "changed" },
+            { label: <ViewLabel label="Dismissed" />, value: "dismissed" },
+          ]}
+        />
+        <Button
+          className={classes.import}
+          leftSection={<IconDownload />}
+          onClick={handleImport}
+          loading={importing}
+        >
           Import
         </Button>
       </Group>
-      <SegmentedControl
-        fullWidth
-        value={currentView}
-        onChange={handleViewChange}
-        data={[
-          { label: "Unreviewed", value: "unreviewed" },
-          { label: "Changed", value: "changed" },
-          { label: "Dismissed", value: "dismissed" },
-        ]}
-      />
       {accounts.length > 0 && (
         <ExternalAccountSelect
           accounts={accounts}

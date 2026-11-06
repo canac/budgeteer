@@ -109,6 +109,29 @@ describe("getUnreviewedTransactions", () => {
     expect(pluck(result.transactions, "vendor")).toEqual(["Mine"]);
   });
 
+  it("counts every view within the account filter", async () => {
+    const otherAccount = { connect: { id: (await createExternalAccount()).id } };
+    await Promise.all([
+      createExternalTransaction({ vendor: "Pending1", account }),
+      createExternalTransaction({ vendor: "Pending2", account }),
+      createExternalTransaction({ vendor: "PendingElsewhere", account: otherAccount }),
+      createExternalTransaction({ vendor: "Dismissed", reviewed: true, account }),
+      createExternalTransaction({
+        vendor: "AcceptedChanged",
+        reviewed: true,
+        changedAt: new Date(),
+        transaction: { create: transaction() },
+        account,
+      }),
+    ]);
+
+    const result = await getUnreviewedTransactions({
+      data: { page: 1, pageSize: 10, view: "dismissed", accountId },
+    });
+
+    expect(result.counts).toEqual({ unreviewed: 2, changed: 1, dismissed: 1 });
+  });
+
   it("combines the external account filter with the view", async () => {
     const otherAccount = { connect: { id: (await createExternalAccount()).id } };
     await Promise.all([

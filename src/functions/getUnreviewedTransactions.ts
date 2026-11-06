@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { literal, number, object, optional, string, union } from "zod";
+import type { Prisma } from "~/prisma/client";
 import { requireAuth } from "~/lib/authMiddleware";
 import { find, pluck } from "~/lib/collections";
 import { getPrisma } from "~/lib/prisma";
@@ -38,6 +39,15 @@ export function suggestRule(
   return vendorAlias ? { vendorAlias, outcome: null, amountRule: false } : null;
 }
 
+type View = "unreviewed" | "changed" | "dismissed";
+
+const viewWheres = {
+  unreviewed: { reviewed: false, removedAt: null },
+  // Removed accepted transactions still appear under "changed"
+  changed: { changedAt: { not: null }, transaction: { isNot: null } },
+  dismissed: { reviewed: true, transaction: { is: null }, removedAt: null },
+} satisfies Record<View, Prisma.ExternalTransactionWhereInput>;
+
 const inputSchema = object({
   page: number().int().min(1).default(1),
   pageSize: number().int().min(1).max(200),
@@ -52,17 +62,12 @@ export const getUnreviewedTransactions = createServerFn()
   .middleware([requireAuth])
   .handler(async ({ data: { page, pageSize, view, accountId } }) => {
     const prisma = getPrisma();
-    const viewWhere =
-      view === "dismissed"
-        ? { reviewed: true, transaction: { is: null }, removedAt: null }
-        : view === "changed"
-          ? // Removed accepted transactions still appear under "changed"
-            { changedAt: { not: null }, transaction: { isNot: null } }
-          : { reviewed: false, removedAt: null };
-    const where = { ...viewWhere, ...(accountId && { accountId }) };
-    const [transactions, total] = await Promise.all([
+    const accountWhere = accountId ? { accountId } : {};
+    const count = (countedView: View) =>
+      prisma.externalTransaction.count({ where: { ...viewWheres[countedView], ...accountWhere } });
+    const [transactions, unreviewed, changed, dismissed] = await Promise.all([
       prisma.externalTransaction.findMany({
-        where,
+        where: { ...viewWheres[view], ...accountWhere },
         orderBy: [{ date: "desc" }, { id: "asc" }],
         include: {
           account: true,
@@ -71,8 +76,11 @@ export const getUnreviewedTransactions = createServerFn()
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
-      prisma.externalTransaction.count({ where }),
+      count("unreviewed"),
+      count("changed"),
+      count("dismissed"),
     ]);
+    const counts = { unreviewed, changed, dismissed };
 
     const rules = await loadRules(pluck(transactions, "vendor"));
     return {
@@ -83,7 +91,8 @@ export const getUnreviewedTransactions = createServerFn()
           suggestion: vendorRules ? suggestRule(vendorRules, transaction.amount) : null,
         };
       }),
-      total,
+      total: counts[view],
+      counts,
     };
   });
 
