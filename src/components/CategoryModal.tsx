@@ -22,6 +22,7 @@ import {
 import { ModalFooter } from "~/components/ModalFooter";
 import { createCategory } from "~/functions/createCategory";
 import { updateCategory } from "~/functions/updateCategory";
+import { useConfirmDelete } from "~/hooks/useConfirmDelete";
 import { useOpened } from "~/hooks/useOpened";
 import { preloadOnHover } from "~/lib/preloadOnHover";
 
@@ -59,7 +60,7 @@ export function CategoryModal({
 }: CategoryModalProps) {
   const { close, modalProps } = useOpened({ onClose });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const deletion = useConfirmDelete({ close, onDelete });
 
   const isEditing = !!editingCategory;
 
@@ -110,16 +111,10 @@ export function CategoryModal({
     onSave();
   });
 
-  const handleDelete = () => {
-    close();
-    onDelete?.();
-  };
-
   return (
     <Modal
       {...modalProps}
-      closeOnEscape={!confirmingDelete}
-      trapFocus={!confirmingDelete}
+      {...deletion.modalProps}
       title={<Text fw="bold">{isEditing ? "Edit Category" : "New Category"}</Text>}
     >
       <form onSubmit={handleSubmit}>
@@ -170,7 +165,7 @@ export function CategoryModal({
                   color="red"
                   data-disabled={!deletable.valid || undefined}
                   {...(deletable.valid && preloadOnHover(preloadDeleteCategoryModal))}
-                  onClick={() => deletable.valid && setConfirmingDelete(true)}
+                  onClick={() => deletable.valid && deletion.confirm()}
                 >
                   Delete
                 </Button>
@@ -182,12 +177,12 @@ export function CategoryModal({
           </ModalFooter>
         </Stack>
       </form>
-      {confirmingDelete && editingCategory && (
+      {deletion.confirming && editingCategory && (
         <DynamicDeleteCategoryModal
-          onClose={() => setConfirmingDelete(false)}
+          onClose={deletion.cancel}
           category={editingCategory}
           month={month}
-          onDelete={handleDelete}
+          onDelete={deletion.handleDelete}
         />
       )}
     </Modal>

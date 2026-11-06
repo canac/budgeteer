@@ -1,6 +1,8 @@
 import {
   ActionIcon,
+  Alert,
   Button,
+  Fieldset,
   Group,
   Modal,
   NumberInput,
@@ -14,10 +16,16 @@ import { IconSwitch } from "@tabler/icons-react";
 import { useParams } from "@tanstack/react-router";
 import { endOfMonth, parseISO } from "date-fns";
 import { number, object, positive, refine, string } from "zod/mini";
+import type { DeleteTransactionModalProps } from "~/components/DeleteTransactionModal";
+import {
+  DynamicDeleteTransactionModal,
+  preloadDeleteTransactionModal,
+} from "~/components/DynamicDeleteTransactionModal";
 import { ModalFooter } from "~/components/ModalFooter";
 import { createTransfer } from "~/functions/createTransfer";
 import { editTransfer } from "~/functions/editTransfer";
 import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances";
+import { useConfirmDelete } from "~/hooks/useConfirmDelete";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
 import { useSortedCategories } from "~/hooks/useSortedCategories";
@@ -26,6 +34,7 @@ import { activeCategories } from "~/lib/activeCategories";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { formatCurrency, fullDateFormatter } from "~/lib/formatters";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 
 const formSchema = object({
   amount: number("Amount is required").check(positive("Amount must be greater than zero")),
@@ -44,8 +53,11 @@ export interface EditTransfer {
   amount: number;
   date: string;
   description: string | null;
-  sourceCategoryId: string;
+  /** Null for leftovers transfers */
+  sourceCategoryId: string | null;
   destinationCategoryId: string;
+  /** The transfer's transaction, which deleting removes */
+  transaction: DeleteTransactionModalProps["transaction"];
 }
 
 export interface TransferModalProps {
@@ -53,6 +65,10 @@ export interface TransferModalProps {
   onSave: () => void;
   sourceCategoryId?: string;
   editingTransfer?: EditTransfer;
+  /** Shows a Delete button for the editing transfer. Called after the user confirms. */
+  onDelete?: () => Promise<void>;
+  /** Disables every field and explains why. */
+  readOnlyReason?: string;
 }
 
 export function TransferModal({
@@ -60,6 +76,8 @@ export function TransferModal({
   onSave,
   sourceCategoryId,
   editingTransfer,
+  onDelete,
+  readOnlyReason,
 }: TransferModalProps) {
   const month = useParams({
     from: "/_layout/budget/$month",
@@ -68,6 +86,7 @@ export function TransferModal({
   });
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
   const { close, modalProps } = useOpened({ onClose });
+  const deletion = useConfirmDelete({ close, onDelete });
   const today = useToday();
 
   const isEditing = !!editingTransfer;
@@ -139,65 +158,96 @@ export function TransferModal({
   return (
     <Modal
       {...modalProps}
-      title={<Text fw="bold">{isEditing ? "Edit Transfer" : "New Transfer"}</Text>}
+      {...deletion.modalProps}
+      title={
+        <Text fw="bold">
+          {readOnlyReason ? "Transfer" : isEditing ? "Edit Transfer" : "New Transfer"}
+        </Text>
+      }
     >
       <form onSubmit={handleSubmit}>
         <Stack>
-          <NumberInput
-            label="Amount"
-            key={form.key("amount")}
-            {...form.getInputProps("amount")}
-            min={0}
-            required
-          />
-          <Select
-            label="Source"
-            data={categoryOptions}
-            key={form.key("sourceCategoryId")}
-            {...form.getInputProps("sourceCategoryId")}
-            error={form.errors.sourceCategoryId}
-            required
-            searchable
-            disabled={isEditing}
-          />
-          {!isEditing && (
-            <Group justify="center">
-              <ActionIcon
-                variant="subtle"
-                size="lg"
-                onClick={handleSwitch}
-                title="Switch source and destination"
-                disabled={!form.values.sourceCategoryId && !form.values.destinationCategoryId}
-              >
-                <IconSwitch />
-              </ActionIcon>
-            </Group>
-          )}
-          <Select
-            label="Destination"
-            data={categoryOptions.filter((option) => option.value !== form.values.sourceCategoryId)}
-            key={form.key("destinationCategoryId")}
-            {...form.getInputProps("destinationCategoryId")}
-            error={form.errors.destinationCategoryId}
-            required
-            searchable
-            disabled={isEditing}
-          />
-          <TextInput
-            label="Description"
-            key={form.key("description")}
-            {...form.getInputProps("description")}
-          />
+          {readOnlyReason && <Alert>{readOnlyReason}</Alert>}
+          <Fieldset variant="unstyled" disabled={!!readOnlyReason}>
+            <Stack>
+              <NumberInput
+                label="Amount"
+                key={form.key("amount")}
+                {...form.getInputProps("amount")}
+                min={0}
+                required
+              />
+              <Select
+                label="Source"
+                data={categoryOptions}
+                key={form.key("sourceCategoryId")}
+                {...form.getInputProps("sourceCategoryId")}
+                error={form.errors.sourceCategoryId}
+                placeholder={isEditing ? "Leftovers" : undefined}
+                required
+                searchable
+                disabled={isEditing}
+              />
+              {!isEditing && (
+                <Group justify="center">
+                  <ActionIcon
+                    variant="subtle"
+                    size="lg"
+                    onClick={handleSwitch}
+                    title="Switch source and destination"
+                    disabled={!form.values.sourceCategoryId && !form.values.destinationCategoryId}
+                  >
+                    <IconSwitch />
+                  </ActionIcon>
+                </Group>
+              )}
+              <Select
+                label="Destination"
+                data={categoryOptions.filter(
+                  (option) => option.value !== form.values.sourceCategoryId,
+                )}
+                key={form.key("destinationCategoryId")}
+                {...form.getInputProps("destinationCategoryId")}
+                error={form.errors.destinationCategoryId}
+                required
+                searchable
+                disabled={isEditing}
+              />
+              <TextInput
+                label="Description"
+                key={form.key("description")}
+                {...form.getInputProps("description")}
+              />
+            </Stack>
+          </Fieldset>
+          <Text size="sm" c="dimmed">
+            Transfer Date: {fullDateFormatter.format(transferDate)}
+          </Text>
           <ModalFooter>
-            <Text size="sm" c="dimmed">
-              Transfer Date: {fullDateFormatter.format(transferDate)}
-            </Text>
-            <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
-              {isEditing ? "Update" : "Save"}
-            </Button>
+            {isEditing && onDelete && (
+              <Button
+                color="red"
+                {...preloadOnHover(preloadDeleteTransactionModal)}
+                onClick={deletion.confirm}
+              >
+                Delete
+              </Button>
+            )}
+            {!readOnlyReason && (
+              <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
+                {isEditing ? "Update" : "Save"}
+              </Button>
+            )}
           </ModalFooter>
         </Stack>
       </form>
+      {editingTransfer && deletion.confirming && (
+        <DynamicDeleteTransactionModal
+          onClose={deletion.cancel}
+          transaction={editingTransfer.transaction}
+          onDelete={deletion.handleDelete}
+        />
+      )}
     </Modal>
   );
 }

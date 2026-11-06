@@ -1,6 +1,7 @@
-import type { ComponentProps, KeyboardEvent, ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { Text } from "@mantine/core";
 import clsx from "clsx";
+import { Clickable } from "~/components/Clickable";
 import classes from "./List.module.css";
 
 interface ListProps {
@@ -31,13 +32,6 @@ export interface ListRowProps extends Pick<
   tags?: ReactNode;
 }
 
-function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-  if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) {
-    event.preventDefault();
-    event.currentTarget.click();
-  }
-}
-
 export function ListRow({
   icon,
   title,
@@ -52,14 +46,9 @@ export function ListRow({
   const hasBottom = Boolean(meta) || Boolean(tags);
 
   return (
-    <div
+    <Clickable
       className={clsx(classes.row, onClick && classes.clickable, className)}
-      {...(onClick && {
-        role: "button",
-        tabIndex: 0,
-        onClick,
-        onKeyDown: handleKeyDown,
-      })}
+      onClick={onClick}
       {...props}
     >
       <div className={classes.cellTitle}>
@@ -69,7 +58,7 @@ export function ListRow({
         {icon}
       </div>
       {value && <div className={classes.cellValue}>{value}</div>}
-      <div className={classes.cellActions}>{actions}</div>
+      {actions && <div className={classes.cellActions}>{actions}</div>}
       {hasBottom && (
         <div className={classes.cellBottom}>
           {meta && (
@@ -80,6 +69,6 @@ export function ListRow({
           {tags}
         </div>
       )}
-    </div>
+    </Clickable>
   );
 }

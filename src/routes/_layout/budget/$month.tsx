@@ -8,20 +8,20 @@ import {
   IconFilterOff,
 } from "@tabler/icons-react";
 import { createFileRoute, Outlet, useMatchRoute, useRouter } from "@tanstack/react-router";
-import clsx from "clsx";
 import { addMonths, parseISO, startOfMonth, subMonths } from "date-fns";
 import { boolean, object, optional, catch as zCatch } from "zod/mini";
+import { Clickable } from "~/components/Clickable";
 import {
   DynamicLeftoversTransferModal,
   preloadLeftoversTransferModal,
 } from "~/components/DynamicLeftoversTransferModal";
-import { EditableAmount } from "~/components/EditableAmount";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { MantineButtonLink } from "~/components/MantineButtonLink";
 import { MonthSwiper } from "~/components/MonthSwiper";
 import { getBudgetByMonth } from "~/functions/getBudgetByMonth";
 import { getBudgetMonths } from "~/functions/getBudgetMonths";
 import { setBudgetIncome } from "~/functions/setBudgetIncome";
+import { useEditableAmount } from "~/hooks/useEditableAmount";
 import { useToday } from "~/hooks/useToday";
 import { amountSignClassname, formatCurrency, monthFormatter } from "~/lib/formatters";
 import { toISOMonthString } from "~/lib/iso";
@@ -90,6 +90,11 @@ function BudgetLayout() {
     });
     await router.invalidate();
   };
+  const income = useEditableAmount({
+    className: leftToBudget === 0 ? "positive" : undefined,
+    amount: budget.income,
+    saveAmount: handleSaveIncome,
+  });
 
   return (
     <MonthSwiper
@@ -177,14 +182,12 @@ function BudgetLayout() {
         />
         <Card shadow="sm">
           <Stack gap="xs">
-            <Group justify="space-between">
-              <Title order={2}>Income</Title>
-              <EditableAmount
-                className={clsx(classes.income, { positive: leftToBudget === 0 })}
-                amount={budget.income}
-                saveAmount={handleSaveIncome}
-              />
-            </Group>
+            <Clickable onClick={income.edit}>
+              <Group justify="space-between">
+                <Title order={2}>Income</Title>
+                {income.field}
+              </Group>
+            </Clickable>
             {leftToBudget !== 0 && (
               <Group justify="space-between">
                 <Text>Left to budget</Text>

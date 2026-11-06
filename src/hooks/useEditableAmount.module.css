@@ -1,15 +1,10 @@
-.root form {
+.form {
   display: inline;
 }
 
 .text {
-  /* Reset button user-agent styles */
-  border: none;
-  background: none;
-  padding: 0;
-
+  /* Matches the input's underline so toggling editing doesn't shift the layout */
   border-bottom: 2px solid transparent;
-  cursor: pointer;
 }
 
 .input {

@@ -1,0 +1,7 @@
+.root {
+  cursor: pointer;
+
+  &:focus-visible {
+    border-radius: var(--mantine-radius-md);
+  }
+}

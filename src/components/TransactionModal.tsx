@@ -2,6 +2,7 @@ import {
   Alert,
   Autocomplete,
   Button,
+  Fieldset,
   Group,
   Modal,
   NumberInput,
@@ -14,6 +15,10 @@ import { schemaResolver, useForm } from "@mantine/form";
 import { useState } from "react";
 import { extractErrorMessage } from "src/lib/error";
 import { boolean, minLength, number, object, positive, refine, string } from "zod/mini";
+import {
+  DynamicDeleteTransactionModal,
+  preloadDeleteTransactionModal,
+} from "~/components/DynamicDeleteTransactionModal";
 import { ModalFooter } from "~/components/ModalFooter";
 import { createTransaction } from "~/functions/createTransaction";
 import { editTransaction } from "~/functions/editTransaction";
@@ -21,6 +26,7 @@ import { getCategoriesWithBalances } from "~/functions/getCategoriesWithBalances
 import { getFirstMonth } from "~/functions/getFirstMonth";
 import { getVendors } from "~/functions/getVendors";
 import { useCategorySplit } from "~/hooks/useCategorySplit";
+import { useConfirmDelete } from "~/hooks/useConfirmDelete";
 import { useOpened } from "~/hooks/useOpened";
 import { useServerFnData } from "~/hooks/useServerFnData";
 import { useToday } from "~/hooks/useToday";
@@ -33,6 +39,7 @@ import {
 import { pluck } from "~/lib/collections";
 import { dollarsToPennies, penniesToDollars } from "~/lib/currencyConversion";
 import { toISODateString, toISOMonthString } from "~/lib/iso";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 
 interface EditTransaction {
   id: string;
@@ -50,8 +57,10 @@ interface EditTransaction {
 export interface TransactionModalProps {
   onClose: () => void;
   onSave: () => void;
+  onDelete?: () => Promise<void>;
   editingTransaction?: EditTransaction;
   initialCategoryId?: string;
+  readOnlyReason?: string;
 }
 
 const amountSchema = number("Amount is required").check(
@@ -78,13 +87,16 @@ const formSchema = object({
 export function TransactionModal({
   onClose,
   onSave,
+  onDelete,
   editingTransaction,
   initialCategoryId,
+  readOnlyReason,
 }: TransactionModalProps) {
   const vendors = useServerFnData(getVendors) ?? [];
   const categories = useServerFnData(getCategoriesWithBalances) ?? [];
   const firstMonth = useServerFnData(getFirstMonth);
   const { close, modalProps } = useOpened({ onClose });
+  const deletion = useConfirmDelete({ close, onDelete });
   const today = useToday();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -174,59 +186,87 @@ export function TransactionModal({
   return (
     <Modal
       {...modalProps}
-      title={<Text fw="bold">{isEditing ? "Edit Transaction" : "New Transaction"}</Text>}
+      {...deletion.modalProps}
+      title={
+        <Text fw="bold">
+          {readOnlyReason ? "Transaction" : isEditing ? "Edit Transaction" : "New Transaction"}
+        </Text>
+      }
     >
       <form onSubmit={handleSubmit}>
         <Stack>
-          <Group align="flex-end" wrap="nowrap">
-            <NumberInput
-              label="Amount"
-              key={form.key("amount")}
-              {...form.getInputProps("amount")}
-              min={0}
-              required
-              disabled={external}
-              style={{ flex: 1 }}
-            />
-            <Switch
-              label="Income"
-              key={form.key("isIncome")}
-              {...form.getInputProps("isIncome", { type: "checkbox" })}
-              disabled={external}
-              mb={8}
-            />
-          </Group>
-          <Autocomplete
-            label="Vendor"
-            key={form.key("vendor")}
-            {...form.getInputProps("vendor")}
-            data={vendors}
-            required
-          />
-          <TextInput
-            label="Description"
-            key={form.key("description")}
-            {...form.getInputProps("description")}
-          />
-          <TextInput
-            type="date"
-            label="Date"
-            key={form.key("date")}
-            {...form.getInputProps("date")}
-            required
-            disabled={external}
-            min={firstMonth ?? undefined}
-          />
-          {categorySelect}
-          {splitFields}
+          {readOnlyReason && <Alert>{readOnlyReason}</Alert>}
+          <Fieldset variant="unstyled" disabled={!!readOnlyReason}>
+            <Stack>
+              <Group align="flex-end" wrap="nowrap">
+                <NumberInput
+                  label="Amount"
+                  key={form.key("amount")}
+                  {...form.getInputProps("amount")}
+                  min={0}
+                  required
+                  disabled={external}
+                  style={{ flex: 1 }}
+                />
+                <Switch
+                  label="Income"
+                  key={form.key("isIncome")}
+                  {...form.getInputProps("isIncome", { type: "checkbox" })}
+                  disabled={external}
+                  mb={8}
+                />
+              </Group>
+              <Autocomplete
+                label="Vendor"
+                key={form.key("vendor")}
+                {...form.getInputProps("vendor")}
+                data={vendors}
+                required
+              />
+              <TextInput
+                label="Description"
+                key={form.key("description")}
+                {...form.getInputProps("description")}
+              />
+              <TextInput
+                type="date"
+                label="Date"
+                key={form.key("date")}
+                {...form.getInputProps("date")}
+                required
+                disabled={external}
+                min={firstMonth ?? undefined}
+              />
+              {categorySelect}
+              {splitFields}
+            </Stack>
+          </Fieldset>
           {errorMessage !== null && <Alert color="red">{errorMessage}</Alert>}
           <ModalFooter>
-            <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
-              {isEditing ? "Update" : "Save"}
-            </Button>
+            {isEditing && onDelete && (
+              <Button
+                color="red"
+                {...preloadOnHover(preloadDeleteTransactionModal)}
+                onClick={deletion.confirm}
+              >
+                Delete
+              </Button>
+            )}
+            {!readOnlyReason && (
+              <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
+                {isEditing ? "Update" : "Save"}
+              </Button>
+            )}
           </ModalFooter>
         </Stack>
       </form>
+      {editingTransaction && deletion.confirming && (
+        <DynamicDeleteTransactionModal
+          onClose={deletion.cancel}
+          transaction={editingTransaction}
+          onDelete={deletion.handleDelete}
+        />
+      )}
     </Modal>
   );
 }

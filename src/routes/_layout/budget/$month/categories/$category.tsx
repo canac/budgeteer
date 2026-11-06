@@ -6,7 +6,7 @@ import { parseISO, subMonths } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { CategoryHeading } from "~/components/CategoryHeading";
-import { EditableAmount } from "~/components/EditableAmount";
+import { Clickable } from "~/components/Clickable";
 import { ListRow } from "~/components/List";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { TransactionList } from "~/components/TransactionList";
@@ -14,6 +14,7 @@ import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBalance } from "~/functions/setCategoryBalance";
 import { setCategoryBudgetedAmount } from "~/functions/setCategoryBudgetedAmount";
 import { setCategoryStartingBalance } from "~/functions/setCategoryStartingBalance";
+import { useEditableAmount } from "~/hooks/useEditableAmount";
 import { useOpened } from "~/hooks/useOpened";
 import {
   amountSignClassname,
@@ -86,30 +87,36 @@ function CategoryDetailsPage() {
     (budgetedAmount === 0 ? 1 : -budgetCategory.transactionTotal / budgetedAmount) * 100;
 
   const previousMonthBalance = budgetCategory.startingBalance - budgetedAmount;
+  const currentBalance = useEditableAmount({
+    className: clsx(classes.balance, amountSignClassname(budgetCategory.currentBalance)),
+    editable: budgetCategory.category.accumulating,
+    amount: budgetCategory.currentBalance,
+    saveAmount: handleSaveBalance,
+  });
+  const budgeted = useEditableAmount({
+    className: amountSignClassname(budgetedAmount),
+    amount: budgetedAmount,
+    saveAmount: handleSaveBudgetedAmount,
+  });
+  const startingBalance = useEditableAmount({
+    className: amountSignClassname(previousMonthBalance),
+    amount: previousMonthBalance,
+    saveAmount: handleSaveStartingBalance,
+  });
   const monthDate = parseISO(month);
   const transactionRows = (
     <>
       <ListRow
         className={classes.startingBalance}
         title="Budgeted this month"
-        value={
-          <EditableAmount
-            className={amountSignClassname(budgetedAmount)}
-            amount={budgetedAmount}
-            saveAmount={handleSaveBudgetedAmount}
-          />
-        }
+        value={budgeted.field}
+        onClick={budgeted.edit}
       />
       {budgetCategory.category.accumulating && (
         <ListRow
           title={`${monthOnlyFormatter.format(subMonths(monthDate, 1))} balance`}
-          value={
-            <EditableAmount
-              className={amountSignClassname(previousMonthBalance)}
-              amount={previousMonthBalance}
-              saveAmount={handleSaveStartingBalance}
-            />
-          }
+          value={startingBalance.field}
+          onClick={startingBalance.edit}
         />
       )}
     </>
@@ -132,20 +139,12 @@ function CategoryDetailsPage() {
         </Drawer.Header>
         <Drawer.Body>
           <Stack gap="lg">
-            <div>
+            <Clickable onClick={currentBalance.edit}>
               <Text size="xs" fw="bold" c="dimmed" tt="uppercase">
                 Current Balance
               </Text>
-              <EditableAmount
-                className={clsx(
-                  classes.balance,
-                  amountSignClassname(budgetCategory.currentBalance),
-                )}
-                editable={budgetCategory.category.accumulating}
-                amount={budgetCategory.currentBalance}
-                saveAmount={handleSaveBalance}
-              />
-            </div>
+              {currentBalance.field}
+            </Clickable>
 
             <div>
               <Group justify="space-between" mb="xs">

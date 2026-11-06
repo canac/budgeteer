@@ -17,12 +17,19 @@
   grid-template-areas:
     "title value actions"
     "bottom bottom bottom";
+
+  /* An empty track still gets a column gap, which would push the value in from the edge */
+  &:not(:has(> .cellActions)) {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "title value"
+      "bottom bottom";
+  }
 }
 
 .clickable {
   position: relative;
   isolation: isolate;
-  cursor: pointer;
 
   /* Bleeds past the row so the text lines up with headings, and rounding the row would curve its divider */
   &::before {
@@ -37,10 +44,6 @@
     &:hover::before {
       background-color: var(--mantine-color-default-hover);
     }
-  }
-
-  &:focus-visible {
-    border-radius: var(--mantine-radius-md);
   }
 }
 

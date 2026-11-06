@@ -1,31 +1,19 @@
-import { ActionIcon, Badge, type BadgeProps, Menu, Text, ThemeIcon, Tooltip } from "@mantine/core";
-import {
-  IconArrowsRightLeft,
-  IconDots,
-  IconEdit,
-  IconPencilDollar,
-  IconTrash,
-} from "@tabler/icons-react";
+import { Badge, type BadgeProps, Text, ThemeIcon } from "@mantine/core";
+import { IconArrowsRightLeft, IconPencilDollar } from "@tabler/icons-react";
 import { createLink, linkOptions, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { parseISO } from "date-fns";
 import { forwardRef, type ReactNode, useState } from "react";
-import invariant from "tiny-invariant";
-import type { DeleteTransactionModalProps } from "~/components/DeleteTransactionModal";
 import type { TransferModalProps } from "~/components/TransferModal";
 import type { getBudgetCategory } from "~/functions/getBudgetCategory";
 import type { Category } from "~/prisma/client";
-import {
-  DynamicDeleteTransactionModal,
-  preloadDeleteTransactionModal,
-} from "~/components/DynamicDeleteTransactionModal";
-import { DynamicTransferModal } from "~/components/DynamicTransferModal";
+import { DynamicTransferModal, preloadTransferModal } from "~/components/DynamicTransferModal";
 import { List, ListRow } from "~/components/List";
 import { getTransaction } from "~/functions/getTransaction";
-import { usePreloadWhenIdle } from "~/hooks/usePreloadWhenIdle";
 import { formatCurrency, shortDateFormatter } from "~/lib/formatters";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 import type { TransactionModalProps } from "./TransactionModal";
-import { DynamicTransactionModal } from "./DynamicTransactionModal";
+import { DynamicTransactionModal, preloadTransactionModal } from "./DynamicTransactionModal";
 import classes from "./TransactionList.module.css";
 
 type BaseTransaction = Awaited<ReturnType<typeof getBudgetCategory>>["transactions"][number];
@@ -115,6 +103,11 @@ function isLeftoversTransfer(transaction: ListTransaction) {
   return !!transfer && !transfer.sourceCategoryId;
 }
 
+type Editing = { readOnlyReason?: string } & (
+  | { type: "transaction"; transaction: NonNullable<TransactionModalProps["editingTransaction"]> }
+  | { type: "transfer"; transfer: NonNullable<TransferModalProps["editingTransfer"]> }
+);
+
 function uneditableReason(transaction: ListTransaction) {
   if (transaction.type === "BALANCE_ADJUSTMENT") {
     return "Cannot edit balance adjustments";
@@ -182,69 +175,55 @@ export function TransactionList({
   month,
 }: TransactionListProps) {
   const router = useRouter();
-  const [deletingTransaction, setDeletingTransaction] = useState<
-    DeleteTransactionModalProps["transaction"] | null
-  >(null);
-  const [editingTransaction, setEditingTransaction] = useState<
-    TransactionModalProps["editingTransaction"] | null
-  >(null);
-  const [editingTransfer, setEditingTransfer] = useState<
-    TransferModalProps["editingTransfer"] | null
-  >(null);
-  usePreloadWhenIdle(preloadDeleteTransactionModal);
+  const [editing, setEditing] = useState<Editing | null>(null);
 
   const handleUpdate = () => router.invalidate();
 
-  const handleDeleteTransaction = (transaction: DeleteTransactionModalProps["transaction"]) => {
-    setDeletingTransaction(transaction);
-  };
-  const handleEditTransaction = async (transaction: ListTransaction) => {
+  const handleEdit = async (transaction: ListTransaction) => {
     const fetched = await getTransaction({
       data: { id: transaction.id },
     });
 
-    if (fetched.transfer) {
-      const { sourceCategoryId } = fetched.transfer;
-      invariant(sourceCategoryId, "Leftovers transfers cannot be edited");
-      setEditingTransfer({
-        ...fetched.transfer,
-        sourceCategoryId,
-        date: fetched.date,
-        description: fetched.description,
-      });
-    } else {
-      setEditingTransaction(fetched);
-    }
+    const readOnlyReason = uneditableReason(transaction) ?? undefined;
+    setEditing(
+      fetched.transfer
+        ? {
+            type: "transfer",
+            transfer: {
+              ...fetched.transfer,
+              date: fetched.date,
+              description: fetched.description,
+              transaction: fetched,
+            },
+            readOnlyReason,
+          }
+        : { type: "transaction", transaction: fetched, readOnlyReason },
+    );
   };
 
   return (
     <>
-      {deletingTransaction && (
-        <DynamicDeleteTransactionModal
-          onClose={() => setDeletingTransaction(null)}
-          transaction={deletingTransaction}
-          onDelete={handleUpdate}
-        />
-      )}
-      {editingTransaction && (
+      {editing?.type === "transaction" && (
         <DynamicTransactionModal
-          onClose={() => setEditingTransaction(null)}
-          editingTransaction={editingTransaction}
+          onClose={() => setEditing(null)}
+          editingTransaction={editing.transaction}
           onSave={handleUpdate}
+          onDelete={handleUpdate}
+          readOnlyReason={editing.readOnlyReason}
         />
       )}
-      {editingTransfer && (
+      {editing?.type === "transfer" && (
         <DynamicTransferModal
-          onClose={() => setEditingTransfer(null)}
-          editingTransfer={editingTransfer}
+          onClose={() => setEditing(null)}
+          editingTransfer={editing.transfer}
           onSave={handleUpdate}
+          onDelete={handleUpdate}
+          readOnlyReason={editing.readOnlyReason}
         />
       )}
       <List className={clsx(classes.root, className)}>
         {transactions.map((transaction) => {
           const income = transaction.type !== "TRANSFER" && transaction.amount >= 0;
-          const uneditableMessage = uneditableReason(transaction);
-          const editable = uneditableMessage === null;
           // Per-category lists show this category's split, so transfers keep their direction
           const amount = showCategories
             ? (transaction.transfer?.amount ?? transaction.amount)
@@ -273,38 +252,10 @@ export function TransactionList({
               value={
                 <Text className={income ? "positive" : undefined}>{formatCurrency(amount)}</Text>
               }
-              actions={
-                <Menu position="bottom-end">
-                  <Menu.Target>
-                    <ActionIcon
-                      variant="subtle"
-                      size="lg"
-                      color="gray"
-                      aria-label="Transaction actions"
-                    >
-                      <IconDots />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Tooltip label={uneditableMessage} disabled={editable}>
-                      <Menu.Item
-                        leftSection={<IconEdit size={16} />}
-                        disabled={!editable}
-                        onClick={() => handleEditTransaction(transaction)}
-                      >
-                        Edit
-                      </Menu.Item>
-                    </Tooltip>
-                    <Menu.Item
-                      color="red"
-                      leftSection={<IconTrash size={16} />}
-                      onClick={() => handleDeleteTransaction(transaction)}
-                    >
-                      Delete
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              }
+              {...preloadOnHover(
+                transaction.transfer ? preloadTransferModal : preloadTransactionModal,
+              )}
+              onClick={() => handleEdit(transaction)}
             />
           );
         })}

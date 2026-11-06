@@ -31,7 +31,7 @@ export function DeleteTransactionModal({
     <Modal {...modalProps} title={<Text fw="bold">Delete Transaction</Text>}>
       <Stack>
         <Text>
-          Are you sure you want to delete the transaction "{transaction.vendor}" from{" "}
+          Are you sure you want to delete the transaction at "{transaction.vendor}" on{" "}
           {fullDateFormatter.format(parseISO(transaction.date))}?
         </Text>
         <ModalFooter>
