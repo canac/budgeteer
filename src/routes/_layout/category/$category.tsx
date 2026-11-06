@@ -2,9 +2,8 @@ import { Button, Card, Grid, Group, Select, Stack, Switch, Text, Title } from "@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { parseISO, subMonths } from "date-fns";
 import { coerce, enum as enumType, object, optional, string } from "zod/mini";
-import { CategoryHeaderActions } from "~/components/CategoryHeaderActions";
+import { CategoryHeading } from "~/components/CategoryHeading";
 import { CategoryHistoryChart } from "~/components/CategoryHistoryChart";
-import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { PageContainer } from "~/components/PageContainer";
 import { TransactionList } from "~/components/TransactionList";
 import { getCategoryHistory } from "~/functions/getCategoryHistory";
@@ -108,19 +107,18 @@ function CategoryHistoryPage() {
       <Stack gap="xl">
         <Group justify="space-between" align="flex-start">
           <div>
-            <Group gap="sm">
-              <Title order={1} size="2.5rem" fw="bold">
-                {categoryHistory.category.name}
-              </Title>
-              <CategoryTypeIcons category={categoryHistory.category} size={28} />
-              <CategoryHeaderActions
-                category={categoryHistory.category}
-                deletable={categoryHistory.deletable}
-                month={currentMonth}
-                onSave={() => router.invalidate()}
-                onDelete={() => navigate({ to: "/budget/$month", params: { month: currentMonth } })}
-              />
-            </Group>
+            <CategoryHeading
+              category={categoryHistory.category}
+              deletable={categoryHistory.deletable}
+              month={currentMonth}
+              onSave={() => router.invalidate()}
+              onDelete={() => navigate({ to: "/budget/$month", params: { month: currentMonth } })}
+              renderHeading={(name) => (
+                <Title order={1} size="2.5rem" fw="bold">
+                  {name}
+                </Title>
+              )}
+            />
             <Text size="lg" c="dimmed">
               {startMonth === endMonth
                 ? startMonthFormatted

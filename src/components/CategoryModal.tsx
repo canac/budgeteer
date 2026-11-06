@@ -8,16 +8,22 @@ import {
   Switch,
   Text,
   TextInput,
+  Tooltip,
 } from "@mantine/core";
 import { schemaResolver, useForm } from "@mantine/form";
 import { IconPigMoney, IconWallet } from "@tabler/icons-react";
 import { useState } from "react";
 import { extractErrorMessage } from "src/lib/error";
 import { boolean, minLength, object, string } from "zod/mini";
+import {
+  DynamicDeleteCategoryModal,
+  preloadDeleteCategoryModal,
+} from "~/components/DynamicDeleteCategoryModal";
 import { ModalFooter } from "~/components/ModalFooter";
 import { createCategory } from "~/functions/createCategory";
 import { updateCategory } from "~/functions/updateCategory";
 import { useOpened } from "~/hooks/useOpened";
+import { preloadOnHover } from "~/lib/preloadOnHover";
 
 interface EditCategory {
   id: string;
@@ -26,11 +32,15 @@ interface EditCategory {
   flexible: boolean;
 }
 
+export type Deletable = { valid: true } | { valid: false; message: string };
+
 export interface CategoryModalProps {
   onClose: () => void;
   onSave: () => void;
   month: string;
   editingCategory?: EditCategory;
+  deletable?: Deletable;
+  onDelete?: () => void;
 }
 
 const formSchema = object({
@@ -39,9 +49,17 @@ const formSchema = object({
   flexible: boolean(),
 });
 
-export function CategoryModal({ onClose, onSave, month, editingCategory }: CategoryModalProps) {
+export function CategoryModal({
+  onClose,
+  onSave,
+  month,
+  editingCategory,
+  deletable,
+  onDelete,
+}: CategoryModalProps) {
   const { close, modalProps } = useOpened({ onClose });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const isEditing = !!editingCategory;
 
@@ -92,9 +110,16 @@ export function CategoryModal({ onClose, onSave, month, editingCategory }: Categ
     onSave();
   });
 
+  const handleDelete = () => {
+    close();
+    onDelete?.();
+  };
+
   return (
     <Modal
       {...modalProps}
+      closeOnEscape={!confirmingDelete}
+      trapFocus={!confirmingDelete}
       title={<Text fw="bold">{isEditing ? "Edit Category" : "New Category"}</Text>}
     >
       <form onSubmit={handleSubmit}>
@@ -139,15 +164,32 @@ export function CategoryModal({ onClose, onSave, month, editingCategory }: Categ
           </Fieldset>
           {errorMessage !== null && <Alert color="red">{errorMessage}</Alert>}
           <ModalFooter>
-            <Button variant="default" onClick={close}>
-              Cancel
-            </Button>
+            {deletable && (
+              <Tooltip label={!deletable.valid && deletable.message} disabled={deletable.valid}>
+                <Button
+                  color="red"
+                  data-disabled={!deletable.valid || undefined}
+                  {...(deletable.valid && preloadOnHover(preloadDeleteCategoryModal))}
+                  onClick={() => deletable.valid && setConfirmingDelete(true)}
+                >
+                  Delete
+                </Button>
+              </Tooltip>
+            )}
             <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
               {isEditing ? "Update" : "Save"}
             </Button>
           </ModalFooter>
         </Stack>
       </form>
+      {confirmingDelete && editingCategory && (
+        <DynamicDeleteCategoryModal
+          onClose={() => setConfirmingDelete(false)}
+          category={editingCategory}
+          month={month}
+          onDelete={handleDelete}
+        />
+      )}
     </Modal>
   );
 }

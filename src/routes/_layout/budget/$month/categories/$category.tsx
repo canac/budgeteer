@@ -5,12 +5,10 @@ import clsx from "clsx";
 import { parseISO, subMonths } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
-import { CategoryHeaderActions } from "~/components/CategoryHeaderActions";
-import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
+import { CategoryHeading } from "~/components/CategoryHeading";
 import { EditableAmount } from "~/components/EditableAmount";
 import { ListRow } from "~/components/List";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
-import { MantineLink } from "~/components/MantineLink";
 import { TransactionList } from "~/components/TransactionList";
 import { getBudgetCategory } from "~/functions/getBudgetCategory";
 import { setCategoryBalance } from "~/functions/setCategoryBalance";
@@ -122,27 +120,14 @@ function CategoryDetailsPage() {
       <Drawer.Overlay />
       <Drawer.Content>
         <Drawer.Header>
-          <Group wrap="nowrap">
-            <Drawer.Title>
-              <MantineLink
-                inherit
-                c="inherit"
-                underline="never"
-                to="/category/$category"
-                params={{ category }}
-              >
-                {budgetCategory.category.name}
-              </MantineLink>
-            </Drawer.Title>
-            <CategoryTypeIcons category={budgetCategory.category} size={28} />
-            <CategoryHeaderActions
-              category={budgetCategory.category}
-              deletable={budgetCategory.deletable}
-              month={month}
-              onSave={() => router.invalidate()}
-              onDelete={close}
-            />
-          </Group>
+          <CategoryHeading
+            category={budgetCategory.category}
+            deletable={budgetCategory.deletable}
+            month={month}
+            onSave={() => router.invalidate()}
+            onDelete={close}
+            renderHeading={(name) => <Drawer.Title>{name}</Drawer.Title>}
+          />
           <Drawer.CloseButton />
         </Drawer.Header>
         <Drawer.Body>
