@@ -1,5 +1,5 @@
 import { Card, Group, Stack, Text, Title } from "@mantine/core";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { TransactionList } from "~/components/TransactionList";
@@ -25,17 +25,20 @@ function TransactionsPage() {
   const { month } = Route.useParams();
 
   return (
-    <Card shadow="sm">
-      <Stack gap="xs">
-        <Group justify="space-between">
-          <Group gap="xs">
-            <Title order={2}>Transactions</Title>
-            <Text c="dimmed">{transactions.length}</Text>
+    <>
+      <Card shadow="sm">
+        <Stack gap="xs">
+          <Group justify="space-between">
+            <Group gap="xs">
+              <Title order={2}>Transactions</Title>
+              <Text c="dimmed">{transactions.length}</Text>
+            </Group>
+            <AddTransactionButton />
           </Group>
-          <AddTransactionButton />
-        </Group>
-        <TransactionList transactions={transactions} showCategories month={month} />
-      </Stack>
-    </Card>
+          <TransactionList transactions={transactions} showCategories month={month} />
+        </Stack>
+      </Card>
+      <Outlet />
+    </>
   );
 }

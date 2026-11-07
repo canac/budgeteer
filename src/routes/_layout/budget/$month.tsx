@@ -52,7 +52,7 @@ function BudgetLayout() {
     useDisclosure(false);
   const matchRoute = useMatchRoute();
   const today = useToday();
-  const onTransactions = !!matchRoute({ to: "/budget/$month/transactions" });
+  const onTransactions = !!matchRoute({ to: "/budget/$month/transactions", fuzzy: true });
   const leftToBudget = budget.income - totalBudgetedAmount;
 
   const previousMonth =
