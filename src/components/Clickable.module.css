@@ -1,7 +1,24 @@
 .root {
+  position: relative;
+  isolation: isolate;
   cursor: pointer;
 
-  &:focus-visible {
+  /* Hover fills and the focus ring draw here, so callers can bleed them past the content */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--clickable-bleed-y, 0px) * -1) calc(var(--clickable-bleed-x, 0px) * -1);
+    z-index: -1;
     border-radius: var(--mantine-radius-md);
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    /* Matches Mantine's focus ring */
+    &::before {
+      outline: 2px solid var(--mantine-primary-color-filled);
+      outline-offset: var(--clickable-ring-offset, calc(0.125rem * var(--mantine-scale)));
+    }
   }
 }

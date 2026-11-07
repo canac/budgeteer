@@ -167,7 +167,7 @@ function BudgetLayout() {
         />
         <Card shadow="sm">
           <Stack gap="xs">
-            <Clickable onClick={income.edit}>
+            <Clickable className={classes.clickableRow} onClick={income.edit}>
               <Group justify="space-between">
                 <Title order={2} className={classes.iconLabel}>
                   Income
@@ -185,6 +185,7 @@ function BudgetLayout() {
               </Group>
             )}
             <Clickable
+              className={classes.clickableRow}
               onClick={canTransferLeftovers ? openLeftoversTransfer : undefined}
               {...(canTransferLeftovers && preloadOnHover(preloadLeftoversTransferModal))}
               title={canTransferLeftovers ? "Transfer leftovers" : undefined}

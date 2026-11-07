@@ -25,17 +25,10 @@
 }
 
 .clickable {
-  position: relative;
-  isolation: isolate;
-
   /* Bleeds past the row so the text lines up with headings, and rounding the row would curve its divider */
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0 calc(var(--mantine-spacing-md) * -1);
-    z-index: -1;
-    border-radius: var(--mantine-radius-md);
-  }
+  --clickable-bleed-x: var(--mantine-spacing-md);
+  /* Keeps the ring inside, since a SwipeActions scroller clips anything past the row */
+  --clickable-ring-offset: -2px;
 
   @media (hover: hover) {
     &:hover::before {

@@ -7,4 +7,11 @@
     display: flex;
     align-items: center;
   }
+
+  /* Rings the row like a list row's */
+  .clickableRow {
+    --clickable-bleed-x: var(--mantine-spacing-md);
+    --clickable-bleed-y: calc(var(--mantine-spacing-xs) / 2);
+    --clickable-ring-offset: -2px;
+  }
 }
