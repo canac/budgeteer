@@ -4,7 +4,7 @@ import { parseISO } from "date-fns";
 import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { TransactionList } from "~/components/TransactionList";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
-import { monthFormatter, monthOnlyFormatter } from "~/lib/formatters";
+import { monthFormatter } from "~/lib/formatters";
 
 export const Route = createFileRoute("/_layout/budget/$month/transactions")({
   component: TransactionsPage,
@@ -33,11 +33,9 @@ function TransactionsPage() {
         <Group justify="space-between">
           <Group gap="xs">
             <Title order={2}>Transactions</Title>
-            <AddTransactionButton />
+            <Text c="dimmed">{transactions.length}</Text>
           </Group>
-          <Text c="dimmed">
-            {transactions.length} in {monthOnlyFormatter.format(parseISO(month))}
-          </Text>
+          <AddTransactionButton />
         </Group>
         <TransactionList transactions={transactions} showCategories month={month} />
       </Stack>
