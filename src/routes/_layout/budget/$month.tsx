@@ -184,7 +184,7 @@ function BudgetLayout() {
           <Stack gap="xs">
             <Clickable onClick={income.edit}>
               <Group justify="space-between">
-                <Title order={2}>
+                <Title order={2} className={classes.incomeTitle}>
                   Income
                   <EditPencil />
                 </Title>
