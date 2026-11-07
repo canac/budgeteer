@@ -16,7 +16,7 @@
   }
 }
 
-/* The pencil takes the type icons' place while it shows */
+/* The edit icon takes the type icons' place while it shows */
 @media (hover: hover) {
   .typeIcons {
     transition: opacity 150ms ease;

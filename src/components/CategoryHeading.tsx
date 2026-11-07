@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import type { Deletable } from "~/components/CategoryModal";
 import { CategoryTypeIcons } from "~/components/CategoryTypeIcons";
 import { DynamicCategoryModal, preloadCategoryModal } from "~/components/DynamicCategoryModal";
-import { EditPencil } from "~/components/EditPencil";
+import { EditIcon } from "~/components/EditIcon";
 import { preloadOnHover } from "~/lib/preloadOnHover";
 import classes from "./CategoryHeading.module.css";
 
@@ -40,7 +40,7 @@ export function CategoryHeading({
           onClick={openEditModal}
         >
           {category.name}
-          <EditPencil size={28} />
+          <EditIcon size={28} />
         </UnstyledButton>,
       )}
       <CategoryTypeIcons className={classes.typeIcons} category={category} size={28} />

@@ -7,7 +7,7 @@ import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { AddTransferButton } from "~/components/AddTransferButton";
 import { CategoryHeading } from "~/components/CategoryHeading";
 import { Clickable } from "~/components/Clickable";
-import { EditPencil } from "~/components/EditPencil";
+import { EditIcon } from "~/components/EditIcon";
 import { ListRow } from "~/components/List";
 import { MantineActionIconLink } from "~/components/MantineActionIconLink";
 import { TransactionList } from "~/components/TransactionList";
@@ -146,7 +146,7 @@ function CategoryDetailsPage() {
               </Text>
               <Group gap={0} wrap="nowrap">
                 {currentBalance.field}
-                {currentBalance.edit && !currentBalance.editing && <EditPencil size={28} />}
+                {currentBalance.edit && !currentBalance.editing && <EditIcon size={28} />}
               </Group>
             </Clickable>
 
