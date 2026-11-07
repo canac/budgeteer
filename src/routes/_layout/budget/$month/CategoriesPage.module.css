@@ -37,3 +37,16 @@
     cursor: grabbing;
   }
 }
+
+/* Take up all the line's spare space, so the toggle keeps its basis until it wraps and then fills its own line */
+.heading {
+  flex-grow: 1000;
+}
+
+.viewToggle {
+  flex: 1 1 18rem;
+
+  > * {
+    flex: 1;
+  }
+}

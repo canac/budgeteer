@@ -163,8 +163,10 @@ function CategoriesPage() {
       <Card shadow="sm">
         <Stack gap="xs">
           <Group justify="space-between">
-            <Title order={2}>Categories</Title>
-            <ButtonGroup>
+            <Title order={2} className={classes.heading}>
+              Categories
+            </Title>
+            <ButtonGroup className={classes.viewToggle}>
               <Button
                 variant={viewMode === "budgeted" ? "filled" : "outline"}
                 size="xs"
