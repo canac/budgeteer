@@ -1,17 +1,35 @@
-import { ActionIcon, Alert, Button, Group, Stack, Switch, Table, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Alert,
+  Badge,
+  Button,
+  Collapse,
+  Group,
+  Menu,
+  Paper,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
 import {
   IconAlertTriangle,
   IconArchive,
-  IconArchiveOff,
+  IconArrowBackUp,
   IconBuildingBank,
+  IconChevronRight,
+  IconDotsVertical,
+  IconPlayerPause,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
 import { usePlaidLink, type PlaidLinkOnExit, type PlaidLinkOnSuccess } from "react-plaid-link";
 import { extractErrorMessage } from "src/lib/error";
 import invariant from "tiny-invariant";
 import { showNotification } from "~/components/LazyNotifications";
+import { List, ListRow } from "~/components/List";
 import { createLinkToken as createLinkTokenFn } from "~/functions/createLinkToken";
 import { createUpdateLinkToken as createUpdateLinkTokenFn } from "~/functions/createUpdateLinkToken";
 import { exchangePublicToken as exchangePublicTokenFn } from "~/functions/exchangePublicToken";
@@ -20,6 +38,7 @@ import { getExternalConnections } from "~/functions/getExternalConnections";
 import { markConnectionReconnected as markConnectionReconnectedFn } from "~/functions/markConnectionReconnected";
 import { setExternalAccountArchived as setExternalAccountArchivedFn } from "~/functions/setExternalAccountArchived";
 import { setExternalAccountEnabled as setExternalAccountEnabledFn } from "~/functions/setExternalAccountEnabled";
+import classes from "./AccountsPage.module.css";
 
 export const Route = createFileRoute("/_layout/import/accounts")({
   component: AccountsPage,
@@ -40,6 +59,7 @@ function AccountsPage() {
   const setExternalAccountEnabled = useServerFn(setExternalAccountEnabledFn);
   const setExternalAccountArchived = useServerFn(setExternalAccountArchivedFn);
 
+  const [showArchived, setShowArchived] = useState(false);
   const [linkToken, setLinkToken] = useState<string | null>(null);
   // Set while reauthenticating an existing Item (update mode)
   const [reconnectId, setReconnectId] = useState<string | null>(null);
@@ -138,9 +158,11 @@ function AccountsPage() {
   };
 
   const needsReconnect = connections.filter((connection) => connection.loginRequired);
+  const activeAccounts = accounts.filter((account) => !account.archived);
+  const archivedAccounts = accounts.filter((account) => account.archived);
 
   return (
-    <Stack>
+    <Stack className="list-column">
       {needsReconnect.map((connection) => (
         <Alert
           key={connection.id}
@@ -166,44 +188,103 @@ function AccountsPage() {
       {accounts.length === 0 ? (
         <Text c="dimmed">No accounts enrolled yet.</Text>
       ) : (
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Institution</Table.Th>
-              <Table.Th>Account</Table.Th>
-              <Table.Th ta="center">Sync transactions</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {accounts.map((account) => (
-              <Table.Tr key={account.id} c={account.archived ? "dimmed" : undefined}>
-                <Table.Td>{account.institution}</Table.Td>
-                <Table.Td>{account.name}</Table.Td>
-                <Table.Td ta="center">
-                  <Group justify="center">
-                    <Switch
-                      checked={account.enabled}
-                      disabled={account.archived}
-                      onChange={(event) => handleToggle(account.id, event.currentTarget.checked)}
-                      aria-label={`${account.enabled ? "Disable" : "Enable"} ${account.name}`}
+        <Paper withBorder className={classes.panel}>
+          {activeAccounts.length > 0 && (
+            <List className={classes.list}>
+              {activeAccounts.map((account) => (
+                <ListRow
+                  key={account.id}
+                  className={classes.row}
+                  title={account.name}
+                  meta={account.institution}
+                  actions={
+                    <Group gap={4} wrap="nowrap">
+                      <Badge
+                        variant="light"
+                        color={account.enabled ? "green" : "gray"}
+                        leftSection={<span className={classes.dot} />}
+                      >
+                        {account.enabled ? "Syncing" : "Paused"}
+                      </Badge>
+                      <Menu position="bottom-end">
+                        <Menu.Target>
+                          <ActionIcon
+                            variant="subtle"
+                            color="gray"
+                            size="lg"
+                            aria-label={`Options for ${account.name}`}
+                          >
+                            <IconDotsVertical size={18} />
+                          </ActionIcon>
+                        </Menu.Target>
+                        <Menu.Dropdown>
+                          <Menu.Item
+                            leftSection={
+                              account.enabled ? (
+                                <IconPlayerPause size={16} />
+                              ) : (
+                                <IconRefresh size={16} />
+                              )
+                            }
+                            onClick={() => handleToggle(account.id, !account.enabled)}
+                          >
+                            {account.enabled ? "Pause syncing" : "Resume syncing"}
+                          </Menu.Item>
+                          <Menu.Item
+                            color="red"
+                            leftSection={<IconArchive size={16} />}
+                            onClick={() => handleArchive(account.id, true)}
+                          >
+                            Archive account
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
+                    </Group>
+                  }
+                />
+              ))}
+            </List>
+          )}
+          {archivedAccounts.length > 0 && (
+            <>
+              <UnstyledButton
+                className={classes.footer}
+                aria-expanded={showArchived}
+                onClick={() => setShowArchived(!showArchived)}
+              >
+                <IconChevronRight size={16} className={classes.chevron} />
+                {archivedAccounts.length} archived{" "}
+                {archivedAccounts.length === 1 ? "account" : "accounts"}
+              </UnstyledButton>
+              <Collapse expanded={showArchived}>
+                <List className={clsx(classes.list, classes.archived)}>
+                  {archivedAccounts.map((account) => (
+                    <ListRow
+                      key={account.id}
+                      className={classes.row}
+                      title={
+                        <Text span c="dimmed">
+                          {account.name}
+                        </Text>
+                      }
+                      meta={account.institution}
+                      actions={
+                        <ActionIcon
+                          variant="subtle"
+                          size="lg"
+                          aria-label={`Unarchive ${account.name}`}
+                          onClick={() => handleArchive(account.id, false)}
+                        >
+                          <IconArrowBackUp size={18} />
+                        </ActionIcon>
+                      }
                     />
-                  </Group>
-                </Table.Td>
-                <Table.Td ta="right">
-                  <ActionIcon
-                    variant="subtle"
-                    size="lg"
-                    aria-label={`${account.archived ? "Unarchive" : "Archive"} ${account.name}`}
-                    onClick={() => handleArchive(account.id, !account.archived)}
-                  >
-                    {account.archived ? <IconArchiveOff /> : <IconArchive />}
-                  </ActionIcon>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+                  ))}
+                </List>
+              </Collapse>
+            </>
+          )}
+        </Paper>
       )}
     </Stack>
   );
