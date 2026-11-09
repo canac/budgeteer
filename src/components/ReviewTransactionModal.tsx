@@ -210,7 +210,12 @@ export function ReviewTransactionModal({
             {...form.getInputProps("outcome")}
             onChange={(value) => {
               const chosen: Outcome = value === "dismiss" ? "dismiss" : "categorize";
+              const remembered = form.getValues().remember;
               form.setFieldValue("outcome", chosen);
+
+              if (remembered) {
+                return;
+              }
 
               let keepSuggestion: boolean;
               if (chosen !== initialOutcome) {
