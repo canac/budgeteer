@@ -95,7 +95,7 @@ function OverviewPage() {
           </MantineLink>
         </Title>
 
-        <SimpleGrid cols={{ base: 1, sm: 4 }}>
+        <SimpleGrid cols={{ base: 2, sm: 4 }}>
           <Card shadow="sm">
             <Stack gap="xs">
               <Text size="sm" c="dimmed" fw={500}>
