@@ -70,11 +70,6 @@ const theme = createTheme({
         size: "md",
       },
     },
-    Table: {
-      defaultProps: {
-        striped: true,
-      },
-    },
   },
 });
 
