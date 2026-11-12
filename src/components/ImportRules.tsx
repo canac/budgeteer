@@ -2,6 +2,7 @@ import { Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import clsx from "clsx";
 import { useState } from "react";
 import type { RuleDraft } from "~/components/RuleModal";
 import type { VendorRules } from "~/lib/ruleLookup";
@@ -66,7 +67,7 @@ export function ImportRules({ rules }: ImportRulesProps) {
                   <>
                     {vendor}
                     <span className={classes.ruleSeparator}>•</span>
-                    <span className={classes.ruleAmount}>
+                    <span className={clsx(classes.ruleAmount, { positive: amountRule.amount > 0 })}>
                       {formatSignedCurrency(amountRule.amount)}
                     </span>
                   </>
