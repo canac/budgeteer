@@ -1,7 +1,6 @@
 import { Card, Group, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { parseISO } from "date-fns";
-import { AddTransactionButton } from "~/components/AddTransactionButton";
 import { TransactionList } from "~/components/TransactionList";
 import { getBudgetTransactions } from "~/functions/getBudgetTransactions";
 import { monthFormatter } from "~/lib/formatters";
@@ -28,12 +27,9 @@ function TransactionsPage() {
     <>
       <Card shadow="sm">
         <Stack gap="xs">
-          <Group justify="space-between">
-            <Group gap="xs">
-              <Title order={2}>Transactions</Title>
-              <Text c="dimmed">{transactions.length}</Text>
-            </Group>
-            <AddTransactionButton />
+          <Group gap="xs">
+            <Title order={2}>Transactions</Title>
+            <Text c="dimmed">{transactions.length}</Text>
           </Group>
           <TransactionList transactions={transactions} showCategories month={month} />
         </Stack>
