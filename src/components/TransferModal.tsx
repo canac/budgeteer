@@ -220,24 +220,26 @@ export function TransferModal({
               />
             </Stack>
           </Fieldset>
-          <Text size="sm" c="dimmed">
-            Transfer Date: {fullDateFormatter.format(transferDate)}
-          </Text>
           <ModalFooter>
-            {isEditing && onDelete && (
-              <Button
-                color="red"
-                {...preloadOnHover(preloadDeleteTransactionModal)}
-                onClick={deletion.confirm}
-              >
-                Delete
-              </Button>
-            )}
-            {!readOnlyReason && (
-              <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
-                {isEditing ? "Update" : "Save"}
-              </Button>
-            )}
+            <Text size="sm" c="dimmed">
+              Transfer Date: {fullDateFormatter.format(transferDate)}
+            </Text>
+            <Group gap="sm">
+              {isEditing && onDelete && (
+                <Button
+                  color="red"
+                  {...preloadOnHover(preloadDeleteTransactionModal)}
+                  onClick={deletion.confirm}
+                >
+                  Delete
+                </Button>
+              )}
+              {!readOnlyReason && (
+                <Button type="submit" loading={form.submitting} disabled={!form.isValid()}>
+                  {isEditing ? "Update" : "Save"}
+                </Button>
+              )}
+            </Group>
           </ModalFooter>
         </Stack>
       </form>
