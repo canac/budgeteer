@@ -17,7 +17,7 @@ interface ChartDatum {
   category: string;
   percentageSpent: number;
   spent: number;
-  budgeted: number;
+  budgetedAmount: number;
 }
 
 function isChartDatum(value: unknown): value is ChartDatum {
@@ -47,7 +47,7 @@ function Tooltip({ payload }: { payload: ReadonlyArray<{ payload?: unknown }> })
         </Text>
       </Group>
       <Text size="sm" c="dimmed" mt={4} ml="calc(12px + var(--mantine-spacing-sm))">
-        {formatCurrency(datum.spent)} of {formatCurrency(datum.budgeted)}
+        {formatCurrency(datum.spent)} of {formatCurrency(datum.budgetedAmount)}
       </Text>
     </Paper>
   );
@@ -72,17 +72,17 @@ function OverviewPage() {
   const isMobile = useMediaQuery("(max-width: 48em)");
 
   const chartData: ChartDatum[] = [
-    ...categories.map(({ category, spent, budgeted }) => ({
+    ...categories.map(({ category, spent, budgetedAmount }) => ({
       category: category.name,
-      percentageSpent: budgeted === 0 ? 1 : spent / budgeted,
+      percentageSpent: budgetedAmount === 0 ? 1 : spent / budgetedAmount,
       spent,
-      budgeted,
+      budgetedAmount,
     })),
     {
       category: "Total",
       percentageSpent: totalBudgeted === 0 ? 1 : totalSpent / totalBudgeted,
       spent: totalSpent,
-      budgeted: totalBudgeted,
+      budgetedAmount: totalBudgeted,
     },
   ];
 

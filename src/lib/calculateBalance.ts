@@ -11,7 +11,6 @@ type BudgetCategoryWithCategory = Pick<BudgetCategory, "categoryId"> & {
 
 interface BalanceFields {
   spent: number;
-  budgeted: number;
   balance: number;
 }
 
@@ -86,7 +85,6 @@ export async function calculateBalances<BC extends BudgetCategoryWithCategory>(
     return {
       ...budgetCategory,
       spent: monthTransactionTotal === 0 ? 0 : -monthTransactionTotal,
-      budgeted,
       balance: budgeted + transactionTotal,
     } satisfies BC & BalanceFields;
   });
